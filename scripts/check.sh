@@ -28,7 +28,8 @@ if [ "${1:-}" = "--quick" ]; then
     changed=$({ git diff --name-only HEAD; git ls-files --others --exclude-standard; } | grep -E '\.[Rr]$' | sort -u || true)
     if [ -n "$changed" ]; then
         # shellcheck disable=SC2086
-        Rscript -e 'files <- commandArgs(TRUE); files <- files[file.exists(files)]
+        Rscript -e 'pkgload::load_all(quiet = TRUE)
+            files <- commandArgs(TRUE); files <- files[file.exists(files)]
             lints <- do.call(c, lapply(files, lintr::lint))
             if (length(lints)) { print(lints); quit(status = 1) }' $changed || fail "lintr"
     fi
@@ -53,7 +54,7 @@ step "1/5 air format --check"
 air format --check . || fail "air format --check"
 
 step "2/5 lintr::lint_package()"
-Rscript -e 'lints <- lintr::lint_package(); if (length(lints)) { print(lints); quit(status = 1) }' || fail "lintr::lint_package()"
+Rscript -e 'pkgload::load_all(quiet = TRUE); lints <- lintr::lint_package(); if (length(lints)) { print(lints); quit(status = 1) }' || fail "lintr::lint_package()"
 
 step "3/5 devtools::document()"
 before=$(doc_state)

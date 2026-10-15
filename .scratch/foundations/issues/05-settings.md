@@ -1,6 +1,6 @@
 # Settings
 
-Status: ready-for-agent
+Status: done
 Type: task
 Blocked by: 04
 
@@ -21,6 +21,10 @@ Implement `anndata_settings`, `with_anndata_settings()` and `local_anndata_setti
 - Tests for get, set, validation errors by class, reset, scoped override (including nesting and error exit), interaction with `options()`, and printing (snapshot test)
 - Exported functions are fully documented with runnable examples
 - `scripts/check.sh` passes
+
+## Comments
+
+- 2026-10-15: Implemented `R/settings.R` with tests and a print snapshot. `anndata_settings` is an S3 environment whose active bindings are added in `.onLoad()`, because active bindings do not survive installation. `$<-` and `[[<-` methods give classed errors (`anndata_invalid_setting_error`) for unknown names. Scoped overrides use `on.exit` via `do.call` (withr is only in Suggests and `rlang::defer` is not exported). `scripts/check.sh` now runs `pkgload::load_all()` before linting so `object_usage_linter` sees internals from other files.
 
 ## References
 

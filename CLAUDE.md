@@ -45,4 +45,7 @@ Kept brief and current by the loop.
 - `air.toml` and `.lintr` exist, check with `air format --check .` and `lintr::lint_package()`
 - `R CMD check` gives a NOTE "unable to verify current time" unless `_R_CHECK_SYSTEM_CLOCK_=false` is set, so always set it.
   Never treat a NOTE as acceptable.
+- Active bindings in package-level objects are lost on install, so create them in `.onLoad()`
+- Snapshots are only written by `scripts/check.sh --quick`, because `R CMD check` runs in a temp copy
+- Lint runs after `pkgload::load_all()` so cross-file internals are visible to `object_usage_linter`
 - Python is only used through `uv run --project tests/python ...`
