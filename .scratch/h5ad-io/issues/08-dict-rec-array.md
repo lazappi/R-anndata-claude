@@ -1,6 +1,6 @@
 # Dict and rec-array
 
-Status: needs-triage
+Status: ready-for-agent
 Type: task
 Blocked by: 05, 06
 

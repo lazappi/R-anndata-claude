@@ -1,6 +1,6 @@
 # obs_names_make_unique and var_names_make_unique
 
-Status: needs-triage
+Status: ready-for-agent
 Type: task
 Blocked by: 07
 

@@ -1,6 +1,6 @@
 # rhdf5 capability spike
 
-Status: needs-triage
+Status: ready-for-agent
 Type: research
 Blocked by: none
 

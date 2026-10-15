@@ -1,6 +1,6 @@
 # Dataframe
 
-Status: needs-triage
+Status: ready-for-agent
 Type: task
 Blocked by: 06, core-object/02
 

@@ -1,6 +1,6 @@
 # Sparse matrices
 
-Status: needs-triage
+Status: ready-for-agent
 Type: task
 Blocked by: 04, 05, core-object/01
 

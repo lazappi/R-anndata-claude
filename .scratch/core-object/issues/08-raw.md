@@ -1,6 +1,6 @@
 # Raw class and raw slot
 
-Status: needs-triage
+Status: ready-for-agent
 Type: task
 Blocked by: 05, 07
 

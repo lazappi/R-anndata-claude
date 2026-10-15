@@ -1,8 +1,8 @@
 # AnnData and Raw, read_h5ad and write_h5ad basics
 
-Status: needs-triage
+Status: ready-for-agent
 Type: task
-Blocked by: 07, 08, 09, core-object/08
+Blocked by: 07, 08, 09, core-object/09
 
 ## What
 

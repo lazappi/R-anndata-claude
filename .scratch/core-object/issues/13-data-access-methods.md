@@ -1,8 +1,8 @@
 # to_df, obs_vector, var_vector and key methods
 
-Status: needs-triage
+Status: ready-for-agent
 Type: task
-Blocked by: 08
+Blocked by: 06, 08
 
 ## What
 

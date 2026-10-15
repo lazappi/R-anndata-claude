@@ -1,6 +1,6 @@
 # Dense arrays, string arrays, scalars, null and bytes
 
-Status: needs-triage
+Status: ready-for-agent
 Type: task
 Blocked by: 03, 04
 

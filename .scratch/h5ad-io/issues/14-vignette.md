@@ -1,8 +1,8 @@
 # Package vignette
 
-Status: needs-triage
+Status: ready-for-agent
 Type: task
-Blocked by: 12
+Blocked by: 12, core-object/16
 
 ## What
 

@@ -1,8 +1,8 @@
 # read_h5ad and write_h5ad options
 
-Status: needs-triage
+Status: ready-for-agent
 Type: task
-Blocked by: 10
+Blocked by: 10, core-object/14
 
 ## What
 

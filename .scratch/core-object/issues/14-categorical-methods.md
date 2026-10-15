@@ -1,6 +1,6 @@
 # strings_to_categoricals and rename_categories
 
-Status: needs-triage
+Status: ready-for-agent
 Type: task
 Blocked by: 07
 

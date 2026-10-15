@@ -1,6 +1,6 @@
 # Realistic and compressed fixtures
 
-Status: needs-triage
+Status: ready-for-agent
 Type: task
 Blocked by: 11
 

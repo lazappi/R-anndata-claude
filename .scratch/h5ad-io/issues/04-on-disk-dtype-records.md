@@ -1,8 +1,8 @@
 # On-disk dtype preservation mechanism
 
-Status: needs-triage
+Status: ready-for-agent
 Type: task
-Blocked by: 02, 03, core-object/01
+Blocked by: 02, 03, core-object/01, core-object/10, core-object/11
 
 ## What
 

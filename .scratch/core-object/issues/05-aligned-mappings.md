@@ -1,6 +1,6 @@
 # Aligned mappings: obsm, varm, obsp, varp
 
-Status: needs-triage
+Status: ready-for-agent
 Type: task
 Blocked by: 03
 
