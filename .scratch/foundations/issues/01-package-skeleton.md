@@ -1,6 +1,6 @@
 # Package skeleton
 
-Status: ready-for-agent
+Status: done
 Type: task
 Blocked by: none
 
@@ -27,3 +27,11 @@ Create the `anndata.claude` package skeleton at the repository root with usethis
 
 - `.scratch/foundations/spec.md` (Package skeleton)
 - ADR 0001
+
+## Comments
+
+2026-10-15: Created DESCRIPTION, LICENSE, LICENSE.md, README.md, .Rbuildignore, .gitignore additions, testthat 3e setup with one placeholder test and roxygen package docs.
+`devtools::check()` gives 0 errors, 0 warnings and 0 notes, and tests pass.
+Placeholder `@importFrom` lines in `R/anndata.claude-package.R` avoid the unused-Imports note and should be removed as real code uses each package.
+`air.toml` and `.lintr` are already in `.Rbuildignore` for ticket 02.
+Released as `0.0.0.9000` (no bump, first ticket creating DESCRIPTION).

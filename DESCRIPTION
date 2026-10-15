@@ -1,0 +1,30 @@
+Package: anndata.claude
+Title: Annotated Data Matrices and Their On-Disk Formats
+Version: 0.0.0.9000
+Authors@R:
+    person("Luke", "Zappia", , "luke.zappia@gmail.com", role = c("aut", "cre"))
+Description: An R port of Python 'anndata' (reference release 0.13.4) for
+    annotated data matrices. The first priority is compatibility with the
+    anndata on-disk formats, so that objects read from a file are equal
+    whichever language wrote it.
+License: BSD_3_clause + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.3
+Depends:
+    R (>= 4.3)
+Imports:
+    cli,
+    lifecycle,
+    Matrix,
+    R6,
+    rhdf5,
+    rlang,
+    S4Vectors
+Suggests:
+    covr,
+    knitr,
+    rmarkdown,
+    testthat (>= 3.0.0),
+    withr
+Config/testthat/edition: 3

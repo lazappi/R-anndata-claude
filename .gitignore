@@ -1,3 +1,11 @@
 .reference/
 .ralph/
 STOP
+.Rproj.user/
+.Rhistory
+.RData
+.Ruserdata
+.DS_Store
+*.Rcheck/
+*.tar.gz
+.venv/

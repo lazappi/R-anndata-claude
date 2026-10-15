@@ -39,4 +39,7 @@ Kept brief and current by the loop.
 
 - `scripts/fetch-reference.sh` fetches the Python reference to `.reference/anndata/`
 - `scripts/check.sh` is the full check that must pass before every commit, and `scripts/check.sh --quick <test files>` is for use during development (both from foundations tickets 03 and later)
+- Until `scripts/check.sh` exists use `devtools::document()`, `devtools::test()` and `devtools::check()` (check takes about 2 minutes)
+- `LICENSE` needs `ORGANIZATION` as well as `COPYRIGHT HOLDER`, otherwise check gives a note
+- Placeholder `@importFrom` lines in `R/anndata.claude-package.R` silence the unused-Imports note, remove each once real code uses that package
 - Python is only used through `uv run --project tests/python ...`
