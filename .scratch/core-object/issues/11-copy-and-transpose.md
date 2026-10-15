@@ -1,6 +1,6 @@
 # copy and transpose
 
-Status: ready-for-agent
+Status: done
 Type: task
 Blocked by: 06, 08
 
@@ -20,3 +20,8 @@ Blocked by: 06, 08
 - `scripts/check.sh` passes
 
 ## Comments
+
+- 2026-10-15: Added `copy()` (reuses `subset_slots()` with no indices, so no unused-category removal), `transpose()` and an S3 `t.AnnData`.
+  `copy(filename=)` raises `anndata_not_supported_error` until backed mode.
+  Tests in `tests/testthat/test-copy-transpose.R`.
+  Full check and review passed.

@@ -451,6 +451,40 @@ AnnDataClass <- R6Class(
       }
       private$.raw <- make_raw(self, raw, call)
       invisible(self)
+    },
+    #' @description A deep copy that is independent of this object.
+    #' @param filename Must be `NULL` until backed mode is supported.
+    copy = function(filename = NULL) {
+      if (!is.null(filename)) {
+        abort_not_supported(
+          "Copying to a {.arg filename} is not yet supported.",
+          call = rlang::caller_env()
+        )
+      }
+      raw <- private$.raw
+      subset_slots(
+        self,
+        raw = if (!is.null(raw)) {
+          list(X = raw$X, var = raw$var, varm = as.list(raw$varm))
+        }
+      )
+    },
+    #' @description A new `AnnData` with observations and variables swapped.
+    #'   X and layers are transposed, obsm and varm and obsp and varp swap
+    #'   places, `uns` is kept and the Raw is dropped.
+    transpose = function() {
+      layers <- lapply(as.list(private$.layers), matrix_transpose)
+      AnnData(
+        obs = private$.var,
+        var = private$.obs,
+        uns = private$.uns,
+        obsm = as.list(private$.varm),
+        varm = as.list(private$.obsm),
+        obsp = as.list(private$.varp),
+        varp = as.list(private$.obsp),
+        layers = layers,
+        shape = if (!length(layers)) rev(self$shape)
+      )
     }
   ),
   active = list(
@@ -677,3 +711,9 @@ AnnDataClass <- R6Class(
     }
   )
 )
+
+#' @export
+#' @noRd
+t.AnnData <- function(x) {
+  .subset2(x, "transpose")()
+}
