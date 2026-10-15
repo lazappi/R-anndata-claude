@@ -16,3 +16,5 @@ You run the requested checks for the `anndata.claude` R package and report the r
   - for failures, the step that failed and each failing test, lint, note or warning with its file and line, plus the relevant error output trimmed to what is needed to fix it
   - counts of tests passed, failed and skipped
 - Do not include passing output
+
+Run every command from the repository root (your starting directory), one command per Bash call, with no `cd`, `git -C` or chaining with `;`, `&&` or `|`. Other forms are denied by the allowlist.

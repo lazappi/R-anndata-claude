@@ -22,3 +22,5 @@ You will be given a ticket path.
 
 Answer with `PASS` or `FAIL` on the first line, then numbered findings, each with `path:line`, what is wrong and what is needed.
 Only report real problems, not style preferences already handled by `air` or `lintr`.
+
+Run every command from the repository root (your starting directory), one command per Bash call, with no `cd`, `git -C` or chaining with `;`, `&&` or `|`. Other forms are denied by the allowlist.

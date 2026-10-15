@@ -12,3 +12,5 @@ You answer one narrowly scoped lookup question about this repository or the pinn
 - Report concise findings with `path:line` references and short quotes of the relevant code or text
 - Say plainly when something was not found and list where you looked
 - Do not speculate about Python behaviour beyond what the source shows, since that is the python-oracle's job
+
+Run every command from the repository root (your starting directory), one command per Bash call, with no `cd`, `git -C` or chaining with `;`, `&&` or `|`. Other forms are denied by the allowlist.

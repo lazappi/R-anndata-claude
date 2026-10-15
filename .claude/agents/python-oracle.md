@@ -17,3 +17,5 @@ You are the authority on the behaviour of Python anndata 0.13.4, the reference i
   - the script you ran, inline
   - `path:line` references to the responsible Python code
 - If the behaviour depends on versions or settings, say so and show each case
+
+Run every command from the repository root (your starting directory), one command per Bash call, with no `cd`, `git -C` or chaining with `;`, `&&` or `|`. Other forms are denied by the allowlist.

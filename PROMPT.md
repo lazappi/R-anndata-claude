@@ -91,6 +91,8 @@ To mark it blocked:
 ## Tools and permissions
 
 - Prefer the Read, Grep, Glob, Edit and Write tools over shell equivalents (`cat`, `grep`, `find`, `sed`)
+- Every run and subagent starts in the repository root.
+  Never use `cd` or `git -C`, because commands in those forms do not match the allowlist and are denied.
 - Run one command per Bash call.
   Avoid chaining with `;`, `&&` or `|`, because a chain is denied if any part of it is not allowlisted.
 - A permission denial is not a reason to stop or ask.
