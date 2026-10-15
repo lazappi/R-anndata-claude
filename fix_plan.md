@@ -20,4 +20,6 @@ The human owns the order of the Queue.
 
 ## Discovered
 
+- [ ] `.Rbuildignore` excludes `^tests/python$`, but ticket 06 needs `tests/python` available inside `R CMD check` (tests are copied into the check directory). Fix as part of foundations/06.
+
 ## Blocked
