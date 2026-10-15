@@ -21,7 +21,7 @@ The human owns the order of the Queue.
 - [x] h5ad-io/02: encoding table (`.scratch/h5ad-io/issues/02-encoding-table.md`)
 - [x] 🛑 Human checkpoint: review `.scratch/h5ad-io/rhdf5-spike.md` and `.scratch/h5ad-io/encoding-table.md` before core-object starts
 - [x] core-object/01: matrix value coercion and helpers (`.scratch/core-object/issues/01-matrix-values.md`)
-- [ ] core-object/02: obs and var data frame handling (`.scratch/core-object/issues/02-dataframe-inputs.md`)
+- [x] core-object/02: obs and var data frame handling (`.scratch/core-object/issues/02-dataframe-inputs.md`)
 - [ ] core-object/03: AnnData class and basic construction (`.scratch/core-object/issues/03-anndata-class-construction.md`)
 - [ ] core-object/04: X assignment and validation (`.scratch/core-object/issues/04-x-assignment.md`)
 - [ ] core-object/05: aligned mappings: obsm, varm, obsp, varp (`.scratch/core-object/issues/05-aligned-mappings.md`)

@@ -1,6 +1,6 @@
 # obs and var data frame handling
 
-Status: ready-for-agent
+Status: done
 Type: task
 Blocked by: none
 
@@ -25,3 +25,10 @@ Internal helpers that turn user input into the `S4Vectors::DataFrame` held in ob
 - `scripts/check.sh` passes
 
 ## Comments
+
+2026-10-15: Done in `R/annotation-frames.R` (`as_annotation_frame()`, `check_names_unique()`, `warn_names_not_unique()`) with tests in `test-annotation-frames.R`.
+- The index name lives in `S4Vectors::metadata(df)[["index_name"]]`, and is read from the `index_name` attribute of a `data.frame`. Later tickets must keep that metadata when copying, subsetting and transposing.
+- `NA` row names need `with_frame_names()`, because `rownames<-` and `DataFrame(row.names=)` reject them.
+- Python-confirmed: a frame with a default integer index warns and gets names `"0"`..`"n-1"` (R automatic row names behave the same way), and a wrong-length frame raises the `_mk_df_error` message.
+- Deliberate deviation: Python's dict path keeps non-string `obs_names` (e.g. int64) with no warning, but the ticket and spec require coercion with `anndata_implicit_modification_warning`, so a list with non-character names warns.
+- With no `expected` length, a list gets default names (Python overwrites the index), as in `aligned_df.py:66-67`.

@@ -47,6 +47,8 @@ Kept brief and current by the loop.
   Never treat a NOTE as acceptable.
 - The full check's document step fails if `man/` is new or changed, so run it once (it writes the files) then rerun
 - Matrix classes: use `Matrix::t()` (base `t()` misses the S4 method in tests) and `as(x, "lMatrix")` (`as(x, "lgCMatrix")` is deprecated)
+- `DataFrame` rejects `NA` row names via `rownames<-` and `DataFrame(row.names=)`, so set them with `with_frame_names()` (slot assignment), and the index name is kept in `metadata(df)$index_name`
+- Variables only used inside cli `{}` strings trip `object_usage_linter`, so compute values inline or pass them as condition fields
 - Active bindings in package-level objects are lost on install, so create them in `.onLoad()`
 - Snapshots are only written by `scripts/check.sh --quick`, because `R CMD check` runs in a temp copy
 - Lint runs after `pkgload::load_all()` so cross-file internals are visible to `object_usage_linter`
