@@ -1,6 +1,6 @@
 # Structural comparison helpers
 
-Status: in-progress
+Status: done
 Type: task
 Blocked by: 06
 
@@ -33,3 +33,6 @@ Its work is committed as-is in a work-in-progress commit.
 `scripts/check.sh` passed on this state when re-run by hand (coverage 81.29%).
 `tests/python/pyproject.toml` gained `pytest`, `dask` and `fast-array-utils`, because `anndata.tests.helpers` imports them.
 Still to do: confirm every acceptance criterion, run the reviewer (which now reviews all changes since the last tag), then do the bookkeeping, version bump and tag.
+
+2026-10-15 (loop): Confirmed every acceptance criterion. Full `scripts/check.sh` passed (0 errors, warnings or notes, coverage 81.29%) and the reviewer returned PASS. Released as v0.0.0.9006.
+Note: `_snaps/comparison.md` embeds digests of the smoke data, so update the snapshot if `write_smoke.py` data changes.
