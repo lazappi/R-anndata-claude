@@ -88,6 +88,18 @@ To mark it blocked:
 4. Commit the bookkeeping and exit.
    The next run picks a different item.
 
+## Tools and permissions
+
+- Prefer the Read, Grep, Glob, Edit and Write tools over shell equivalents (`cat`, `grep`, `find`, `sed`)
+- Run one command per Bash call.
+  Avoid chaining with `;`, `&&` or `|`, because a chain is denied if any part of it is not allowlisted.
+- A permission denial is not a reason to stop or ask.
+  Retry with a dedicated tool or an allowlisted command.
+  If an essential command is genuinely denied, mark the item blocked (step 8), naming the exact command and why it is needed.
+- Delegating builds and tests to the `checker` subagent is the intended workflow, not a way round a denial
+- Never end a run by asking a question, because nobody will answer.
+  Every run ends with a commit or with `.ralph/halt`.
+
 ## Hard rules
 
 - Never edit specs (`.scratch/*/spec.md`), ADRs, `PROMPT.md`, `ralph/`, `.claude/` or `scripts/ralph.sh`.
