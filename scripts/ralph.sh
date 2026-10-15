@@ -31,6 +31,10 @@ export CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS="${CLAUDE_CODE_PRINT_BG_WAIT_CEILING
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT" || exit 1
 
+# Keep the Mac awake (idle sleep, and system sleep on power) until this script exits.
+# Closing a laptop lid still sleeps it unless it is on power with an external display.
+caffeinate -i -s -w $$ &
+
 MAX_RUNS="${1:-${RALPH_MAX_RUNS:-20}}"
 MAX_IDLE="${RALPH_MAX_IDLE:-3}"
 MAX_LIMIT_WAIT="${RALPH_MAX_LIMIT_WAIT:-21600}"
