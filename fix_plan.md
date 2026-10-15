@@ -34,7 +34,7 @@ The human owns the order of the Queue.
 - [x] core-object/10: subsetting (`.scratch/core-object/issues/10-subsetting.md`)
 - [x] core-object/11: copy and transpose (`.scratch/core-object/issues/11-copy-and-transpose.md`)
 - [x] core-object/12: obs_names_make_unique and var_names_make_unique (`.scratch/core-object/issues/12-make-unique.md`)
-- [ ] core-object/13: to_df, obs_vector, var_vector and key methods (`.scratch/core-object/issues/13-data-access-methods.md`)
+- [x] core-object/13: to_df, obs_vector, var_vector and key methods (`.scratch/core-object/issues/13-data-access-methods.md`)
 - [ ] core-object/14: strings_to_categoricals and rename_categories (`.scratch/core-object/issues/14-categorical-methods.md`)
 - [ ] core-object/15: printing (`.scratch/core-object/issues/15-printing.md`)
 - [ ] core-object/16: R generics and comparison error (`.scratch/core-object/issues/16-generics-and-comparison.md`)
@@ -56,6 +56,8 @@ The human owns the order of the Queue.
 - [x] `.Rbuildignore` excludes `^tests/python$`, but ticket 06 needs `tests/python` available inside `R CMD check` (tests are copied into the check directory). Fix as part of foundations/06.
 
 - [x] Deadlock: core-object/06 has `Blocked by: 04`, but 04's last sub-item (`layers[[NA]]` assignment) needs 06. The human should remove 04 from 06's `Blocked by:` (06 can then finish 04's sub-item).
+
+- [ ] Python 0.13.4 marks `obs_vector`, `var_vector` and the `*_keys()` methods deprecated (they warn). core-object/13 does not warn, because the spec is silent. The human should decide whether to add an `anndata_deprecated_warning`.
 
 ## Blocked
 

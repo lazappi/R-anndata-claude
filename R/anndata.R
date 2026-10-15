@@ -494,6 +494,36 @@ AnnDataClass <- R6Class(
       )
       invisible(self)
     },
+    #' @description The data matrix X, or a layer, as a dense `data.frame`
+    #'   with `obs_names` as row names and `var_names` as column names.
+    #' @param layer Key of a layer, or `NULL` for X.
+    to_df = function(layer = NULL) {
+      adata_to_df(self, layer, rlang::caller_env())
+    },
+    #' @description Values of obs column `k`, or of variable `k` across
+    #'   observations (from X or `layer`).
+    #' @param k A column of `obs` or a name in `var_names`.
+    #' @param layer Key of a layer, or `NULL` for X.
+    obs_vector = function(k, layer = NULL) {
+      adata_vector(self, k, "obs", layer, rlang::caller_env())
+    },
+    #' @description Values of var column `k`, or of observation `k` across
+    #'   variables (from X or `layer`).
+    #' @param k A column of `var` or a name in `obs_names`.
+    #' @param layer Key of a layer, or `NULL` for X.
+    var_vector = function(k, layer = NULL) {
+      adata_vector(self, k, "var", layer, rlang::caller_env())
+    },
+    #' @description Column names of `obs`.
+    obs_keys = function() colnames(private$.obs),
+    #' @description Column names of `var`.
+    var_keys = function() colnames(private$.var),
+    #' @description Keys of `obsm`.
+    obsm_keys = function() private$.obsm$keys(),
+    #' @description Keys of `varm`.
+    varm_keys = function() private$.varm$keys(),
+    #' @description Sorted keys of `uns`.
+    uns_keys = function() sort(names(private$.uns) %||% character()),
     #' @description A new `AnnData` with observations and variables swapped.
     #'   X and layers are transposed, obsm and varm and obsp and varp swap
     #'   places, `uns` is kept and the Raw is dropped.
