@@ -494,6 +494,38 @@ AnnDataClass <- R6Class(
       )
       invisible(self)
     },
+    #' @description Converts character columns of `obs` and `var` with fewer
+    #'   distinct values than rows to unordered factors in place, with levels in
+    #'   natural order. Each conversion signals an `anndata_info_message`
+    #'   condition (`... storing 'key' as categorical`), which like Python's
+    #'   info log is silent unless a handler is set.
+    #' @param df A data frame to convert instead of `obs` and `var`. R data
+    #'   frames are values, so the converted frame is returned invisibly.
+    strings_to_categoricals = function(df = NULL) {
+      call <- rlang::caller_env()
+      if (!is.null(df)) {
+        return(invisible(categorise_frame(df, call)))
+      }
+      private$.obs <- categorise_frame(private$.obs, call)
+      private$.var <- categorise_frame(private$.var, call)
+      invisible(self)
+    },
+    #' @description Renames the levels of a factor column of `obs` (or `var`
+    #'   when `key` is not in `obs`), matching `categories` to the old levels by
+    #'   position.
+    #' @param key A factor column of `obs` or `var`.
+    #' @param categories Character vector of new levels, as many as the old.
+    rename_categories = function(key, categories) {
+      renamed <- rename_frame_categories(
+        private$.obs,
+        private$.var,
+        key,
+        categories,
+        rlang::caller_env()
+      )
+      private[[paste0(".", renamed$attr)]] <- renamed$frame
+      invisible(self)
+    },
     #' @description The data matrix X, or a layer, as a dense `data.frame`
     #'   with `obs_names` as row names and `var_names` as column names.
     #' @param layer Key of a layer, or `NULL` for X.

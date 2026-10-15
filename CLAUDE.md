@@ -61,4 +61,6 @@ Kept brief and current by the loop.
 - rhdf5 gotchas are in `.scratch/h5ad-io/rhdf5-spike.md`: read with `native = TRUE`, and use the low-level `H5D`/`H5A` API because high-level writes add `rhdf5-NA.OK` attributes and gzip
 - `.scratch/h5ad-io/encoding-table.md` has a generated block: after changing an encoding case, run `uv run --project tests/python python -I tests/python/encoding_table.py tests/testthat/fixtures .scratch/h5ad-io/encoding-table.md`, because a test checks it is current
 - Non-h5ad Python expectations are JSON written by a `tests/python/*_cases.py` script into `tests/testthat/fixtures/`, run from `scripts/regenerate-fixtures.sh` and guarded by a freshness test (see `make_unique_cases.py`)
+- Python's `logger.info` calls become `rlang::signal(class = "anndata_info_message")` (silent unless handled), test them with `withCallingHandlers()`
+- In Python fixture scripts pass plain lists to `pd.DataFrame(..., index=)`, because a `pd.Series` with a default index is reindexed to all `NA`
 - Python is only used through `uv run --project tests/python ...`, in tests via `run_python()` which sets a private `TMPDIR` (uv lock files left in the check temp dir cause a NOTE)

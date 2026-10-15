@@ -1,0 +1,484 @@
+{
+  "convert": {
+    "plain": {
+      "values": [
+        "b",
+        "a",
+        "b",
+        "a",
+        "c10",
+        "c2"
+      ],
+      "result": {
+        "categories": [
+          "a",
+          "b",
+          "c2",
+          "c10"
+        ],
+        "values": [
+          "b",
+          "a",
+          "b",
+          "a",
+          "c10",
+          "c2"
+        ]
+      },
+      "messages": [
+        "... storing 'col' as categorical"
+      ]
+    },
+    "all_unique": {
+      "values": [
+        "a",
+        "b",
+        "c",
+        "d",
+        "e",
+        "f"
+      ],
+      "result": null,
+      "messages": []
+    },
+    "with_na": {
+      "values": [
+        "x",
+        null,
+        "x",
+        "y",
+        null,
+        "y"
+      ],
+      "result": {
+        "categories": [
+          "x",
+          "y"
+        ],
+        "values": [
+          "x",
+          null,
+          "x",
+          "y",
+          null,
+          "y"
+        ]
+      },
+      "messages": [
+        "... storing 'col' as categorical"
+      ]
+    },
+    "unique_with_na": {
+      "values": [
+        "a",
+        null,
+        "b",
+        "c",
+        "d",
+        "e"
+      ],
+      "result": {
+        "categories": [
+          "a",
+          "b",
+          "c",
+          "d",
+          "e"
+        ],
+        "values": [
+          "a",
+          null,
+          "b",
+          "c",
+          "d",
+          "e"
+        ]
+      },
+      "messages": [
+        "... storing 'col' as categorical"
+      ]
+    },
+    "all_na": {
+      "values": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "result": null,
+      "messages": []
+    },
+    "mixed": {
+      "values": [
+        "a",
+        1,
+        "a",
+        1,
+        "a",
+        1
+      ],
+      "result": null,
+      "messages": []
+    },
+    "numbers": {
+      "values": [
+        1,
+        2,
+        1,
+        2,
+        1,
+        2
+      ],
+      "result": null,
+      "messages": []
+    },
+    "natural": {
+      "values": [
+        "c10",
+        "c2",
+        "c1",
+        "c10",
+        "c2",
+        "c1"
+      ],
+      "result": {
+        "categories": [
+          "c1",
+          "c2",
+          "c10"
+        ],
+        "values": [
+          "c10",
+          "c2",
+          "c1",
+          "c10",
+          "c2",
+          "c1"
+        ]
+      },
+      "messages": [
+        "... storing 'col' as categorical"
+      ]
+    },
+    "case": {
+      "values": [
+        "B",
+        "a",
+        "b",
+        "A",
+        "a",
+        "b"
+      ],
+      "result": {
+        "categories": [
+          "A",
+          "B",
+          "a",
+          "b"
+        ],
+        "values": [
+          "B",
+          "a",
+          "b",
+          "A",
+          "a",
+          "b"
+        ]
+      },
+      "messages": [
+        "... storing 'col' as categorical"
+      ]
+    },
+    "digits_first": {
+      "values": [
+        "10a",
+        "2a",
+        "a",
+        "10a",
+        "2a",
+        "a"
+      ],
+      "result": {
+        "categories": [
+          "2a",
+          "10a",
+          "a"
+        ],
+        "values": [
+          "10a",
+          "2a",
+          "a",
+          "10a",
+          "2a",
+          "a"
+        ]
+      },
+      "messages": [
+        "... storing 'col' as categorical"
+      ]
+    },
+    "single_row": {
+      "values": [
+        "a"
+      ],
+      "result": null,
+      "messages": []
+    }
+  },
+  "rename": {
+    "obs": {
+      "obs": {
+        "s": {
+          "categories": [
+            "W",
+            "X",
+            "Y"
+          ],
+          "values": [
+            "W",
+            "X",
+            "Y",
+            "W",
+            "X",
+            "Y"
+          ]
+        },
+        "both": {
+          "categories": [
+            "u",
+            "v"
+          ],
+          "values": [
+            "u",
+            "v",
+            "u",
+            "v",
+            "u",
+            "v"
+          ]
+        }
+      },
+      "var": {
+        "g": {
+          "categories": [
+            "p",
+            "q"
+          ],
+          "values": [
+            "p",
+            "q",
+            "p"
+          ]
+        },
+        "both": {
+          "categories": [
+            "k",
+            "l"
+          ],
+          "values": [
+            "k",
+            "l",
+            "k"
+          ]
+        }
+      }
+    },
+    "var": {
+      "obs": {
+        "s": {
+          "categories": [
+            "a",
+            "b",
+            "c"
+          ],
+          "values": [
+            "a",
+            "b",
+            "c",
+            "a",
+            "b",
+            "c"
+          ]
+        },
+        "both": {
+          "categories": [
+            "u",
+            "v"
+          ],
+          "values": [
+            "u",
+            "v",
+            "u",
+            "v",
+            "u",
+            "v"
+          ]
+        }
+      },
+      "var": {
+        "g": {
+          "categories": [
+            "P",
+            "Q"
+          ],
+          "values": [
+            "P",
+            "Q",
+            "P"
+          ]
+        },
+        "both": {
+          "categories": [
+            "k",
+            "l"
+          ],
+          "values": [
+            "k",
+            "l",
+            "k"
+          ]
+        }
+      }
+    },
+    "both_prefers_obs": {
+      "obs": {
+        "s": {
+          "categories": [
+            "a",
+            "b",
+            "c"
+          ],
+          "values": [
+            "a",
+            "b",
+            "c",
+            "a",
+            "b",
+            "c"
+          ]
+        },
+        "both": {
+          "categories": [
+            "A",
+            "B"
+          ],
+          "values": [
+            "A",
+            "B",
+            "A",
+            "B",
+            "A",
+            "B"
+          ]
+        }
+      },
+      "var": {
+        "g": {
+          "categories": [
+            "p",
+            "q"
+          ],
+          "values": [
+            "p",
+            "q",
+            "p"
+          ]
+        },
+        "both": {
+          "categories": [
+            "k",
+            "l"
+          ],
+          "values": [
+            "k",
+            "l",
+            "k"
+          ]
+        }
+      }
+    },
+    "swap_names": {
+      "obs": {
+        "s": {
+          "categories": [
+            "c",
+            "a",
+            "b"
+          ],
+          "values": [
+            "c",
+            "a",
+            "b",
+            "c",
+            "a",
+            "b"
+          ]
+        },
+        "both": {
+          "categories": [
+            "u",
+            "v"
+          ],
+          "values": [
+            "u",
+            "v",
+            "u",
+            "v",
+            "u",
+            "v"
+          ]
+        }
+      },
+      "var": {
+        "g": {
+          "categories": [
+            "p",
+            "q"
+          ],
+          "values": [
+            "p",
+            "q",
+            "p"
+          ]
+        },
+        "both": {
+          "categories": [
+            "k",
+            "l"
+          ],
+          "values": [
+            "k",
+            "l",
+            "k"
+          ]
+        }
+      }
+    },
+    "missing_key": {
+      "error": "ValueError",
+      "message": "nope is neither in `.obs` nor in `.var`."
+    },
+    "not_categorical": {
+      "error": "AttributeError",
+      "message": "Can only use .cat accessor with a 'category' dtype"
+    },
+    "too_short": {
+      "error": "ValueError",
+      "message": "new categories need to have the same number of items as the old categories!"
+    },
+    "too_long": {
+      "error": "ValueError",
+      "message": "new categories need to have the same number of items as the old categories!"
+    },
+    "duplicates": {
+      "error": "ValueError",
+      "message": "Categorical categories must be unique"
+    },
+    "mapping": {
+      "error": "ValueError",
+      "message": "Only list-like `categories` is supported."
+    }
+  }
+}
