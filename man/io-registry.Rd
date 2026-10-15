@@ -53,7 +53,9 @@ them.
 \details{
 Encoding tickets add to the registry with \code{register_reader()} and
 \code{register_writer()}.
-Readers are called as \code{fn(elem, path)} with an open group or dataset handle.
+Readers are called as \code{fn(elem, path, store)} with an open group or dataset
+handle, its absolute path and the store it was opened from (rhdf5 cannot
+open a sibling dataset from a dataset handle).
 Writers are called as \code{fn(store, key, value, dataset_kwargs, path)} with an
 open group handle.
 Nested Elements go through \code{read_elem()} and \code{write_elem()} so that every

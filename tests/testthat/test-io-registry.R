@@ -48,7 +48,7 @@ test_that("write_elem passes options and overwrites existing keys", {
       rhdf5::h5writeAttribute(value$n, group, "n", asScalar = TRUE)
     }
   )
-  register_reader("test-elem", "0.1.0", function(elem, path) {
+  register_reader("test-elem", "0.1.0", function(elem, path, store) {
     rhdf5::H5Aread(rhdf5::H5Aopen(elem, "n"))
   })
   store <- local_h5_store()

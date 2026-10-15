@@ -68,4 +68,6 @@ Kept brief and current by the loop.
 - The element registry (`R/io-registry.R`) is internal until ticket 05: encodings call `register_writer()`/`register_reader()`, tests use `local_io_registry()` and `local_h5_store()` from `helper-io.R`
 - On-disk dtype records (`R/dtype.R`) are the `anndata_dtype` attribute plus S3 class `anndata_typed` for plain arrays, so use `set_dtype()`/`drop_dtype()`, compare classes with `drop_dtype()` in tests and allow `typed_class` in `is.object()` checks
 - rhdf5 gives no dataset sign from a dataset handle, so `read_dataset(loc, name)` takes a group or file handle and uses `h5ls`, and `H5Dread(bit64conversion = "double")` warns exactly when 64-bit values reach 2^53
+- Readers are called `fn(elem, path, store)`, and files calling `register_*()` at top level must collate after `io-registry.R` (e.g. `io-values.R`)
+- A scalar Element has no `dim` and a 1-element array has `dim` 1 (`as_array()`), and complex128 types come from a throwaway `h5createDataset(storage.mode = "complex")`
 - Python is only used through `uv run --project tests/python ...`, in tests via `run_python()` which sets a private `TMPDIR` (uv lock files left in the check temp dir cause a NOTE)

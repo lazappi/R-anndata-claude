@@ -1,6 +1,6 @@
 # Dense arrays, string arrays, scalars, null and bytes
 
-Status: ready-for-agent
+Status: done
 Type: task
 Blocked by: 03, 04
 
@@ -25,3 +25,16 @@ Register `array` 0.2.0, `string-array` 0.2.0, `numeric-scalar` 0.2.0, `string` 0
 - Apply the int32 -2147483648 rule from ticket 04 to arrays and scalars, with a fixture containing that value
 
 ## Comments
+
+2026-10-16: Done (`R/io-values.R`, tests in `test-io-values.R`).
+- Scalar versus array is carried by `dim`: a scalar read has none, a 1-element array read has `dim` 1, and `as_array()` (exported) adds a `dim`
+- Readers are now called as `fn(elem, path, store)` because rhdf5 cannot open a sibling dataset from a dataset handle (dtype needs `h5ls` of the parent)
+- Files that call `register_*()` at top level must collate after `io-registry.R` (hence the name `io-values.R`)
+- `find_writer()` looks up the class of `drop_dtype(value)`, so records do not hide the class
+- `NA_real_` is normalised to NaN in `write_dataset()`
+- Integer, logical and character `NA` raise `anndata_io_registry_error` until ticket 06 adds the nullable encodings (06 must replace that check in `write_values()`)
+- `bytes` reads as a `raw` vector. Python's own rewrite turns integer and float32 scalars into int64 and float64 and cannot write a complex scalar, so the R -> Python -> R test accounts for that
+- complex128 is written by taking the type from a throwaway dataset made with `h5createDataset(storage.mode = "complex")`, since rhdf5 has no exported compound builder
+- `dataset_kwargs` (compression, chunking) is ignored for now and belongs to ticket 11, so scalars are trivially uncompressed
+- Ticket 09 must strip the length-1 `dim` when reading dataframe columns from `read_elem()` values
+- New fixtures `array_int32_min` and `scalar_int32_min`, plus `tests/python/rewrite.py`

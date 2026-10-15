@@ -212,6 +212,9 @@ def _element_cases():
     cases["array_float64_special"] = lambda: np.array(SPECIAL)
     cases["array_float64_2d"] = lambda: np.arange(6, dtype="float64").reshape(2, 3)
     cases["array_int32_2d"] = lambda: np.arange(6, dtype="int32").reshape(2, 3)
+    # -2^31 shares its bit pattern with R's NA_integer_
+    cases["array_int32_min"] = lambda: np.array([-(2**31), 0, 5], dtype="int32")
+    cases["scalar_int32_min"] = lambda: np.int32(-(2**31))
     cases["array_float64_3d"] = lambda: np.arange(24, dtype="float64").reshape(2, 3, 4)
     cases["array_float64_empty"] = lambda: np.zeros(0)
     cases["array_float64_0x3"] = lambda: np.zeros((0, 3))

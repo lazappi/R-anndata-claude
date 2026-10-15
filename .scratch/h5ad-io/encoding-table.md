@@ -136,6 +136,7 @@ Both are in the table's last rows, and are recorded in the fixtures manifest und
 | `array_int16` | ndarray int16 (3,) | array 0.2.0 | array 0.2.0: int16 [3] = [1, 2, 3] |  |
 | `array_int32` | ndarray int32 (3,) | array 0.2.0 | array 0.2.0: int32 [3] = [1, 2, 3] |  |
 | `array_int32_2d` | ndarray int32 (2, 3) | array 0.2.0 | array 0.2.0: int32 [2x3] = [0, 1, 2, 3, 4, 5] |  |
+| `array_int32_min` | ndarray int32 (3,) | array 0.2.0 | array 0.2.0: int32 [3] = [-2147483648, 0, 5] |  |
 | `array_int64` | ndarray int64 (3,) | array 0.2.0 | array 0.2.0: int64 [3] = [1, 2, 3] |  |
 | `array_int8` | ndarray int8 (3,) | array 0.2.0 | array 0.2.0: int8 [3] = [1, 2, 3] |  |
 | `array_uint16` | ndarray uint16 (3,) | array 0.2.0 | array 0.2.0: uint16 [3] = [1, 2, 3] |  |
@@ -221,6 +222,7 @@ Both are in the table's last rows, and are recorded in the fixtures manifest und
 | `scalar_float64` | np.float64 scalar | numeric-scalar 0.2.0 | numeric-scalar 0.2.0: float64 [scalar] = [1.0] |  |
 | `scalar_int16` | np.int16 scalar | numeric-scalar 0.2.0 | numeric-scalar 0.2.0: int16 [scalar] = [1] |  |
 | `scalar_int32` | np.int32 scalar | numeric-scalar 0.2.0 | numeric-scalar 0.2.0: int32 [scalar] = [1] |  |
+| `scalar_int32_min` | np.int32 scalar | numeric-scalar 0.2.0 | numeric-scalar 0.2.0: int32 [scalar] = [-2147483648] |  |
 | `scalar_int64` | np.int64 scalar | numeric-scalar 0.2.0 | numeric-scalar 0.2.0: int64 [scalar] = [1] |  |
 | `scalar_int8` | np.int8 scalar | numeric-scalar 0.2.0 | numeric-scalar 0.2.0: int8 [scalar] = [1] |  |
 | `scalar_python_bool` | bool | numeric-scalar 0.2.0 | numeric-scalar 0.2.0: bool (enum int8: FALSE=0, TRUE=1) [scalar] = [True] |  |

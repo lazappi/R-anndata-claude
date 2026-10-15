@@ -10,7 +10,9 @@
 #'
 #' Encoding tickets add to the registry with `register_reader()` and
 #' `register_writer()`.
-#' Readers are called as `fn(elem, path)` with an open group or dataset handle.
+#' Readers are called as `fn(elem, path, store)` with an open group or dataset
+#' handle, its absolute path and the store it was opened from (rhdf5 cannot
+#' open a sibling dataset from a dataset handle).
 #' Writers are called as `fn(store, key, value, dataset_kwargs, path)` with an
 #' open group handle.
 #' Nested Elements go through `read_elem()` and `write_elem()` so that every
@@ -121,10 +123,10 @@ abort_awkward <- function(path, call = rlang::caller_env()) {
 read_elem <- function(store, path) {
   elem <- rhdf5::H5Oopen(store, path)
   on.exit(rhdf5::H5Oclose(elem), add = TRUE)
-  read_elem_object(elem)
+  read_elem_object(elem, store)
 }
 
-read_elem_object <- function(elem, call = rlang::caller_env()) {
+read_elem_object <- function(elem, store, call = rlang::caller_env()) {
   path <- rhdf5::H5Iget_name(elem)
   type <- read_elem_attr(elem, "encoding-type")
   version <- read_elem_attr(elem, "encoding-version")
@@ -153,11 +155,12 @@ read_elem_object <- function(elem, call = rlang::caller_env()) {
       call = call
     )
   }
-  fn(elem, path)
+  fn(elem, path, store)
 }
 
 find_writer <- function(value, path, call) {
-  for (class in methods::is(value)) {
+  # A dtype record adds an S3 class that hides the class the writer is under
+  for (class in methods::is(drop_dtype(value))) {
     writer <- io_registry$write[[class]]
     if (!is.null(writer)) {
       return(writer)

@@ -81,6 +81,10 @@
       "file": "h5ad/array_int32_2d.h5",
       "python": "ndarray int32 (2, 3)"
     },
+    "array_int32_min": {
+      "file": "h5ad/array_int32_min.h5",
+      "python": "ndarray int32 (3,)"
+    },
     "array_int64": {
       "file": "h5ad/array_int64.h5",
       "python": "ndarray int64 (3,)"
@@ -418,6 +422,10 @@
     },
     "scalar_int32": {
       "file": "h5ad/scalar_int32.h5",
+      "python": "np.int32 scalar"
+    },
+    "scalar_int32_min": {
+      "file": "h5ad/scalar_int32_min.h5",
       "python": "np.int32 scalar"
     },
     "scalar_int64": {

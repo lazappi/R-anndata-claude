@@ -248,14 +248,18 @@ sparse_write_dtypes <- function(x, path, call = rlang::caller_env()) {
   dtypes
 }
 
-# The dtype of a numeric dataset, or NA when it is not an integer or float.
+# The `h5ls()` row of a dataset: class, dtype, dataspace type and rank.
 # `h5ls()` is the only way to see the sign and width (no `H5Tget_sign`).
-h5_dtype <- function(loc, path) {
-  parent_path <- dirname(path)
-  parent <- rhdf5::H5Gopen(loc, parent_path)
+h5_info <- function(loc, path) {
+  parent <- rhdf5::H5Gopen(loc, dirname(path))
   on.exit(rhdf5::H5Gclose(parent), add = TRUE)
   listing <- rhdf5::h5ls(parent, recursive = FALSE, all = TRUE)
-  type <- listing$dtype[listing$name == basename(path)]
+  listing[listing$name == basename(path), , drop = FALSE]
+}
+
+# The dtype of a numeric dataset, or NA when it is not an integer or float
+h5_dtype <- function(loc, path) {
+  type <- h5_info(loc, path)$dtype
   match_type <- sub("BE$", "LE", type)
   names(h5_numeric_types)[match(match_type, h5_numeric_types)]
 }
@@ -292,11 +296,15 @@ read_h5_values <- function(dset, dtype, path, call) {
   # rhdf5 reads -2^31 as NA and prints a message about it
   values <- suppressMessages(rhdf5::H5Dread(dset))
   if (is.raw(values)) {
+    # A scalar dataspace has no dim
+    if (is.null(dim(values))) {
+      return(as.integer(values))
+    }
     return(array(as.integer(values), dim(values)))
   }
   if (identical(dtype, "int32") && anyNA(values)) {
     missing <- is.na(values)
-    values <- array(as.double(values), dim(values))
+    values <- structure(as.double(values), dim = dim(values))
     values[missing] <- -2^31
   }
   values
@@ -338,6 +346,10 @@ write_dataset <- function(
   path <- elem_path(loc, name)
   dtype <- write_dtype(x, path, call)
   values <- as.vector(drop_dtype(x))
+  if (is.double(values)) {
+    # `NA_real_` and `NaN` are both written as a plain NaN
+    values[is.na(values)] <- NaN
+  }
   dims <- dim(x) %||% length(x)
   space <- if (scalar) {
     rhdf5::H5Screate("H5S_SCALAR")
