@@ -25,8 +25,14 @@
 #' an `anndata_read_only_error`.
 #'
 #' @param X A numeric or logical matrix, or a `Matrix` sparse matrix, or `NULL`.
+#'   An `AnnData` supplies all its Slots, and then `obs`, `var`, `uns`, `obsm`,
+#'   `varm`, `obsp` and `varp` must not be given.
+#'   A `data.frame` or `DataFrame` is converted to a matrix, with a warning when
+#'   its columns differ in type, and its row and column names become the
+#'   obs_names and var_names. Automatic row names are ignored.
 #' @param obs,var Annotations of observations and variables as `NULL`, a named
-#'   list, a `data.frame` or a `DataFrame`.
+#'   list, a `data.frame` or a `DataFrame`. When `X` is a frame with names,
+#'   these must match them, unless they have no names of their own.
 #' @param uns Unstructured annotation, a named list or `NULL`.
 #' @param ... Must be empty, so that the arguments after `uns` are named.
 #' @param obsm,varm,obsp,varp,layers Aligned mappings as named lists or `NULL`.
@@ -43,6 +49,13 @@
 #' adata <- AnnData(matrix(as.numeric(1:6), nrow = 3))
 #' adata$shape
 #' adata$obs_names
+#'
+#' # From a data frame, whose names are kept
+#' df <- data.frame(a = c(1, 2), b = c(3, 4), row.names = c("r1", "r2"))
+#' AnnData(df)$obs_names
+#'
+#' # From another AnnData
+#' AnnData(adata)$shape
 #'
 #' @export
 AnnData <- function(
@@ -228,6 +241,82 @@ reshape_x <- function(value, shape, call) {
   copy_dtype(matrix(flat, shape[[1L]], shape[[2L]], byrow = TRUE), value)
 }
 
+is_given <- function(x) {
+  !is.null(x) && (length(x) > 0L || NROW(x) > 0L)
+}
+
+# Whether an annotation input carries no names of its own (Python: a
+# `RangeIndex`), so names from a data frame `X` can take their place
+has_default_names <- function(anno, attr) {
+  if (is.data.frame(anno)) {
+    automatic_row_names(anno)
+  } else if (methods::is(anno, "DataFrame")) {
+    is.null(rownames(anno))
+  } else {
+    !any(names(anno) %in% index_elements[[attr]])
+  }
+}
+
+with_default_names_replaced <- function(anno, attr, names) {
+  if (is.data.frame(anno)) {
+    rownames(anno) <- names
+  } else if (methods::is(anno, "DataFrame")) {
+    anno <- with_frame_names(anno, names)
+  } else {
+    anno[[index_elements[[attr]][[1L]]]] <- names
+  }
+  anno
+}
+
+# Row and column names of a data frame `X` become obs_names and var_names
+# unless obs and var bring names, which must then match (`verify`)
+frame_x_names <- function(x, obs, var) {
+  result <- list(obs_anno = obs, var_anno = var, verify = list())
+  dim_names <- list(
+    obs = if (is.data.frame(x) && automatic_row_names(x)) {
+      NULL
+    } else {
+      rownames(x)
+    },
+    var = colnames(x)
+  )
+  for (attr in c("obs", "var")) {
+    names <- dim_names[[attr]]
+    anno <- result[[paste0(attr, "_anno")]]
+    if (is.null(names)) {
+      next
+    }
+    if (is.null(anno)) {
+      anno <- list()
+      anno[[index_elements[[attr]][[1L]]]] <- names
+    } else if (has_default_names(anno, attr)) {
+      anno <- with_default_names_replaced(anno, attr, names)
+    } else {
+      result$verify[[attr]] <- names
+    }
+    result[[paste0(attr, "_anno")]] <- anno
+  }
+  result
+}
+
+# Mirrors `ensure_df_homogeneous`: warns when the columns differ in type
+homogeneous_matrix <- function(x, call) {
+  types <- vapply(
+    as.list(x),
+    function(column) paste(class(column), collapse = "/"),
+    character(1)
+  )
+  value <- as.matrix(x)
+  dimnames(value) <- NULL
+  if (length(unique(types)) > 1L) {
+    warn_implicit_modification(
+      "{.field X} converted to a matrix with type {.val {typeof(value)}}.",
+      call = call
+    )
+  }
+  value
+}
+
 #' @noRd
 AnnDataClass <- R6Class(
   "AnnData",
@@ -259,6 +348,34 @@ AnnDataClass <- R6Class(
            supported.",
           call = call
         )
+      }
+      if (inherits(X, "AnnData")) {
+        others <- list(obs, var, uns, obsm, varm, obsp, varp)
+        if (any(vapply(others, is_given, logical(1)))) {
+          abort_invalid_argument(
+            "If {.arg X} is an {.cls AnnData} no further arguments must be
+             provided.",
+            call
+          )
+        }
+        source_adata <- X
+        obs <- source_adata$obs
+        var <- source_adata$var
+        uns <- source_adata$uns
+        obsm <- as.list(source_adata$obsm)
+        varm <- as.list(source_adata$varm)
+        obsp <- as.list(source_adata$obsp)
+        varp <- as.list(source_adata$varp)
+        layers <- as.list(source_adata$layers)
+        raw <- source_adata$raw
+        X <- source_adata$X
+      }
+      x_names <- list()
+      if (is.data.frame(X) || methods::is(X, "DataFrame")) {
+        x_names <- frame_x_names(X, obs, var)
+        obs <- x_names$obs_anno
+        var <- x_names$var_anno
+        X <- homogeneous_matrix(X, call)
       }
       # Python takes X from layers[None] when X is not given
       layers_x <- if (is.list(layers)) layers[is.na(names(layers))] else list()
@@ -317,6 +434,16 @@ AnnDataClass <- R6Class(
         mapping <- aligned_mapping_class$new(self, attr)
         mapping$replace(initial[[attr]], call = call)
         private[[paste0(".", attr)]] <- mapping
+      }
+      for (attr in c("obs", "var")) {
+        expected <- x_names$verify[[attr]]
+        actual <- rownames(private[[paste0(".", attr)]])
+        if (!is.null(expected) && !identical(actual, expected)) {
+          abort_invalid_argument(
+            "Index of {.field {attr}} must match the names of {.field X}.",
+            call
+          )
+        }
       }
       if (get_setting("check_uniqueness")) {
         check_names_unique(rownames(private$.obs), "obs", call = call)

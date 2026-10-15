@@ -22,10 +22,16 @@ AnnData(
 )
 }
 \arguments{
-\item{X}{A numeric or logical matrix, or a \code{Matrix} sparse matrix, or \code{NULL}.}
+\item{X}{A numeric or logical matrix, or a \code{Matrix} sparse matrix, or \code{NULL}.
+An \code{AnnData} supplies all its Slots, and then \code{obs}, \code{var}, \code{uns}, \code{obsm},
+\code{varm}, \code{obsp} and \code{varp} must not be given.
+A \code{data.frame} or \code{DataFrame} is converted to a matrix, with a warning when
+its columns differ in type, and its row and column names become the
+obs_names and var_names. Automatic row names are ignored.}
 
 \item{obs, var}{Annotations of observations and variables as \code{NULL}, a named
-list, a \code{data.frame} or a \code{DataFrame}.}
+list, a \code{data.frame} or a \code{DataFrame}. When \code{X} is a frame with names,
+these must match them, unless they have no names of their own.}
 
 \item{uns}{Unstructured annotation, a named list or \code{NULL}.}
 
@@ -79,5 +85,12 @@ an \code{anndata_read_only_error}.
 adata <- AnnData(matrix(as.numeric(1:6), nrow = 3))
 adata$shape
 adata$obs_names
+
+# From a data frame, whose names are kept
+df <- data.frame(a = c(1, 2), b = c(3, 4), row.names = c("r1", "r2"))
+AnnData(df)$obs_names
+
+# From another AnnData
+AnnData(adata)$shape
 
 }
