@@ -24,3 +24,19 @@ Single-context: one `CONTEXT.md` plus `docs/adr/` at the repo root. See `docs/ag
 
 - Start at `.scratch/roadmap/spec.md`, which lists the sub-projects and their order
 - Python anndata 0.13.4 is the only reference, fetch it with `scripts/fetch-reference.sh` (to `.reference/anndata/`)
+
+## Ralph loop
+
+- Development runs as a Ralph loop: `scripts/ralph.sh` feeds `PROMPT.md` to a fresh `claude -p` run per item in `fix_plan.md`
+- Loop runs use `ralph/settings.json` (Sonnet, no plugins, project subagents only, no edits to specs, ADRs or loop config)
+- Project subagents are defined in `.claude/agents/`: `searcher` and `checker` (Haiku), and `python-oracle` and `reviewer` (Sonnet)
+- Create a `STOP` file at the root to stop the loop after the current run
+- Versions use tidyverse-style development numbers (`0.0.0.9000`), bumped by one and tagged `v<version>` only when a ticket is done
+
+## Build, test and learnings
+
+Kept brief and current by the loop.
+
+- `scripts/fetch-reference.sh` fetches the Python reference to `.reference/anndata/`
+- `scripts/check.sh` is the full check that must pass before every commit, and `scripts/check.sh --quick <test files>` is for use during development (both from foundations tickets 03 and later)
+- Python is only used through `uv run --project tests/python ...`
