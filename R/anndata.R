@@ -269,15 +269,7 @@ AnnDataClass <- R6Class(
           call = call
         )
       }
-      slots <- list(
-        uns = uns,
-        obsm = obsm,
-        varm = varm,
-        layers = layers,
-        raw = raw,
-        obsp = obsp,
-        varp = varp
-      )
+      slots <- list(uns = uns, layers = layers, raw = raw)
       for (slot in names(slots)) {
         if (!is.null(slots[[slot]])) {
           abort_slot_not_supported(slot, call)
@@ -298,7 +290,7 @@ AnnDataClass <- R6Class(
         dims <- if (!is.null(shape)) {
           check_shape(shape, call)
         } else {
-          infer_shape(obs, var)
+          infer_shape(obs, var, obsm, varm, obsp = obsp, varp = varp)
         }
         source <- "shape"
       }
@@ -319,6 +311,12 @@ AnnDataClass <- R6Class(
       private$.layers <- list()
       if (!is.null(X)) {
         private$set_x(X, call)
+      }
+      initial <- list(obsm = obsm, varm = varm, obsp = obsp, varp = varp)
+      for (attr in names(initial)) {
+        mapping <- aligned_mapping_class$new(self, attr)
+        mapping$replace(initial[[attr]], call = call)
+        private[[paste0(".", attr)]] <- mapping
       }
       if (get_setting("check_uniqueness")) {
         check_names_unique(rownames(private$.obs), "obs", call = call)
@@ -350,6 +348,21 @@ AnnDataClass <- R6Class(
         abort_read_only("var")
       }
       private$.var
+    },
+    #' @field obsm,varm Aligned mappings of axis arrays, see
+    #'   `anndata-aligned-mappings`. Assigning a named list replaces them.
+    obsm = function(value) {
+      private$aligned("obsm", value, missing(value), rlang::caller_env())
+    },
+    varm = function(value) {
+      private$aligned("varm", value, missing(value), rlang::caller_env())
+    },
+    #' @field obsp,varp Aligned mappings of pairwise arrays.
+    obsp = function(value) {
+      private$aligned("obsp", value, missing(value), rlang::caller_env())
+    },
+    varp = function(value) {
+      private$aligned("varp", value, missing(value), rlang::caller_env())
     },
     #' @field obs_names Names of observations.
     obs_names = function(value) {
@@ -412,6 +425,22 @@ AnnDataClass <- R6Class(
     .obs = NULL,
     .var = NULL,
     .layers = NULL,
+    .obsm = NULL,
+    .varm = NULL,
+    .obsp = NULL,
+    .varp = NULL,
+    # Gets an aligned mapping, or replaces its contents. Assigning the mapping
+    # itself is what `adata$obsm[["k"]] <- v` does after the mapping changed.
+    aligned = function(attr, value, get, call) {
+      mapping <- private[[paste0(".", attr)]]
+      if (get) {
+        return(mapping)
+      }
+      if (!identical(value, mapping)) {
+        mapping$replace(value, call = call)
+      }
+      invisible(NULL)
+    },
     # Validates X and stores it first in the layers storage under the `NA` key
     set_x = function(value, call) {
       position <- x_position(private$.layers)

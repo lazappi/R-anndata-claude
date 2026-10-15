@@ -50,6 +50,8 @@ Kept brief and current by the loop.
 - `DataFrame` rejects `NA` row names via `rownames<-` and `DataFrame(row.names=)`, so set them with `with_frame_names()` (slot assignment), and the index name is kept in `metadata(df)$index_name`
 - Variables only used inside cli `{}` strings trip `object_usage_linter`, so compute values inline or pass them as condition fields
 - `AnnData` is `AnnDataClass` (R6, `R/anndata.R`) wrapped by `AnnData()`: roxygen needs `@noRd` on the class, `@importFrom R6 R6Class` stays in the package file and `.lintr` allows the names `AnnData`, `AnnDataClass` and `X`
+- S3 methods for `$`, `[[` and similar need a plain `@export` tag (`@exportS3Method` breaks roxygen), and `R CMD check` needs `devtools::document()` to have registered them in `NAMESPACE`
+- Inside R6 classes with custom `$` methods use `.subset2()` and `private`, not `self$`, and `adata$obsm[["k"]] <- v` assigns the mapping back to the active binding, so it must ignore an identical value
 - Active bindings in package-level objects are lost on install, so create them in `.onLoad()`
 - Snapshots are only written by `scripts/check.sh --quick`, because `R CMD check` runs in a temp copy
 - Lint runs after `pkgload::load_all()` so cross-file internals are visible to `object_usage_linter`
