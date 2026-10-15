@@ -1,0 +1,15 @@
+[project]
+name = "anndata-claude-reference"
+version = "0.0.0"
+description = "Pinned Python reference environment for anndata.claude tests (scripts only, not a package)"
+requires-python = ">=3.12"
+dependencies = [
+    "anndata==0.13.4",
+    "pandas>=3",
+    "h5py",
+    "numpy",
+    "scipy",
+]
+
+[tool.uv]
+package = false

@@ -1,6 +1,6 @@
 # Python reference environment
 
-Status: ready-for-agent
+Status: done
 Type: task
 Blocked by: 03
 
@@ -22,3 +22,7 @@ Set up the pinned Python reference environment and the R helpers that call it, a
 - The smoke test passes with `uv` available, and is skipped (not failed) with `ANNDATA_SKIP_PYTHON=true`
 - `uv.lock` is committed and the environment builds from it
 - `scripts/check.sh` passes
+
+## Comments
+
+- 2026-10-15: Added `tests/python/` uv project (`pyproject.toml`, `uv.lock`, `versions.py`), `tests/testthat/helper-python.R` and `test-python.R`. `.Rbuildignore` now only excludes `tests/python/.venv` and `__pycache__`. Added `jsonlite` to Suggests for parsing script JSON in tests. `run_python()` runs scripts with `python -I` and gives uv its own `TMPDIR`, because uv lock files left in the check temp dir cause a detritus NOTE. Later scripts (`h5_tree.py` etc.) go in `tests/python/` and are called by name.

@@ -16,7 +16,8 @@
 ^air\.toml$
 ^\.lintr$
 ^\.air$
-^tests/python$
+^tests/python/\.venv$
+^tests/python/__pycache__$
 ^\.venv$
 ^\.Rproj\.user$
 ^.*\.Rproj$
