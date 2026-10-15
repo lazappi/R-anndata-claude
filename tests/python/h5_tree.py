@@ -53,6 +53,15 @@ def digest(dataset):
                 item = item.encode("utf-8")
             sha.update(bytes(item))
             sha.update(b"\0")
+    elif isinstance(values, np.ndarray) and values.dtype.names is not None:
+        # Compound members may hold object pointers, so hash field by field
+        for name in values.dtype.names:
+            sha.update(name.encode("utf-8"))
+            for item in np.asarray(values[name]).ravel().tolist():
+                if isinstance(item, str):
+                    item = item.encode("utf-8")
+                sha.update(item if isinstance(item, bytes) else repr(item).encode())
+                sha.update(b"\0")
     elif isinstance(values, (bytes, str)):
         sha.update(values.encode("utf-8") if isinstance(values, str) else values)
     else:

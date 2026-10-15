@@ -1,5 +1,8 @@
 {
   "cases": {
+    "spike_types": {
+      "file": "spike_types.h5"
+    },
     "trivial": {
       "file": "trivial.h5ad"
     }

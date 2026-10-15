@@ -22,9 +22,11 @@ Imports:
     rlang,
     S4Vectors
 Suggests:
+    bit64,
     covr,
     jsonlite,
     knitr,
+    rhdf5filters,
     rmarkdown,
     testthat (>= 3.0.0),
     withr

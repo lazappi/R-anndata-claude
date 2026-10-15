@@ -49,4 +49,5 @@ Kept brief and current by the loop.
 - Snapshots are only written by `scripts/check.sh --quick`, because `R CMD check` runs in a temp copy
 - Lint runs after `pkgload::load_all()` so cross-file internals are visible to `object_usage_linter`
 - Fixtures are regenerated with `scripts/regenerate-fixtures.sh` (cases registered in `tests/python/generate_fixtures.py`), and a test checks they match a fresh generation, so recommit them when a case changes
+- rhdf5 gotchas are in `.scratch/h5ad-io/rhdf5-spike.md`: read with `native = TRUE`, and use the low-level `H5D`/`H5A` API because high-level writes add `rhdf5-NA.OK` attributes and gzip
 - Python is only used through `uv run --project tests/python ...`, in tests via `run_python()` which sets a private `TMPDIR` (uv lock files left in the check temp dir cause a NOTE)
