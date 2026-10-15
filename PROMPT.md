@@ -22,6 +22,8 @@ No human is watching, so never wait for input.
 - If the first unchecked item in the Queue is a `🛑 Human checkpoint`, write its text to `.ralph/halt` and exit without other changes.
   Never tick a checkpoint or work past one, because only the human removes it.
 - If no item qualifies, write the reason to `.ralph/halt` (one or two lines) and exit without other changes
+- A problem with one item (a dependency cycle, a ticket that needs a human decision) is not a reason to halt while other items qualify.
+  Record it under **Discovered** for the human, skip that item and take the next one that qualifies.
 - Set the ticket's `Status:` to `in-progress` when you start it
 
 ## 2. Study before changing anything
