@@ -73,6 +73,28 @@ else:
     print("--- no result event found, see log")
 EOF
 
+    # List permission denials so allowlist gaps are visible
+    python3 - "$log" <<'EOF'
+import json, sys
+tools, denied = {}, []
+for line in open(sys.argv[1], encoding="utf-8", errors="replace"):
+    try:
+        event = json.loads(line)
+    except ValueError:
+        continue
+    if event.get("type") == "assistant":
+        for block in event.get("message", {}).get("content", []):
+            if block.get("type") == "tool_use":
+                args = block.get("input", {})
+                tools[block.get("id")] = args.get("command") or args.get("file_path") or block.get("name")
+    elif event.get("type") == "system" and event.get("subtype") == "permission_denied":
+        denied.append(tools.get(event.get("tool_use_id"), event.get("tool_name", "?")))
+if denied:
+    print(f"--- {len(denied)} permission denial(s):")
+    for d in denied:
+        print(f"    {d}")
+EOF
+
     after="$(git rev-parse HEAD)"
     if [ "$before" = "$after" ]; then
         idle=$((idle + 1))
@@ -80,6 +102,12 @@ EOF
     else
         idle=0
         git log --oneline "$before..$after"
+    fi
+
+    if [ -n "$(git status --porcelain)" ]; then
+        echo "Run $run left uncommitted changes, stopping. Inspect the log and the changes, then commit or discard."
+        git status --short
+        exit 1
     fi
 
     if [ -f .ralph/halt ]; then
