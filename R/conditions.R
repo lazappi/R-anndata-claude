@@ -87,12 +87,13 @@ abort_dimension <- function(
 abort_io_registry <- function(
   message,
   ...,
+  class = NULL,
   call = rlang::caller_env(),
   .envir = parent.frame()
 ) {
   anndata_abort(
     message,
-    "anndata_io_registry_error",
+    c(class, "anndata_io_registry_error"),
     ...,
     call = call,
     .envir = .envir
@@ -102,12 +103,13 @@ abort_io_registry <- function(
 abort_not_supported <- function(
   message,
   ...,
+  class = NULL,
   call = rlang::caller_env(),
   .envir = parent.frame()
 ) {
   anndata_abort(
     message,
-    "anndata_not_supported_error",
+    c(class, "anndata_not_supported_error"),
     ...,
     call = call,
     .envir = .envir

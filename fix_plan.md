@@ -40,7 +40,7 @@ The human owns the order of the Queue.
   - [ ] `rename_categories` renaming of scanpy `uns` rec-array fields (needs rec-array structure from h5ad-io/08)
 - [x] core-object/15: printing (`.scratch/core-object/issues/15-printing.md`)
 - [x] core-object/16: R generics and comparison error (`.scratch/core-object/issues/16-generics-and-comparison.md`)
-- [ ] h5ad-io/03: element registry and error classes (`.scratch/h5ad-io/issues/03-element-registry.md`)
+- [x] h5ad-io/03: element registry and error classes (`.scratch/h5ad-io/issues/03-element-registry.md`)
 - [ ] h5ad-io/04: on-disk dtype preservation mechanism (`.scratch/h5ad-io/issues/04-on-disk-dtype-records.md`)
 - [ ] h5ad-io/05: dense arrays, string arrays, scalars, null and bytes (`.scratch/h5ad-io/issues/05-dense-scalar-null.md`)
 - [ ] h5ad-io/06: nullable and categorical arrays (`.scratch/h5ad-io/issues/06-nullable-categorical.md`)

@@ -1,6 +1,6 @@
 # Element registry and error classes
 
-Status: ready-for-agent
+Status: done
 Type: task
 Blocked by: 01, 02
 
@@ -21,3 +21,11 @@ The dispatch layer that later tickets register encodings into.
 - `scripts/check.sh` passes
 
 ## Comments
+
+2026-10-15: Done (`R/io-registry.R`, `tests/testthat/test-io-registry.R`, helpers in `helper-io.R`).
+- Registry is the internal env `io_registry`. Add encodings with `register_reader(type, version, fn)` (`fn(elem, path)`) and `register_writer(class, type, version, fn)` (`fn(store, key, value, dataset_kwargs, path)`). Write dispatch uses `methods::is(value)` order.
+- `read_elem(store, path)` and `write_elem(store, key, value, dataset_kwargs)` are internal. Export them (with roxygen docs) in the first encoding ticket (05) once real encodings exist.
+- Nested Elements must go through `write_elem()`/`read_elem_object()` so slash checks and dispatch apply at every level. Writers that write into the root (`key == "/"`) must write into `store` itself.
+- Python conditions were confirmed from the 0.13.4 source (`registry.py:376-402`, `utils.py:283`), not by running Python. Errors use classes `anndata_io_registry_error`, `anndata_forward_slash_key_error`, `anndata_invalid_key_error`, `anndata_legacy_format_error` and `anndata_awkward_array_error` (the last two are also `anndata_not_supported_error`). `abort_io_registry()` and `abort_not_supported()` gained a `class` argument.
+- Old-categorical detection happens in the dataframe reader, so `abort_legacy_categorical(path)` exists but is only unit tested here. Ticket 09 must call it and test it end to end.
+- Not covered: Python's `report_*_key_on_error` notes (the errors name their own path instead).
