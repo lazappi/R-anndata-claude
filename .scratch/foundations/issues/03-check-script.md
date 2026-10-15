@@ -17,9 +17,12 @@ It runs, in order, and stops with a non-zero exit at the first failure:
 
 The output should make clear which step failed.
 
+`scripts/check.sh --quick [test files...]` is a fast mode for use during development.
+It runs `air format --check`, `lintr` on changed R files and `devtools::test()` restricted to the given test files (or all tests if none are given), skipping `R CMD check` and coverage.
+
 ## Acceptance criteria
 
-- `scripts/check.sh` passes on the current package
+- `scripts/check.sh` and `scripts/check.sh --quick` pass on the current package
 - Each step demonstrably fails the script when broken (e.g. an unformatted file, a lint or an undocumented change).
   Check this manually and describe it in the commit message, without committing the breakage.
 - Usage is documented in a short comment at the top of the script
