@@ -1,6 +1,6 @@
 # Check script
 
-Status: ready-for-agent
+Status: done
 Type: task
 Blocked by: 02
 
@@ -27,3 +27,10 @@ It runs `air format --check`, `lintr` on changed R files and `devtools::test()` 
 - Each step demonstrably fails the script when broken (e.g. an unformatted file, a lint or an undocumented change).
   Check this manually and describe it in the commit message, without committing the breakage.
 - Usage is documented in a short comment at the top of the script
+
+## Comments
+
+2026-10-15: Added `scripts/check.sh` (full and `--quick`). Both pass on the current package with no NOTEs.
+Step 4 uses `devtools::check(error_on = "note")`, and the document step compares checksums of `man/` and `NAMESPACE` before and after.
+Each step was shown to fail with a temporary breakage (removed afterwards): unformatted file (step 1), `camelCase` lint (step 2), exported roxygen function without regenerated docs (step 3), stray top-level file giving a NOTE (step 4).
+Released as `0.0.0.9002`.
