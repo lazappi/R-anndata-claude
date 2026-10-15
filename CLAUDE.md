@@ -1,7 +1,7 @@
 ## Committing
 
 - You are allowed to commit as needed in this project
-- You should acknowledge yourself on commits
+- You should acknowledge yourself on commits. When working as an autonomous agents, always do this.
 - Each commit should be an atomic unit of work
 - This project uses gitmoji commits, do not use conventional commits
 - Keep commit messages clear and brief
