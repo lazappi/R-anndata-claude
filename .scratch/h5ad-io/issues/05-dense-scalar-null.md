@@ -19,4 +19,9 @@ Register `array` 0.2.0, `string-array` 0.2.0, `numeric-scalar` 0.2.0, `string` 0
 - Scalar versus array behaviour is tested in both directions
 - `scripts/check.sh` passes
 
+## Decisions (human, 2026-10-15)
+
+- complex64 arrays and scalars raise a classed error naming the path on read, and only complex128 is written
+- Apply the int32 -2147483648 rule from ticket 04 to arrays and scalars, with a fixture containing that value
+
 ## Comments

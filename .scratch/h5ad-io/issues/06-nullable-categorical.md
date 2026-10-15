@@ -18,4 +18,8 @@ Register `nullable-integer`, `nullable-boolean`, `nullable-string-array` (all 0.
 - All three round-trip directions pass for each fixture
 - `scripts/check.sh` passes
 
+## Decisions (human, 2026-10-15)
+
+- Honour `allow_write_nullable_strings` as Python does: with `FALSE`, string arrays without missing values are written as `string-array`, and with missing values the write raises Python's error (fixtures `df_col_str_allow_nullable_false` and `df_col_str_na_allow_nullable_false`)
+
 ## Comments

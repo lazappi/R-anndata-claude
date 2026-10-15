@@ -20,4 +20,11 @@ Implement the mechanism from "On-disk dtype preservation": record the On-disk dt
 - Overflow on write errors with the documented class
 - `scripts/check.sh` passes
 
+## Decisions (human, 2026-10-15)
+
+- int64 and uint64: read as double when every value has magnitude below 2^53, otherwise a classed error naming the path.
+  `bit64` is not a dependency.
+- An int32 dataset containing -2147483648 (R's `NA_integer_` bit pattern) is read as double with an int32 record, so it writes back unchanged and is never silently `NA`
+- rec-array fields have no dtype records (ADR 0005)
+
 ## Comments

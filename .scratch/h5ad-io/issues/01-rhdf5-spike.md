@@ -1,6 +1,6 @@
 # rhdf5 capability spike
 
-Status: needs-info
+Status: ready-for-agent
 Type: research
 Blocked by: none
 
@@ -28,6 +28,15 @@ Add `rhdf5` and `rhdf5filters` to Imports (or Suggests if the spike shows that i
 - Each verdict is backed by a test that reads a Python-written fixture and writes a file that Python reads back
 - The int64 recommendation is stated
 - `scripts/check.sh` passes
+
+## Decisions (human, 2026-10-15)
+
+- rec-array: the rhdf5 development version (2.57.20) does not add the needed compound APIs either, so option 3 (accept the degradation, maximise compatibility) is taken.
+  See ADR 0005, the updated "rec-array" section of the spec, and the follow-up ticket 15.
+- int64: the encoding table's policy stands (double below 2^53, otherwise a classed error, no `bit64`)
+- int32 -2147483648: read as double with an int32 record, never as `NA` (spec "On-disk dtype preservation")
+
+To finish this ticket: add a short "Decision" note to the rec-array section of `.scratch/h5ad-io/rhdf5-spike.md` pointing at ADR 0005, then set the ticket to `done`, bump the version and tag as usual.
 
 ## Comments
 
