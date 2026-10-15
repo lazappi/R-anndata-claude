@@ -12,7 +12,8 @@ It runs, in order, and stops with a non-zero exit at the first failure:
 1. `air format --check .`
 2. `lintr::lint_package()`, failing if any lints are found
 3. `devtools::document()`, then failing if any file under `man/` or `NAMESPACE` changed
-4. `devtools::check()`, failing on any error, warning or note
+4. `devtools::check()`, failing on any error, warning or note.
+   Set `_R_CHECK_SYSTEM_CLOCK_=false` so the time-server check cannot produce a note.
 5. A `covr::package_coverage()` report (printed only, not enforced yet)
 
 The output should make clear which step failed.

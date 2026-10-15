@@ -43,5 +43,6 @@ Kept brief and current by the loop.
 - `LICENSE` needs `ORGANIZATION` as well as `COPYRIGHT HOLDER`, otherwise check gives a note
 - Placeholder `@importFrom` lines in `R/anndata.claude-package.R` silence the unused-Imports note, remove each once real code uses that package
 - `air.toml` and `.lintr` exist, check with `air format --check .` and `lintr::lint_package()`
-- `devtools::check()` may give a NOTE "unable to verify current time", it is environmental
+- `R CMD check` gives a NOTE "unable to verify current time" unless `_R_CHECK_SYSTEM_CLOCK_=false` is set, so always set it.
+  Never treat a NOTE as acceptable.
 - Python is only used through `uv run --project tests/python ...`

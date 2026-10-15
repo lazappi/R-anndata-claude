@@ -124,4 +124,6 @@ To mark it blocked:
 Corrections added by the human after watching earlier runs.
 They override anything above.
 
-- (none yet)
+- "No notes" means no notes.
+  Never rationalise an `R CMD check` NOTE, WARNING or lint as environmental or acceptable.
+  Fix the cause, or mark the item blocked if you cannot.
