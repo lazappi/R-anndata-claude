@@ -1,6 +1,6 @@
 # Matrix value coercion and helpers
 
-Status: ready-for-agent
+Status: done
 Type: task
 Blocked by: none
 
@@ -24,3 +24,11 @@ Internal helpers for the array values held in X, layers, obsm, varm, obsp and va
 - `scripts/check.sh` passes
 
 ## Comments
+
+2026-10-15: Added `R/matrix-values.R` with `as_anndata_matrix()` (validate/coerce, `allow_array` for 3+ dims), `matrix_dim()`, `matrix_subset(x, i, j)` and `matrix_transpose()`.
+Errors use `anndata_unsupported_value_error`.
+Matrix 1.x keeps CSR on `[` and `t()` here, but `matrix_transpose()` converts back to CSR explicitly as the spec requires.
+The On-disk dtype record is the `anndata_dtype` attribute (internal constant `dtype_attr`), copied by `copy_dtype()`.
+This is a test double, h5ad-io/04 may replace it and should change `copy_dtype()` only.
+`methods` was added to Imports (needed for `methods::is`/`as`) and `Matrix` is now used through `@importClassesFrom` and `Matrix::t`.
+Subsetting takes 1-based integer positions (or `NULL`), index resolution from R indices belongs to core-object/10.
