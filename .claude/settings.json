@@ -67,7 +67,21 @@
       "Bash(tree:*)",
       "Bash(xargs:*)",
       "Bash(env)",
-      "Bash(date:*)"
+      "Bash(date:*)",
+      "Bash(cd /Users/luke/Documents/Code/lazappi/R-anndata-claude)",
+      "Bash(git -C /Users/luke/Documents/Code/lazappi/R-anndata-claude status:*)",
+      "Bash(git -C /Users/luke/Documents/Code/lazappi/R-anndata-claude diff:*)",
+      "Bash(git -C /Users/luke/Documents/Code/lazappi/R-anndata-claude log:*)",
+      "Bash(git -C /Users/luke/Documents/Code/lazappi/R-anndata-claude show:*)",
+      "Bash(git -C /Users/luke/Documents/Code/lazappi/R-anndata-claude add:*)",
+      "Bash(git -C /Users/luke/Documents/Code/lazappi/R-anndata-claude commit:*)",
+      "Bash(git -C /Users/luke/Documents/Code/lazappi/R-anndata-claude tag:*)",
+      "Bash(git -C /Users/luke/Documents/Code/lazappi/R-anndata-claude rev-parse:*)",
+      "Bash(git -C /Users/luke/Documents/Code/lazappi/R-anndata-claude ls-files:*)",
+      "Bash(git -C /Users/luke/Documents/Code/lazappi/R-anndata-claude mv:*)",
+      "Bash(git -C /Users/luke/Documents/Code/lazappi/R-anndata-claude rm:*)",
+      "Bash(git -C /Users/luke/Documents/Code/lazappi/R-anndata-claude check-ignore:*)",
+      "Bash(git -C /Users/luke/Documents/Code/lazappi/R-anndata-claude describe:*)"
     ]
   }
 }
