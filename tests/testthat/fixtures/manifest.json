@@ -1,10 +1,504 @@
 {
   "cases": {
+    "anndata_0_obs": {
+      "file": "h5ad/anndata_0_obs.h5ad"
+    },
+    "anndata_0_vars": {
+      "file": "h5ad/anndata_0_vars.h5ad"
+    },
+    "anndata_empty_slots": {
+      "file": "h5ad/anndata_empty_slots.h5ad"
+    },
+    "anndata_full": {
+      "file": "h5ad/anndata_full.h5ad"
+    },
+    "anndata_no_raw": {
+      "file": "h5ad/anndata_no_raw.h5ad"
+    },
+    "anndata_no_x": {
+      "file": "h5ad/anndata_no_x.h5ad"
+    },
+    "anndata_sparse_x": {
+      "file": "h5ad/anndata_sparse_x.h5ad"
+    },
+    "array_bool": {
+      "file": "h5ad/array_bool.h5",
+      "python": "ndarray bool (3,)"
+    },
+    "array_bool_2d": {
+      "file": "h5ad/array_bool_2d.h5",
+      "python": "ndarray bool (2, 3)"
+    },
+    "array_complex128": {
+      "file": "h5ad/array_complex128.h5",
+      "python": "ndarray complex128 (2,)"
+    },
+    "array_complex64": {
+      "file": "h5ad/array_complex64.h5",
+      "python": "ndarray complex64 (2,)"
+    },
+    "array_float32": {
+      "file": "h5ad/array_float32.h5",
+      "python": "ndarray float32 (3,)"
+    },
+    "array_float64": {
+      "file": "h5ad/array_float64.h5",
+      "python": "ndarray float64 (3,)"
+    },
+    "array_float64_0x3": {
+      "file": "h5ad/array_float64_0x3.h5",
+      "python": "ndarray float64 (0, 3)"
+    },
+    "array_float64_1elem": {
+      "file": "h5ad/array_float64_1elem.h5",
+      "python": "ndarray float64 (1,)"
+    },
+    "array_float64_2d": {
+      "file": "h5ad/array_float64_2d.h5",
+      "python": "ndarray float64 (2, 3)"
+    },
+    "array_float64_3d": {
+      "file": "h5ad/array_float64_3d.h5",
+      "python": "ndarray float64 (2, 3, 4)"
+    },
+    "array_float64_empty": {
+      "file": "h5ad/array_float64_empty.h5",
+      "python": "ndarray float64 (0,)"
+    },
+    "array_float64_special": {
+      "file": "h5ad/array_float64_special.h5",
+      "python": "ndarray float64 (4,)"
+    },
+    "array_int16": {
+      "file": "h5ad/array_int16.h5",
+      "python": "ndarray int16 (3,)"
+    },
+    "array_int32": {
+      "file": "h5ad/array_int32.h5",
+      "python": "ndarray int32 (3,)"
+    },
+    "array_int32_2d": {
+      "file": "h5ad/array_int32_2d.h5",
+      "python": "ndarray int32 (2, 3)"
+    },
+    "array_int64": {
+      "file": "h5ad/array_int64.h5",
+      "python": "ndarray int64 (3,)"
+    },
+    "array_int8": {
+      "file": "h5ad/array_int8.h5",
+      "python": "ndarray int8 (3,)"
+    },
+    "array_uint16": {
+      "file": "h5ad/array_uint16.h5",
+      "python": "ndarray uint16 (3,)"
+    },
+    "array_uint32": {
+      "file": "h5ad/array_uint32.h5",
+      "python": "ndarray uint32 (3,)"
+    },
+    "array_uint64": {
+      "file": "h5ad/array_uint64.h5",
+      "python": "ndarray uint64 (3,)"
+    },
+    "array_uint8": {
+      "file": "h5ad/array_uint8.h5",
+      "python": "ndarray uint8 (3,)"
+    },
+    "bytes_scalar": {
+      "file": "h5ad/bytes_scalar.h5"
+    },
+    "csc_bool": {
+      "file": "h5ad/csc_bool.h5",
+      "python": "csc_matrix bool, index int32"
+    },
+    "csc_float32": {
+      "file": "h5ad/csc_float32.h5",
+      "python": "csc_matrix float32, index int32"
+    },
+    "csc_float64": {
+      "file": "h5ad/csc_float64.h5",
+      "python": "csc_matrix float64, index int32"
+    },
+    "csc_int32": {
+      "file": "h5ad/csc_int32.h5",
+      "python": "csc_matrix int32, index int32"
+    },
+    "csc_int64": {
+      "file": "h5ad/csc_int64.h5",
+      "python": "csc_matrix int64, index int32"
+    },
+    "csc_int8": {
+      "file": "h5ad/csc_int8.h5",
+      "python": "csc_matrix int8, index int32"
+    },
+    "csr_0_rows": {
+      "file": "h5ad/csr_0_rows.h5",
+      "python": "csr_matrix float64, index int32"
+    },
+    "csr_array_float64": {
+      "file": "h5ad/csr_array_float64.h5",
+      "python": "csr_array float64, index int32"
+    },
+    "csr_bool": {
+      "file": "h5ad/csr_bool.h5",
+      "python": "csr_matrix bool, index int32"
+    },
+    "csr_empty": {
+      "file": "h5ad/csr_empty.h5",
+      "python": "csr_matrix float64, index int32"
+    },
+    "csr_float32": {
+      "file": "h5ad/csr_float32.h5",
+      "python": "csr_matrix float32, index int32"
+    },
+    "csr_float64": {
+      "file": "h5ad/csr_float64.h5",
+      "python": "csr_matrix float64, index int32"
+    },
+    "csr_indices_int64": {
+      "file": "h5ad/csr_indices_int64.h5",
+      "python": "csr_matrix float64, index int64"
+    },
+    "csr_indices_int64_min_dtype": {
+      "file": "h5ad/csr_indices_int64_min_dtype.h5",
+      "python": "csr_matrix float64, index int64"
+    },
+    "csr_indices_min_dtype": {
+      "file": "h5ad/csr_indices_min_dtype.h5",
+      "python": "csr_matrix float64, index int32"
+    },
+    "csr_int32": {
+      "file": "h5ad/csr_int32.h5",
+      "python": "csr_matrix int32, index int32"
+    },
+    "csr_int64": {
+      "file": "h5ad/csr_int64.h5",
+      "python": "csr_matrix int64, index int32"
+    },
+    "csr_int8": {
+      "file": "h5ad/csr_int8.h5",
+      "python": "csr_matrix int8, index int32"
+    },
+    "df_all_types": {
+      "file": "h5ad/df_all_types.h5",
+      "python": "DataFrame[f:float64, i:int32, b:bool, s:str, cat:category, ni:Int64] index str"
+    },
+    "df_col_bool": {
+      "file": "h5ad/df_col_bool.h5",
+      "python": "DataFrame[c:bool] index str"
+    },
+    "df_col_categorical": {
+      "file": "h5ad/df_col_categorical.h5",
+      "python": "DataFrame[c:category] index str"
+    },
+    "df_col_categorical_126": {
+      "file": "h5ad/df_col_categorical_126.h5",
+      "python": "DataFrame[c:category] index str"
+    },
+    "df_col_categorical_127": {
+      "file": "h5ad/df_col_categorical_127.h5",
+      "python": "DataFrame[c:category] index str"
+    },
+    "df_col_categorical_128": {
+      "file": "h5ad/df_col_categorical_128.h5",
+      "python": "DataFrame[c:category] index str"
+    },
+    "df_col_categorical_32767": {
+      "file": "h5ad/df_col_categorical_32767.h5",
+      "python": "DataFrame[c:category] index str"
+    },
+    "df_col_categorical_32768": {
+      "file": "h5ad/df_col_categorical_32768.h5",
+      "python": "DataFrame[c:category] index str"
+    },
+    "df_col_categorical_bool": {
+      "file": "h5ad/df_col_categorical_bool.h5",
+      "python": "DataFrame[c:category] index str"
+    },
+    "df_col_categorical_empty": {
+      "file": "h5ad/df_col_categorical_empty.h5",
+      "python": "DataFrame[c:category] index str"
+    },
+    "df_col_categorical_missing": {
+      "file": "h5ad/df_col_categorical_missing.h5",
+      "python": "DataFrame[c:category] index str"
+    },
+    "df_col_categorical_numeric": {
+      "file": "h5ad/df_col_categorical_numeric.h5",
+      "python": "DataFrame[c:category] index str"
+    },
+    "df_col_categorical_ordered": {
+      "file": "h5ad/df_col_categorical_ordered.h5",
+      "python": "DataFrame[c:category] index str"
+    },
+    "df_col_float32": {
+      "file": "h5ad/df_col_float32.h5",
+      "python": "DataFrame[c:float32] index str"
+    },
+    "df_col_float64": {
+      "file": "h5ad/df_col_float64.h5",
+      "python": "DataFrame[c:float64] index str"
+    },
+    "df_col_float64_nan": {
+      "file": "h5ad/df_col_float64_nan.h5",
+      "python": "DataFrame[c:float64] index str"
+    },
+    "df_col_int32": {
+      "file": "h5ad/df_col_int32.h5",
+      "python": "DataFrame[c:int32] index str"
+    },
+    "df_col_int64": {
+      "file": "h5ad/df_col_int64.h5",
+      "python": "DataFrame[c:int64] index str"
+    },
+    "df_col_int8": {
+      "file": "h5ad/df_col_int8.h5",
+      "python": "DataFrame[c:int8] index str"
+    },
+    "df_col_nullable_bool": {
+      "file": "h5ad/df_col_nullable_bool.h5",
+      "python": "DataFrame[c:boolean] index str"
+    },
+    "df_col_nullable_int": {
+      "file": "h5ad/df_col_nullable_int.h5",
+      "python": "DataFrame[c:Int64] index str"
+    },
+    "df_col_nullable_int8": {
+      "file": "h5ad/df_col_nullable_int8.h5",
+      "python": "DataFrame[c:Int8] index str"
+    },
+    "df_col_nullable_int_nomissing": {
+      "file": "h5ad/df_col_nullable_int_nomissing.h5",
+      "python": "DataFrame[c:Int32] index str"
+    },
+    "df_col_nullable_uint16": {
+      "file": "h5ad/df_col_nullable_uint16.h5",
+      "python": "DataFrame[c:UInt16] index str"
+    },
+    "df_col_object_str": {
+      "file": "h5ad/df_col_object_str.h5",
+      "python": "DataFrame[c:str] index str"
+    },
+    "df_col_str": {
+      "file": "h5ad/df_col_str.h5",
+      "python": "DataFrame[c:str] index str"
+    },
+    "df_col_str_allow_nullable_false": {
+      "file": "h5ad/df_col_str_allow_nullable_false.h5",
+      "python": "DataFrame[c:str] index str"
+    },
+    "df_col_str_allow_nullable_true": {
+      "file": "h5ad/df_col_str_allow_nullable_true.h5",
+      "python": "DataFrame[c:str] index str"
+    },
+    "df_col_str_na": {
+      "file": "h5ad/df_col_str_na.h5",
+      "python": "DataFrame[c:str] index str"
+    },
+    "df_col_str_na_allow_nullable_true": {
+      "file": "h5ad/df_col_str_na_allow_nullable_true.h5",
+      "python": "DataFrame[c:str] index str"
+    },
+    "df_col_string_pdna": {
+      "file": "h5ad/df_col_string_pdna.h5",
+      "python": "DataFrame[c:string] index str"
+    },
+    "df_col_string_pdna_allow_nullable_true": {
+      "file": "h5ad/df_col_string_pdna_allow_nullable_true.h5",
+      "python": "DataFrame[c:string] index str"
+    },
+    "df_col_uint8": {
+      "file": "h5ad/df_col_uint8.h5",
+      "python": "DataFrame[c:uint8] index str"
+    },
+    "df_columns_order": {
+      "file": "h5ad/df_columns_order.h5",
+      "python": "DataFrame[z:int64, a:int64, m:int64] index str"
+    },
+    "df_index_categorical": {
+      "file": "h5ad/df_index_categorical.h5",
+      "python": "DataFrame[c:float64] index category"
+    },
+    "df_index_duplicates": {
+      "file": "h5ad/df_index_duplicates.h5",
+      "python": "DataFrame[c:float64] index str"
+    },
+    "df_index_int": {
+      "file": "h5ad/df_index_int.h5",
+      "python": "DataFrame[c:float64] index int64"
+    },
+    "df_index_na": {
+      "file": "h5ad/df_index_na.h5",
+      "python": "DataFrame[c:float64] index str"
+    },
+    "df_index_named": {
+      "file": "h5ad/df_index_named.h5",
+      "python": "DataFrame[c:float64] index str"
+    },
+    "df_index_nonascii": {
+      "file": "h5ad/df_index_nonascii.h5",
+      "python": "DataFrame[c:float64] index str"
+    },
+    "df_index_range": {
+      "file": "h5ad/df_index_range.h5",
+      "python": "DataFrame[c:float64] index int64"
+    },
+    "df_index_same_as_column": {
+      "file": "h5ad/df_index_same_as_column.h5",
+      "python": "DataFrame[id:str] index str"
+    },
+    "df_no_columns": {
+      "file": "h5ad/df_no_columns.h5",
+      "python": "DataFrame[] index str"
+    },
+    "df_no_rows": {
+      "file": "h5ad/df_no_rows.h5",
+      "python": "DataFrame[c:float64] index object"
+    },
+    "df_no_rows_str_index": {
+      "file": "h5ad/df_no_rows_str_index.h5",
+      "python": "DataFrame[c:float64, s:str] index str"
+    },
+    "df_two_columns": {
+      "file": "h5ad/df_two_columns.h5",
+      "python": "DataFrame[b:float64, a:int64] index str"
+    },
+    "dict_empty": {
+      "file": "h5ad/dict_empty.h5",
+      "python": "dict"
+    },
+    "dict_nested": {
+      "file": "h5ad/dict_nested.h5",
+      "python": "dict"
+    },
+    "dict_with_null": {
+      "file": "h5ad/dict_with_null.h5",
+      "python": "dict"
+    },
+    "null": {
+      "file": "h5ad/null.h5",
+      "python": "None"
+    },
+    "rec_array_basic": {
+      "file": "h5ad/rec_array_basic.h5",
+      "python": "structured ndarray [i:int32, f:float64, fixed:|S3, uni:<U3]"
+    },
+    "rec_array_object_field": {
+      "file": "h5ad/rec_array_object_field.h5",
+      "python": "structured ndarray [o:object, f:float64]"
+    },
+    "rec_array_rank_genes_groups": {
+      "file": "h5ad/rec_array_rank_genes_groups.h5",
+      "python": "structured ndarray [0:<U2, 1:<U2]"
+    },
+    "rec_array_widths": {
+      "file": "h5ad/rec_array_widths.h5",
+      "python": "structured ndarray [u1:uint8, i2:int16, u4:uint32, i8:int64, f4:float32, b:bool]"
+    },
+    "scalar_bool": {
+      "file": "h5ad/scalar_bool.h5",
+      "python": "np.bool scalar"
+    },
+    "scalar_complex128": {
+      "file": "h5ad/scalar_complex128.h5",
+      "python": "np.complex128 scalar"
+    },
+    "scalar_float32": {
+      "file": "h5ad/scalar_float32.h5",
+      "python": "np.float32 scalar"
+    },
+    "scalar_float64": {
+      "file": "h5ad/scalar_float64.h5",
+      "python": "np.float64 scalar"
+    },
+    "scalar_int16": {
+      "file": "h5ad/scalar_int16.h5",
+      "python": "np.int16 scalar"
+    },
+    "scalar_int32": {
+      "file": "h5ad/scalar_int32.h5",
+      "python": "np.int32 scalar"
+    },
+    "scalar_int64": {
+      "file": "h5ad/scalar_int64.h5",
+      "python": "np.int64 scalar"
+    },
+    "scalar_int8": {
+      "file": "h5ad/scalar_int8.h5",
+      "python": "np.int8 scalar"
+    },
+    "scalar_python_bool": {
+      "file": "h5ad/scalar_python_bool.h5",
+      "python": "bool"
+    },
+    "scalar_python_float": {
+      "file": "h5ad/scalar_python_float.h5",
+      "python": "float"
+    },
+    "scalar_python_int": {
+      "file": "h5ad/scalar_python_int.h5",
+      "python": "int"
+    },
+    "scalar_python_str": {
+      "file": "h5ad/scalar_python_str.h5",
+      "python": "str"
+    },
+    "scalar_str_empty": {
+      "file": "h5ad/scalar_str_empty.h5",
+      "python": "str"
+    },
+    "scalar_uint16": {
+      "file": "h5ad/scalar_uint16.h5",
+      "python": "np.uint16 scalar"
+    },
+    "scalar_uint32": {
+      "file": "h5ad/scalar_uint32.h5",
+      "python": "np.uint32 scalar"
+    },
+    "scalar_uint64": {
+      "file": "h5ad/scalar_uint64.h5",
+      "python": "np.uint64 scalar"
+    },
+    "scalar_uint8": {
+      "file": "h5ad/scalar_uint8.h5",
+      "python": "np.uint8 scalar"
+    },
     "spike_types": {
       "file": "spike_types.h5"
     },
+    "string_array_1d": {
+      "file": "h5ad/string_array_1d.h5",
+      "python": "ndarray <U2 (4,)"
+    },
+    "string_array_1elem": {
+      "file": "h5ad/string_array_1elem.h5",
+      "python": "ndarray <U1 (1,)"
+    },
+    "string_array_2d": {
+      "file": "h5ad/string_array_2d.h5",
+      "python": "ndarray <U1 (2, 3)"
+    },
+    "string_array_empty": {
+      "file": "h5ad/string_array_empty.h5",
+      "python": "ndarray object (0,)"
+    },
+    "string_array_object": {
+      "file": "h5ad/string_array_object.h5",
+      "python": "ndarray object (4,)"
+    },
     "trivial": {
       "file": "trivial.h5ad"
+    }
+  },
+  "errors": {
+    "df_col_nullable_float": {
+      "message": "No method registered for writing <class 'pandas.arrays.FloatingArray'> into <class 'h5py._hl.group.Group'>",
+      "type": "IORegistryError"
+    },
+    "df_col_str_na_allow_nullable_false": {
+      "message": "Cannot write `pd.arrays.[Arrow]StringArray` with missing values when `anndata.settings.allow_write_nullable_strings` is set to False. Opt-in to writing these arrays by toggling it to True or remove missing values.",
+      "type": "ValueError"
     }
   },
   "versions": {

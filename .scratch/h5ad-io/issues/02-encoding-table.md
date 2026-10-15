@@ -1,6 +1,6 @@
 # Encoding table
 
-Status: ready-for-agent
+Status: done
 Type: research
 Blocked by: none
 
@@ -18,3 +18,11 @@ Decide the int64 policy if the spike has not, and reconcile with the spike's rec
 - `scripts/check.sh` passes
 
 ## Comments
+
+2026-10-15: Done.
+- Added about 130 encoding cases to `tests/python/generate_fixtures.py` (files under `tests/testthat/fixtures/h5ad/`, an Element at key `x`, or a whole `.h5ad`), with `settings` variants and `errors` in the manifest for values Python refuses.
+- `tests/python/encoding_table.py` generates the observed block of `.scratch/h5ad-io/encoding-table.md` from the fixtures, and a test fails when the committed block is stale. Rerun it after changing a case (command in the table header).
+- `h5_tree.py` now handles the `null` encoding's null dataspace.
+- **int64 policy decided:** read int64 and uint64 as `double` when every value is below 2^53 in magnitude, otherwise raise a classed error naming the path.
+  `bit64` stays in Suggests. Writing int64 is restored through the on-disk dtype record.
+- Findings the later tickets need: pandas 3 `str` columns and the obs/var index are written as `nullable-string-array` with `na-value='NaN'` (not `string-array`), categorical code dtype is int8 below 127 categories, int16 below 32767 and int32 otherwise, min-dtype sparse `indices` use the minor axis size, and Python cannot write nullable `Float64`.

@@ -89,8 +89,9 @@ def describe(path, obj):
     else:
         node["kind"] = "dataset"
         node["dtype"] = describe_type(obj.dtype, obj.id.get_type())
-        node["shape"] = list(obj.shape)
-        node["digest"] = digest(obj)
+        # A null dataspace (the `null` encoding) has no shape and no values
+        node["shape"] = None if obj.shape is None else list(obj.shape)
+        node["digest"] = "empty" if obj.shape is None else digest(obj)
     return node
 
 

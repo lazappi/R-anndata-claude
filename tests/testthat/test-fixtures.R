@@ -13,6 +13,26 @@ test_that("every fixture listed in the manifest exists", {
   }
 })
 
+# Guards the encoding table: its observed block is generated from the fixtures,
+# so it must match what regenerating it now gives
+test_that("the committed encoding table matches the fixtures", {
+  skip_if_no_python()
+  doc <- testthat::test_path(
+    "..",
+    "..",
+    ".scratch",
+    "h5ad-io",
+    "encoding-table.md"
+  )
+  skip_if_not(file.exists(doc), "the encoding table is not in the check copy")
+
+  copy <- withr::local_tempfile(fileext = ".md")
+  file.copy(doc, copy)
+  run_python("encoding_table.py", normalizePath(fixture_path(".")), copy)
+
+  expect_equal(readLines(copy), readLines(doc))
+})
+
 # Guards determinism: regenerating must not change any fixture structurally
 test_that("regenerated fixtures are deterministic and match the committed", {
   skip_if_no_python()
