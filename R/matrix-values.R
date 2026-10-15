@@ -25,10 +25,7 @@ dtype_attr <- "anndata_dtype"
 # Copies the On-disk dtype record (if any) from `from` to `to`
 copy_dtype <- function(to, from) {
   dtype <- attr(from, dtype_attr, exact = TRUE)
-  if (!is.null(dtype)) {
-    attr(to, dtype_attr) <- dtype
-  }
-  to
+  if (is.null(dtype)) to else set_dtype(to, dtype)
 }
 
 is_csr <- function(x) {
@@ -63,7 +60,8 @@ as_anndata_matrix <- function(
   if (methods::is(x, "Matrix")) {
     return(coerce_matrix_class(x, what, call))
   }
-  if (is.array(x) && (is.numeric(x) || is.logical(x)) && !is.object(x)) {
+  plain <- !is.object(x) || identical(oldClass(x)[1L], typed_class)
+  if (is.array(x) && (is.numeric(x) || is.logical(x)) && plain) {
     n_dim <- length(dim(x))
     if (n_dim == 2L || (allow_array && n_dim > 2L)) {
       return(x)

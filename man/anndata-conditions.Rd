@@ -34,6 +34,7 @@ Python's categories map to these classes:\tabular{ll}{
    shape mismatch \tab \code{anndata_dimension_error} \cr
    feature in a later sub-project \tab \code{anndata_not_supported_error} \cr
    values do not fit an On-disk dtype \tab \code{anndata_dtype_overflow_error} \cr
+   dataset is not an integer or float \tab \code{anndata_dtype_error} \cr
 }
 
 

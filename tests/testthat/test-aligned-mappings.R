@@ -175,8 +175,8 @@ test_that("values keep their sparse format and dtype record", {
   typed <- structure(matrix(1, 3, 2), anndata_dtype = "float32")
   adata$obsm[["typed"]] <- typed
   expect_identical(adata$obsm[["typed"]], typed)
-  col <- structure(matrix(1, 3, 1), anndata_dtype = "int8")
-  adata$obsm[["col"]] <- structure(c(1, 1, 1), anndata_dtype = "int8")
+  col <- set_dtype(matrix(1, 3, 1), "int8")
+  adata$obsm[["col"]] <- set_dtype(c(1, 1, 1), "int8")
   expect_identical(adata$obsm[["col"]], col)
   # other Matrix classes are coerced as for X
   adata$obsm[["tmat"]] <- methods::as(csc(3, 2), "TsparseMatrix")

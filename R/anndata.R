@@ -166,7 +166,7 @@ infer_shape <- function(
 is_plain_vector <- function(x) {
   is.null(dim(x)) &&
     is.atomic(x) &&
-    !is.object(x) &&
+    (!is.object(x) || identical(oldClass(x)[1L], typed_class)) &&
     (is.numeric(x) || is.logical(x))
 }
 

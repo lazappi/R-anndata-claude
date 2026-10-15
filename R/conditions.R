@@ -18,6 +18,8 @@
 #' | `IORegistryError` | `anndata_io_registry_error` |
 #' | shape mismatch | `anndata_dimension_error` |
 #' | feature in a later sub-project | `anndata_not_supported_error` |
+#' | values do not fit an On-disk dtype | `anndata_dtype_overflow_error` |
+#' | dataset is not an integer or float | `anndata_dtype_error` |
 #'
 #' A Python `UserWarning` becomes an `anndata_warning` subclass named for the
 #' situation (e.g. `anndata_names_not_unique_warning`), and any other Python

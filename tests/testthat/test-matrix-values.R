@@ -95,7 +95,7 @@ test_that("subsetting rows, columns and both keeps format and dtype", {
     by_col <- matrix_subset(x, j = c(3, 1, 1))
     both <- matrix_subset(x, i = 2, j = 2:3)
     for (res in list(by_row, by_col, both)) {
-      expect_identical(class(res), class(x))
+      expect_identical(class(drop_dtype(res)), class(drop_dtype(x)))
       expect_identical(attr(res, "anndata_dtype"), "float32")
     }
     expect_identical(dim(by_row), c(2L, 3L))
@@ -122,7 +122,7 @@ test_that("arrays subset on the first two dimensions", {
 test_that("transposing keeps format and dtype", {
   for (x in list(dense, csc(), csr(), lcsc())) {
     res <- matrix_transpose(with_dtype(x))
-    expect_identical(class(res), class(x))
+    expect_identical(class(drop_dtype(res)), class(drop_dtype(x)))
     expect_identical(dim(res), c(3L, 2L))
     expect_identical(attr(res, "anndata_dtype"), "float32")
     expect_equal(
