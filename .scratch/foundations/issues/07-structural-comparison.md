@@ -1,0 +1,27 @@
+# Structural comparison helpers
+
+Status: ready-for-agent
+Type: task
+Blocked by: 06
+
+## What
+
+Add the Python scripts and R expectations used to check Structural equivalence and Round trip equality (see `CONTEXT.md` and `.scratch/foundations/spec.md`).
+
+- `tests/python/h5_tree.py <file>` prints JSON describing every group and dataset: path, kind, attributes (names, values and stored types, including whether strings are variable-length UTF-8), dtype, shape and a value digest (a hash of the values, so large datasets compare cheaply)
+- `tests/python/compare.py <a.h5ad> <b.h5ad>` reads both files with `anndata.read_h5ad` and checks them with `anndata.tests.helpers.assert_equal`, exiting non-zero and printing the difference on failure
+- R expectations in `tests/testthat/helper-python.R`:
+  - `expect_structurally_equivalent(a, b)`: compares the two `h5_tree.py` outputs and lists every differing path and property on failure
+  - `expect_python_equal(a, b)`: runs `compare.py`
+- `fixture_path(name)`, returning a path under `tests/testthat/fixtures/`
+- A smoke test using a small script that writes two tiny h5ad files from Python (one identical to the first, one with a changed dtype), checking that equivalence passes and fails as expected and that the failure message names the path
+
+## Acceptance criteria
+
+- The smoke tests pass, and are skipped without Python
+- The failure output of `expect_structurally_equivalent()` is readable (a snapshot test of a failure message)
+- `scripts/check.sh` passes
+
+## References
+
+- `.reference/anndata/src/anndata/tests/helpers.py:620` (`assert_equal`)
