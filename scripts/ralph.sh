@@ -18,6 +18,10 @@
 # loop configuration. Anything not allowlisted is denied (dontAsk mode).
 set -uo pipefail
 
+# In print mode Claude Code kills background subagents still running 10 minutes after
+# the last turn. Allow 30 minutes so a slow full check cannot cut a run short.
+export CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS="${CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS:-1800000}"
+
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT" || exit 1
 

@@ -47,6 +47,8 @@ No human is watching, so never wait for input.
   Before committing, the full `scripts/check.sh` must pass.
   Before `scripts/check.sh` exists, the checker uses devtools directly.
 - Never commit with failing checks
+- Wait for each subagent's result before ending your turn.
+  The run is stopped if a subagent is still running long after your last turn.
 
 ## 5. Independent review
 
