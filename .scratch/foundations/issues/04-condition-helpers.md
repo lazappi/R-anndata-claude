@@ -1,6 +1,6 @@
 # Condition helpers
 
-Status: ready-for-agent
+Status: done
 Type: task
 Blocked by: 03
 
@@ -26,3 +26,11 @@ Implement the internal condition conventions from the "Conditions" section of `.
 ## References
 
 - Python `src/anndata/_warnings.py` for the warning categories
+
+## Comments
+
+2026-10-15: Added `R/conditions.R` with `anndata_abort()`/`anndata_warn()` and named constructors (`abort_dimension`, `abort_io_registry`, `abort_not_supported`, `warn_implicit_modification`, `warn_future`), plus an internal Rd page `anndata-conditions` listing the class conventions.
+All take `call = rlang::caller_env()` and `.envir = parent.frame()`, so the reported call and cli interpolation are the caller's.
+`expect_anndata_condition(expr, class)` in `tests/testthat/helper-conditions.R` catches the condition itself, because `expect_condition()` lets a condition of another class propagate instead of failing.
+Gotcha: single-file lintr (quick mode) flags internal functions used inside top-level helper functions in test files as undefined, so define such helpers inside `test_that()`.
+Reviewer flagged an unrelated uncommitted edit to `CLAUDE.md` ("allowed to acknowledge" to "should acknowledge") that this run did not make, so it was left uncommitted for the human.
