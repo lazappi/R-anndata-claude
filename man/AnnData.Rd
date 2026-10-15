@@ -31,9 +31,10 @@ list, a \code{data.frame} or a \code{DataFrame}.}
 
 \item{...}{Must be empty, so that the arguments after \code{uns} are named.}
 
-\item{obsm, varm, obsp, varp}{Aligned mappings as named lists or \code{NULL}.}
+\item{obsm, varm, obsp, varp, layers}{Aligned mappings as named lists or \code{NULL}.
+An \code{NA} name in \code{layers} addresses X.}
 
-\item{layers, raw}{Further Slots (not yet supported).}
+\item{raw}{Further Slot (not yet supported).}
 
 \item{shape}{Integer vector \code{c(n_obs, n_vars)} used when \code{X} is \code{NULL}.}
 

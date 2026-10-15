@@ -23,11 +23,11 @@ The human owns the order of the Queue.
 - [x] core-object/01: matrix value coercion and helpers (`.scratch/core-object/issues/01-matrix-values.md`)
 - [x] core-object/02: obs and var data frame handling (`.scratch/core-object/issues/02-dataframe-inputs.md`)
 - [x] core-object/03: AnnData class and basic construction (`.scratch/core-object/issues/03-anndata-class-construction.md`)
-- [ ] core-object/04: X assignment and validation (`.scratch/core-object/issues/04-x-assignment.md`)
+- [x] core-object/04: X assignment and validation (`.scratch/core-object/issues/04-x-assignment.md`)
   - [x] `X` setter rules (scalar, reshape, 3-D, NULL)
-  - [ ] `adata$layers[[NA]]` assignment, once ticket 06 provides layers
+  - [x] `adata$layers[[NA]]` assignment, once ticket 06 provides layers
 - [x] core-object/05: aligned mappings: obsm, varm, obsp, varp (`.scratch/core-object/issues/05-aligned-mappings.md`)
-- [ ] core-object/06: layers (`.scratch/core-object/issues/06-layers.md`)
+- [x] core-object/06: layers (`.scratch/core-object/issues/06-layers.md`)
 - [x] core-object/07: obs, var, names and uns assignment (`.scratch/core-object/issues/07-obs-var-names-uns-assignment.md`)
 - [ ] core-object/08: raw class and raw slot (`.scratch/core-object/issues/08-raw.md`)
 - [ ] core-object/09: remaining construction forms (`.scratch/core-object/issues/09-construction-forms.md`)

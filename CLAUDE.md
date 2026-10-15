@@ -52,6 +52,8 @@ Kept brief and current by the loop.
 - `AnnData` is `AnnDataClass` (R6, `R/anndata.R`) wrapped by `AnnData()`: roxygen needs `@noRd` on the class, `@importFrom R6 R6Class` stays in the package file and `.lintr` allows the names `AnnData`, `AnnDataClass` and `X`
 - S3 methods for `$`, `[[` and similar need a plain `@export` tag (`@exportS3Method` breaks roxygen), and `R CMD check` needs `devtools::document()` to have registered them in `NAMESPACE`
 - Inside R6 classes with custom `$` methods use `.subset2()` and `private`, not `self$`, and `adata$obsm[["k"]] <- v` assigns the mapping back to the active binding, so it must ignore an identical value
+- `expect_anndata_condition()` unwinds at the condition, so for warnings whose assignment must complete (then check state) use `expect_warning(..., class =)`
+- Layers are the aligned mapping class with X under the `NA` key, so look keys up with `match()` and never `[[`
 - Active bindings in package-level objects are lost on install, so create them in `.onLoad()`
 - Snapshots are only written by `scripts/check.sh --quick`, because `R CMD check` runs in a temp copy
 - Lint runs after `pkgload::load_all()` so cross-file internals are visible to `object_usage_linter`

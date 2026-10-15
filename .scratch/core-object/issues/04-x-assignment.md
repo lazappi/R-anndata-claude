@@ -1,6 +1,6 @@
 # X assignment and validation
 
-Status: in-progress
+Status: done
 Type: task
 Blocked by: 03
 
@@ -34,3 +34,5 @@ The constructor takes its shape from X so no mismatch arises, and a scalar X err
 Remaining: apply the same rules to `adata$layers[[NA]]`, which needs the layers mapping from ticket 06.
 Python's `layers[None] = wrong shape` raises ValueError with no reshape and no warning, so ticket 06 should check that rather than reuse the X reshape.
 Status stays `in-progress` until then.
+
+2026-10-15: `adata$layers[[NA]]` assignment is done in ticket 06 (shape check with `anndata_dimension_error`, no reshape or warning, Python-confirmed), and all criteria are met.

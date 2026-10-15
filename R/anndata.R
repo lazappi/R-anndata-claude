@@ -29,8 +29,9 @@
 #'   list, a `data.frame` or a `DataFrame`.
 #' @param uns Unstructured annotation, a named list or `NULL`.
 #' @param ... Must be empty, so that the arguments after `uns` are named.
-#' @param obsm,varm,obsp,varp Aligned mappings as named lists or `NULL`.
-#' @param layers,raw Further Slots (not yet supported).
+#' @param obsm,varm,obsp,varp,layers Aligned mappings as named lists or `NULL`.
+#'   An `NA` name in `layers` addresses X.
+#' @param raw Further Slot (not yet supported).
 #' @param shape Integer vector `c(n_obs, n_vars)` used when `X` is `NULL`.
 #' @param filename,filemode Backed mode (not yet supported).
 #'
@@ -156,11 +157,6 @@ infer_shape <- function(
   ))
 }
 
-# The layers storage is a named list with X under the `NA` name (ADR 0004)
-x_position <- function(store) {
-  which(is.na(names(store)))
-}
-
 is_plain_vector <- function(x) {
   is.null(dim(x)) &&
     is.atomic(x) &&
@@ -271,10 +267,20 @@ AnnDataClass <- R6Class(
           call = call
         )
       }
-      slots <- list(layers = layers, raw = raw)
-      for (slot in names(slots)) {
-        if (!is.null(slots[[slot]])) {
-          abort_slot_not_supported(slot, call)
+      if (!is.null(raw)) {
+        abort_slot_not_supported("raw", call)
+      }
+      # Python takes X from layers[None] when X is not given
+      layers_x <- if (is.list(layers)) layers[is.na(names(layers))] else list()
+      if (length(layers_x) && !is.null(layers_x[[1L]])) {
+        if (is.null(X)) {
+          X <- layers_x[[1L]]
+        } else if (!identical(X, layers_x[[1L]])) {
+          abort_invalid_argument(
+            "If you provide {.code layers[[NA]]} and {.arg X}, they must be
+             identical.",
+            call
+          )
         }
       }
       if (!is.null(X)) {
@@ -292,7 +298,7 @@ AnnDataClass <- R6Class(
         dims <- if (!is.null(shape)) {
           check_shape(shape, call)
         } else {
-          infer_shape(obs, var, obsm, varm, obsp = obsp, varp = varp)
+          infer_shape(obs, var, obsm, varm, layers, obsp, varp)
         }
         source <- "shape"
       }
@@ -310,8 +316,9 @@ AnnDataClass <- R6Class(
         source,
         call
       )
-      private$.layers <- list()
       private$set_uns(uns %||% list(), call)
+      private$.layers <- aligned_mapping_class$new(self, "layers")
+      private$.layers$replace(layers, call = call)
       if (!is.null(X)) {
         private$set_x(X, call)
       }
@@ -333,10 +340,16 @@ AnnDataClass <- R6Class(
     #'   key. Assigning `NULL` removes it.
     X = function(value) {
       if (missing(value)) {
-        position <- x_position(private$.layers)
-        return(if (length(position)) private$.layers[[position]] else NULL)
+        return(private$.layers$get(NA_character_))
       }
       private$set_x(value, rlang::caller_env())
+    },
+    #' @field layers Aligned mapping of arrays with the shape of the data, see
+    #'   `anndata-aligned-mappings`. X is stored under the `NA` key (ADR 0004).
+    #'   Assigning a named list replaces the layers and keeps X (with a
+    #'   warning) unless the list has an `NA` entry.
+    layers = function(value) {
+      private$aligned("layers", value, missing(value), rlang::caller_env())
     },
     #' @field obs Annotation of observations, a `DataFrame`.
     obs = function(value) {
@@ -505,21 +518,12 @@ AnnDataClass <- R6Class(
     },
     # Validates X and stores it first in the layers storage under the `NA` key
     set_x = function(value, call) {
-      position <- x_position(private$.layers)
       if (is.null(value)) {
-        if (length(position)) {
-          private$.layers <- private$.layers[-position]
-        }
+        private$.layers$remove(NA_character_)
         return(invisible(NULL))
       }
       value <- coerce_x_shape(value, self$shape, call)
-      others <- if (length(position)) {
-        private$.layers[-position]
-      } else {
-        private$.layers
-      }
-      private$.layers <- c(list(value), others)
-      names(private$.layers) <- c(NA_character_, names(others))
+      private$.layers$set(NA_character_, value, call = call)
       invisible(NULL)
     }
   )

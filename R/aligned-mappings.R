@@ -27,14 +27,19 @@ aligned_kinds <- list(
   obsm = list(axis = 1L, pairwise = FALSE, class = "AxisArrays"),
   varm = list(axis = 2L, pairwise = FALSE, class = "AxisArrays"),
   obsp = list(axis = 1L, pairwise = TRUE, class = "PairwiseArrays"),
-  varp = list(axis = 2L, pairwise = TRUE, class = "PairwiseArrays")
+  varp = list(axis = 2L, pairwise = TRUE, class = "PairwiseArrays"),
+  layers = list(axis = 1:2, pairwise = FALSE, class = "Layers")
 )
 
 is_frame <- function(x) {
   is.data.frame(x) || methods::is(x, "DataFrame")
 }
 
-check_key <- function(key, call) {
+# The `NA` key addresses X in layers (ADR 0004), and `[[NA]]` gives a logical
+check_key <- function(key, call, allow_na = FALSE) {
+  if (allow_na && length(key) == 1L && is.na(key) && !is.object(key)) {
+    return(NA_character_)
+  }
   if (!is.character(key) || length(key) != 1L || is.na(key) || !nzchar(key)) {
     abort_invalid_argument(
       "A key must be a single non-empty string.",
@@ -63,27 +68,57 @@ aligned_mapping_class <- R6Class(
     initialize = function(parent, attrname) {
       private$parent <- parent
       private$attrname <- attrname
+      private$is_layers <- identical(attrname, "layers")
       private$store <- list()
     },
     #' @description The value stored under `key`, or `NULL`.
     get = function(key) {
-      check_key(key, rlang::caller_env())
-      private$store[[key]]
+      key <- check_key(key, rlang::caller_env(), private$is_layers)
+      position <- match(key, names(private$store))
+      if (is.na(position)) NULL else private$store[[position]]
     },
     #' @description Validate `value` and store it under `key`.
     set = function(key, value, call = rlang::caller_env()) {
-      check_key(key, call)
+      key <- check_key(key, call, private$is_layers)
       if (is.null(value)) {
-        private$store[[key]] <- NULL
+        private$drop(key)
         return(invisible(self))
       }
-      private$store[[key]] <- private$validate(value, key, call)
+      private$put(key, private$validate(value, key, call))
       invisible(self)
     },
     #' @description Remove `key`, if present.
     remove = function(key) {
-      check_key(key, rlang::caller_env())
-      private$store[[key]] <- NULL
+      key <- check_key(key, rlang::caller_env(), private$is_layers)
+      private$drop(key)
+      invisible(self)
+    },
+    #' @description Remove every key. In layers `keep_x` decides whether X
+    #'   stays, and `NULL` keeps it with a warning, as Python does.
+    #' @param keep_x `TRUE`, `FALSE` or `NULL`.
+    clear = function(keep_x = NULL, call = rlang::caller_env()) {
+      if (!private$is_layers) {
+        private$store <- list()
+        return(invisible(self))
+      }
+      if (is.null(keep_x)) {
+        warn_future(
+          "{.code layers$clear()} currently keeps {.field X} (stored under the
+           {.code NA} key), but a future release may drop it. Pass
+           {.code keep_x = TRUE} to keep it or {.code keep_x = FALSE} to drop
+           it and silence this warning.",
+          call = call
+        )
+        keep_x <- TRUE
+      }
+      if (!is.logical(keep_x) || length(keep_x) != 1L || is.na(keep_x)) {
+        abort_invalid_argument(
+          "{.arg keep_x} must be {.code TRUE}, {.code FALSE} or {.code NULL}.",
+          call
+        )
+      }
+      x <- private$store[is.na(names(private$store))]
+      private$store <- if (keep_x) x else list()
       invisible(self)
     },
     #' @description Replace the whole contents with a named list.
@@ -93,6 +128,7 @@ aligned_mapping_class <- R6Class(
       }
       value <- value %||% list()
       keys <- names(value)
+      layers <- private$is_layers
       if (!is.list(value) || is_frame(value)) {
         abort_invalid_argument(
           "{.field {private$attrname}} must be a named list or {.code NULL}.",
@@ -100,7 +136,8 @@ aligned_mapping_class <- R6Class(
         )
       }
       if (length(value)) {
-        if (is.null(keys) || anyNA(keys) || !all(nzchar(keys))) {
+        named <- !is.null(keys) && (layers || !anyNA(keys))
+        if (!named || !all(nzchar(keys) | is.na(keys))) {
           abort_invalid_argument(
             "{.field {private$attrname}} must be a fully named list.",
             call
@@ -115,8 +152,18 @@ aligned_mapping_class <- R6Class(
       }
       # Validate everything before replacing anything
       store <- value[!vapply(value, is.null, logical(1))]
-      for (key in names(store)) {
-        store[[key]] <- private$validate(store[[key]], key, call)
+      for (i in seq_along(store)) {
+        store[[i]] <- private$validate(store[[i]], names(store)[[i]], call)
+      }
+      if (layers && anyNA(names(private$store)) && !anyNA(keys)) {
+        warn_future(
+          "Assigning to {.field layers} without an {.code NA} key currently
+           preserves {.field X}, but a future release may drop it. Include
+           {.code NA = adata$X} to keep it, or {.code NA = NULL} to drop it and
+           silence this warning.",
+          call = call
+        )
+        store <- c(store, private$store[is.na(names(private$store))])
       }
       private$store <- store
       invisible(self)
@@ -158,15 +205,35 @@ aligned_mapping_class <- R6Class(
     parent = NULL,
     attrname = NULL,
     store = NULL,
+    is_layers = FALSE,
+    # Keys are matched with `match()` because `NA` (X) is not a valid `[[` name
+    put = function(key, value) {
+      position <- match(key, names(private$store))
+      if (is.na(position)) {
+        private$store <- c(private$store, list(value))
+        names(private$store)[[length(private$store)]] <- key
+      } else {
+        private$store[[position]] <- value
+      }
+    },
+    drop = function(key) {
+      position <- match(key, names(private$store))
+      if (!is.na(position)) {
+        private$store <- private$store[-position]
+      }
+    },
     validate = function(value, key, call) {
       kind <- aligned_kinds[[private$attrname]]
       parent <- private$parent
       what <- paste0(
         private$attrname,
         "[[",
-        encodeString(key, quote = "'"),
+        if (is.na(key)) "NA" else encodeString(key, quote = "'"),
         "]]"
       )
+      if (private$is_layers && is_frame(value)) {
+        value <- as.matrix(value)
+      }
       if (is_frame(value)) {
         if (kind$pairwise) {
           anndata_abort(
@@ -184,10 +251,11 @@ aligned_mapping_class <- R6Class(
         what = what,
         call = call
       )
-      right_shape <- rep(
-        parent$shape[[kind$axis]],
-        if (kind$pairwise) 2L else 1L
-      )
+      right_shape <- if (private$is_layers) {
+        parent$shape
+      } else {
+        rep(parent$shape[[kind$axis]], if (kind$pairwise) 2L else 1L)
+      }
       actual_shape <- dim(value)[seq_along(right_shape)]
       if (!identical(as.integer(actual_shape), as.integer(right_shape))) {
         abort_dimension(
@@ -196,6 +264,16 @@ aligned_mapping_class <- R6Class(
            of the parent. Value had shape ({actual_shape}) while it should
            have had ({right_shape}).",
           what = private$attrname,
+          call = call
+        )
+      }
+      # The X setter reports its own non-2-D warning
+      if (private$is_layers && !is.na(key) && length(dim(value)) > 2L) {
+        anndata_warn(
+          "Layer {.val {key}} must be 2-dimensional, but got an array with
+           shape ({dim(value)}). Higher-dimensional arrays violate the AnnData
+           specification and cannot be written to disk.",
+          "anndata_non_2d_warning",
           call = call
         )
       }

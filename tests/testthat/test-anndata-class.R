@@ -187,14 +187,10 @@ test_that("filename and filemode are not yet supported", {
 
 # Slots whose tickets are not yet done must not be silently dropped
 test_that("slot arguments that are not yet implemented error", {
-  for (slot in c("layers", "raw")) {
-    args <- list(dense_x)
-    args[[slot]] <- list(a = 1)
-    expect_anndata_condition(
-      do.call(AnnData, args),
-      "anndata_not_supported_error"
-    )
-  }
+  expect_anndata_condition(
+    AnnData(dense_x, raw = list(a = 1)),
+    "anndata_not_supported_error"
+  )
 })
 
 # Python makes everything after uns keyword-only
@@ -227,10 +223,10 @@ test_that("fixed read-only fields have their Python values", {
 # must hold it there for ticket 06 to extend
 test_that("X lives in the layers storage under the NA key", {
   adata <- AnnData(dense_x)
-  store <- adata$.__enclos_env__$private$.layers
+  store <- as.list(adata$layers)
   expect_identical(names(store), NA_character_)
   expect_identical(store[[1L]], dense_x)
-  expect_length(AnnData(shape = c(2L, 2L))$.__enclos_env__$private$.layers, 0L)
+  expect_length(AnnData(shape = c(2L, 2L))$layers, 0L)
 })
 
 # X is validated the same way however it is set

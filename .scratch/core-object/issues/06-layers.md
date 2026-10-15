@@ -1,6 +1,6 @@
 # Layers
 
-Status: ready-for-agent
+Status: done
 Type: task
 Blocked by: 05
 
@@ -21,3 +21,13 @@ The `layers` mapping including the X entry under `NA` (ADR 0004), following `ali
 - `scripts/check.sh` passes
 
 ## Comments
+
+2026-10-15: Layers are now the `AnnDataAlignedMapping` class with `attrname = "layers"` and X lives in it under `NA`, so `adata$X` and `adata$layers[[NA]]` share one store. Python-confirmed (`.ralph/oracle/layers.py`):
+- Key order is insertion order: `X` goes last when given with layers (`c("a", NA)`), `X <- NULL` then `X <- v` appends it, and an `NA` entry in `layers` keeps the input position
+- `adata$layers <- list(...)` (also `list()` and `NULL`) keeps X, appended last, with `anndata_future_warning` unless the list has an `NA` entry (`NA = NULL` drops X without warning)
+- `clear(keep_x = NULL)` warns with `anndata_future_warning` and keeps X
+- Wrong shapes are `anndata_dimension_error` with no reshape, and a 1-D vector becomes a column first, as in Python's base `_validate_value`
+- More than 2 dimensions warns `anndata_non_2d_warning` for named layers only, as X warns in its own setter
+- Data frames become matrices
+- The constructor takes X from `layers[[NA]]`, errors if both differ, and infers the shape from layers
+Tests that check state after a warning must use `expect_warning()`, because `expect_anndata_condition()` unwinds before the assignment completes.
