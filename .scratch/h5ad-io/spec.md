@@ -90,7 +90,10 @@ The governing rule is that R writes what the reference environment writes for th
   - `integer` with `NA` is written as `nullable-integer`
   - Double `NA_real_` and `NaN` are both written as NaN.
     On read, NaN becomes `NaN`, and this NA/NaN collapse is documented as an unavoidable deviation.
-  - Complex values use h5py's complex layout
+  - Complex values use h5py's complex layout, and only complex128 is written.
+    complex64 cannot be read correctly by rhdf5, so reading it raises a classed error naming the path.
+  - `allow_write_nullable_strings` is honoured as in Python: with `FALSE`, string columns and the index without missing values are written as `string-array`, and a string column with missing values raises the error Python raises
+  - A data frame with `NULL` row names (e.g. in obsm or uns) is written as Python writes a `RangeIndex`: an int64 `array` `_index` of `0` to `n - 1`
 - **Scalars vs arrays** (Python's behaviour, since R has no scalars):
   - an Element read from disk remembers its Encoding type and is written back with the same one
   - a new length-1 atomic vector with no `dim` is written as `numeric-scalar` or `string`
@@ -108,17 +111,27 @@ The governing rule is that R writes what the reference environment writes for th
   It never truncates or wraps silently.
 - Elements without a record are written with R's native types (float64, int32, bool, UTF-8 strings), which is what Python would write for the equivalent values
 - 64-bit integers must not silently lose precision.
-  Read them as double when every value is exactly representable, otherwise use `bit64::integer64` or raise a classed error.
-  The spike or encoding-table ticket decides which.
+  int64 and uint64 values are read as double when every value has magnitude below 2^53, and otherwise reading raises a classed error naming the path.
+  `bit64` is not a dependency, and the On-disk dtype record restores int64 or uint64 on write (decided in the encoding table).
+- R's `NA_integer_` shares its bit pattern with the int32 value -2147483648.
+  An int32 dataset containing that value is read as double (keeping the int32 record so it writes back unchanged), never as `NA`.
 - `write_csr_csc_indices_with_min_possible_dtype` is honoured (`methods.py:867-968`)
 - The mechanism (attributes, a wrapper class or similar) is an implementation choice.
   It must survive the operations in `core-object` (subset, copy, transpose) and must be invisible to normal use: arithmetic and printing behave as with an ordinary R vector or matrix.
 
 ## rec-array
 
-- A `rec-array` is read into an R structure that keeps field names, field order and per-field dtypes (a `data.frame` with a marker class is the expected choice)
-- Writing that structure produces a `rec-array` with the same compound type
-- Field dtypes follow the On-disk dtype rules, including fixed-length byte and unicode string fields, whose exact HDF5 types must round trip
+rhdf5 cannot inspect or build compound field types, so `rec-array` field dtypes are not preserved (ADR 0005).
+Within that limit, compatibility is maximised:
+
+- A `rec-array` is read into an R structure that keeps field names, field order and values (a `data.frame` with a marker class is the expected choice)
+- Writing that structure produces a `rec-array` that Python reads, with the same field names, order and values.
+  Fields are int32, float64 or fixed-length strings, as rhdf5's compound writer allows.
+  Fixed-length string fields are sized to the longest value in bytes, so non-ASCII text survives.
+- The deviation is documented in the help for reading and writing, and in the vignette
+- Round-trip tests for `rec-array` check that the values of every field are equal in every direction.
+  Structural equivalence is relaxed for `rec-array` field types only, and the relaxation is explicit in the test helper so it cannot hide other differences.
+- Full field dtype fidelity is the follow-up ticket h5ad-io/15
 
 ## Public functions
 
