@@ -124,6 +124,9 @@ No workaround exists inside rhdf5 for field dtype preservation or variable-lengt
 The rec-array and on-disk dtype records for rec-array fields (h5ad-io/08) depend on this decision.
 Nothing else is blocked.
 
+**Decision (human, 2026-10-15):** option 3, accept the degradation.
+See ADR 0005, the "rec-array" section of the spec and follow-up ticket 15 for the later fidelity work.
+
 ## Scalars
 
 - A 0-dimensional dataset reads as a length-1 vector with no `dim`

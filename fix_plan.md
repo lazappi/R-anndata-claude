@@ -17,7 +17,7 @@ The human owns the order of the Queue.
 - [x] foundations/08: fixture pipeline and offline mode (`.scratch/foundations/issues/08-fixture-pipeline.md`)
 - [x] Break `.scratch/core-object/spec.md` into tickets (`.scratch/core-object/issues/`, all `needs-triage`), once foundations is done (16 tickets, awaiting human triage)
 - [x] Break `.scratch/h5ad-io/spec.md` into tickets (`.scratch/h5ad-io/issues/`, all `needs-triage`), once foundations is done (14 tickets, awaiting human triage)
-- [ ] h5ad-io/01: rhdf5 capability spike (`.scratch/h5ad-io/issues/01-rhdf5-spike.md`) (decision made, finish the bookkeeping)
+- [x] h5ad-io/01: rhdf5 capability spike (`.scratch/h5ad-io/issues/01-rhdf5-spike.md`)
 - [x] h5ad-io/02: encoding table (`.scratch/h5ad-io/issues/02-encoding-table.md`)
 - [x] 🛑 Human checkpoint: review `.scratch/h5ad-io/rhdf5-spike.md` and `.scratch/h5ad-io/encoding-table.md` before core-object starts
 - [ ] core-object/01: matrix value coercion and helpers (`.scratch/core-object/issues/01-matrix-values.md`)

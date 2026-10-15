@@ -1,6 +1,6 @@
 # rhdf5 capability spike
 
-Status: ready-for-agent
+Status: done
 Type: research
 Blocked by: none
 
@@ -54,3 +54,6 @@ This only affects h5ad-io/08 (and the rec-array parts of 04).
 Dependencies: `rhdf5` stays in Imports, `bit64` and `rhdf5filters` are in Suggests until code needs them.
 The placeholder `@importFrom rhdf5 h5ls` stays because no package code uses rhdf5 yet, and removing it gives an unused-Imports NOTE.
 Also fixed `tests/python/h5_tree.py` digest, which was non-deterministic for compounds with variable-length strings.
+
+2026-10-15 (finish): Added the human's rec-array decision (option 3, ADR 0005) to the spike document and set the ticket to `done`.
+Documentation only, so no code changed.
