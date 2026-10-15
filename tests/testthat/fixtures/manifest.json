@@ -1,0 +1,13 @@
+{
+  "cases": {
+    "trivial": {
+      "file": "trivial.h5ad"
+    }
+  },
+  "versions": {
+    "anndata": "0.13.4",
+    "h5py": "3.16.0",
+    "numpy": "2.5.4",
+    "pandas": "3.0.6"
+  }
+}

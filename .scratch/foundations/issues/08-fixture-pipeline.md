@@ -1,6 +1,6 @@
 # Fixture pipeline and offline mode
 
-Status: ready-for-agent
+Status: done
 Type: task
 Blocked by: 07
 
@@ -23,3 +23,9 @@ Create the fixture-generation pipeline that `h5ad-io` and later sub-projects wil
 - `ANNDATA_SKIP_PYTHON=true Rscript -e 'devtools::test()'` passes with skips only
 - `scripts/check.sh` passes
 - `.scratch/foundations/spec.md` acceptance criteria are all met, so foundations is complete
+
+## Comments
+
+2026-10-15 (loop): Added `tests/python/generate_fixtures.py` (case registry via `@case(filename)`, manifest with anndata/h5py/numpy/pandas versions), `scripts/regenerate-fixtures.sh`, the committed `trivial.h5ad` and `manifest.json`, and `test-fixtures.R`.
+The determinism test generates twice into temp dirs and compares each with `expect_structurally_equivalent()` and against the committed fixture, so regenerate and commit fixtures whenever a case changes.
+`ANNDATA_SKIP_PYTHON=true devtools::test()` passes with skips only. Full `scripts/check.sh` passed and the reviewer returned PASS. Foundations acceptance criteria are all met. Released as v0.0.0.9007.

@@ -48,4 +48,5 @@ Kept brief and current by the loop.
 - Active bindings in package-level objects are lost on install, so create them in `.onLoad()`
 - Snapshots are only written by `scripts/check.sh --quick`, because `R CMD check` runs in a temp copy
 - Lint runs after `pkgload::load_all()` so cross-file internals are visible to `object_usage_linter`
+- Fixtures are regenerated with `scripts/regenerate-fixtures.sh` (cases registered in `tests/python/generate_fixtures.py`), and a test checks they match a fresh generation, so recommit them when a case changes
 - Python is only used through `uv run --project tests/python ...`, in tests via `run_python()` which sets a private `TMPDIR` (uv lock files left in the check temp dir cause a NOTE)
