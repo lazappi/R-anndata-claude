@@ -64,4 +64,5 @@ Kept brief and current by the loop.
 - Python's `logger.info` calls become `rlang::signal(class = "anndata_info_message")` (silent unless handled), test them with `withCallingHandlers()`
 - In Python fixture scripts pass plain lists to `pd.DataFrame(..., index=)`, because a `pd.Series` with a default index is reindexed to all `NA`
 - `air format` rewrites `×` escapes to literal characters, which gives an R CMD check non-ASCII WARNING, so build such characters with `intToUtf8()`
+- `.Generic` in group generics (`Ops`) trips `object_usage_linter`, so read it with `get(".Generic", envir = environment())`
 - Python is only used through `uv run --project tests/python ...`, in tests via `run_python()` which sets a private `TMPDIR` (uv lock files left in the check temp dir cause a NOTE)
