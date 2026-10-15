@@ -1,2 +1,8 @@
-linters: linters_with_defaults()
+linters: linters_with_defaults(
+    object_name_linter(
+      regexes = c(
+        "snake_case or AnnData names" = "^([a-z][a-z0-9_]*|\\.[a-z][a-z0-9_]*|AnnData|AnnDataClass|X)$"
+      )
+    )
+  )
 encoding: "UTF-8"

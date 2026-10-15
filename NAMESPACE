@@ -3,6 +3,7 @@
 S3method("$<-",anndata_settings)
 S3method("[[<-",anndata_settings)
 S3method(print,anndata_settings)
+export(AnnData)
 export(anndata_settings)
 export(local_anndata_settings)
 export(with_anndata_settings)

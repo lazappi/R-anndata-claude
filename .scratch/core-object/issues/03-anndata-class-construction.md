@@ -1,6 +1,6 @@
 # AnnData class and basic construction
 
-Status: ready-for-agent
+Status: done
 Type: task
 Blocked by: 01, 02
 
@@ -27,3 +27,12 @@ The exported `AnnData()` function wrapping an `AnnData$new()` R6 class (ADR 0002
 - `scripts/check.sh` passes
 
 ## Comments
+
+2026-10-15: Done in `R/anndata.R` (`AnnData()`, internal `AnnDataClass`, `infer_shape()`) with tests in `test-anndata-class.R`.
+- The layers storage is `private$.layers`, a named list with X first under the `NA` name. Ticket 06 extends it.
+- `adata$X` validates the shape exactly and coerces with `as_anndata_matrix()`. Ticket 04 adds vectors, scalars, reshaping and more than 2 dimensions (currently an unsupported-value error).
+- `obs`, `var`, `obs_names` and `var_names` are read-only for now (`anndata_read_only_error`), ticket 07 adds assignment.
+- `uns`, `obsm`, `varm`, `obsp`, `varp`, `layers` and `raw` arguments raise `anndata_not_supported_error` until tickets 05 to 09 so values are never dropped. `infer_shape()` already handles them, and is unit tested directly.
+- `shape` with `X` and an invalid `shape` raise `anndata_invalid_argument_error`.
+- `.lintr` now allows the names `AnnData`, `AnnDataClass` and `X` in `object_name_linter`.
+- `AnnDataClass` needs `@noRd`, otherwise roxygen warns about a missing title, and `@importFrom R6 R6Class` must stay in the package file.
