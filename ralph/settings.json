@@ -1,0 +1,49 @@
+{
+  "model": "sonnet",
+  "enabledPlugins": {
+    "superpowers@claude-plugins-official": false,
+    "code-review@claude-plugins-official": false,
+    "skill-creator@claude-plugins-official": false,
+    "code-simplifier@claude-plugins-official": false,
+    "github@claude-plugins-official": false,
+    "claude-md-management@claude-plugins-official": false,
+    "feature-dev@claude-plugins-official": false,
+    "claude-code-setup@claude-plugins-official": false,
+    "commit-commands@claude-plugins-official": false,
+    "pr-review-toolkit@claude-plugins-official": false,
+    "plugin-dev@claude-plugins-official": false,
+    "hookify@claude-plugins-official": false,
+    "remember@claude-plugins-official": false,
+    "mattpocock-skills@claude-plugins-official": false
+  },
+  "permissions": {
+    "deny": [
+      "Agent(claude)",
+      "Agent(Explore)",
+      "Agent(general-purpose)",
+      "Agent(Plan)",
+      "Agent(claude-code-guide)",
+      "Agent(statusline-setup)",
+      "Agent(fork)",
+      "Bash(git push:*)",
+      "Bash(git reset:*)",
+      "Bash(git checkout:*)",
+      "Bash(git restore:*)",
+      "Bash(git clean:*)",
+      "Bash(git rebase:*)",
+      "Bash(git branch -D:*)",
+      "Bash(git tag -d:*)",
+      "Bash(rm -rf:*)",
+      "Bash(curl:*)",
+      "Bash(wget:*)",
+      "WebFetch",
+      "WebSearch",
+      "Edit(docs/adr/**)",
+      "Edit(.scratch/*/spec.md)",
+      "Edit(PROMPT.md)",
+      "Edit(ralph/**)",
+      "Edit(.claude/**)",
+      "Edit(scripts/ralph.sh)"
+    ]
+  }
+}
