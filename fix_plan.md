@@ -8,7 +8,7 @@ The human owns the order of the Queue.
 ## Queue
 
 - [x] foundations/01: package skeleton (`.scratch/foundations/issues/01-package-skeleton.md`)
-- [ ] foundations/02: formatting and linting (`.scratch/foundations/issues/02-formatting-and-linting.md`)
+- [x] foundations/02: formatting and linting (`.scratch/foundations/issues/02-formatting-and-linting.md`)
 - [ ] foundations/03: check script (`.scratch/foundations/issues/03-check-script.md`)
 - [ ] foundations/04: condition helpers (`.scratch/foundations/issues/04-condition-helpers.md`)
 - [ ] foundations/05: settings (`.scratch/foundations/issues/05-settings.md`)
