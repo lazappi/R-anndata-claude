@@ -3,6 +3,7 @@
 S3method("$",AnnDataAlignedMapping)
 S3method("$<-",AnnDataAlignedMapping)
 S3method("$<-",anndata_settings)
+S3method("[",AnnData)
 S3method("[",Raw)
 S3method("[[",AnnDataAlignedMapping)
 S3method("[[<-",AnnDataAlignedMapping)

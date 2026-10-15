@@ -123,8 +123,8 @@ subset_value <- function(x, idx, pairwise = FALSE) {
 }
 
 # Independent copy of `adata` restricted to observations `oidx` and variables
-# `vidx` (`NULL` keeps an axis), without raw
-subset_slots <- function(adata, oidx = NULL, vidx = NULL) {
+# `vidx` (`NULL` keeps an axis), with `raw` as given to `AnnData()`
+subset_slots <- function(adata, oidx = NULL, vidx = NULL, raw = NULL) {
   by_axis <- function(mapping, idx, pairwise = FALSE) {
     lapply(as.list(mapping), subset_value, idx = idx, pairwise = pairwise)
   }
@@ -143,6 +143,7 @@ subset_slots <- function(adata, oidx = NULL, vidx = NULL) {
       obsp = by_axis(adata$obsp, oidx, TRUE),
       varp = by_axis(adata$varp, vidx, TRUE),
       layers = layers,
+      raw = raw,
       shape = if (!length(layers)) {
         c(
           length(oidx %||% seq_len(adata$n_obs)),
@@ -152,4 +153,66 @@ subset_slots <- function(adata, oidx = NULL, vidx = NULL) {
     ),
     classes = "anndata_names_not_unique_warning"
   )
+}
+
+# Drops the unused levels of the factor columns of `sub`, a row subset of
+# `full`, and subsets the matching `<col>_colors` entry of `uns` (Python
+# `_remove_unused_categories`). Returns the new frame and `uns`.
+drop_unused_categories <- function(full, sub, uns) {
+  for (key in colnames(full)) {
+    column <- full[[key]]
+    if (!is.factor(column)) {
+      next
+    }
+    kept <- droplevels(sub[[key]])
+    sub[[key]] <- kept
+    color_key <- paste0(key, "_colors")
+    colors <- uns[[color_key]]
+    if (is.null(colors)) {
+      next
+    }
+    if (length(colors) != nlevels(column)) {
+      uns[[color_key]] <- NULL
+    } else {
+      uns[[color_key]] <- colors[levels(column) %in% levels(kept)]
+    }
+  }
+  list(frame = sub, uns = uns)
+}
+
+# Independent copy of `adata` restricted to observations `oidx` and variables
+# `vidx` (`NULL` keeps an axis), with raw subset on observations only
+subset_anndata <- function(adata, oidx = NULL, vidx = NULL) {
+  raw <- adata$raw
+  new <- subset_slots(
+    adata,
+    oidx,
+    vidx,
+    raw = if (!is.null(raw)) {
+      list(
+        X = matrix_subset(raw$X, oidx, NULL),
+        var = raw$var,
+        varm = as.list(raw$varm)
+      )
+    }
+  )
+  if (get_setting("remove_unused_categories")) {
+    obs <- drop_unused_categories(adata$obs, new$obs, new$uns)
+    var <- drop_unused_categories(adata$var, new$var, obs$uns)
+    new$obs <- obs$frame
+    new$var <- var$frame
+    new$uns <- var$uns
+  }
+  new
+}
+
+#' @export
+#' @noRd
+`[.AnnData` <- function(x, i, j) {
+  call <- rlang::caller_env()
+  rows <- if (missing(i)) NULL else i
+  cols <- if (missing(j) || nargs() < 3L) NULL else j
+  oidx <- normalize_index(rows, .subset2(x, "obs_names"), "obs", call)
+  vidx <- normalize_index(cols, .subset2(x, "var_names"), "var", call)
+  subset_anndata(x, oidx, vidx)
 }

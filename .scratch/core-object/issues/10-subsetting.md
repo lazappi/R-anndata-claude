@@ -1,6 +1,6 @@
 # Subsetting
 
-Status: ready-for-agent
+Status: done
 Type: task
 Blocked by: 06, 08
 
@@ -26,3 +26,9 @@ Blocked by: 06, 08
 - `scripts/check.sh` passes
 
 ## Comments
+
+2026-10-15: Added `[.AnnData` and `subset_anndata()` in `R/index.R` on top of the existing `subset_slots()`.
+Raw is subset on observations only by passing a `raw` list to `AnnData()`.
+`drop_unused_categories()` follows Python `_remove_unused_categories`: colors of the wrong length are removed, otherwise subset to the kept levels.
+A length-1 colors entry is not special-cased because R has no 0-d arrays.
+Tests in `tests/testthat/test-subsetting.R`.
