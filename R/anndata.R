@@ -159,6 +159,84 @@ x_position <- function(store) {
   which(is.na(names(store)))
 }
 
+is_plain_vector <- function(x) {
+  is.null(dim(x)) &&
+    is.atomic(x) &&
+    !is.object(x) &&
+    (is.numeric(x) || is.logical(x))
+}
+
+# Mirrors the Python `X` setter: scalars fill, other shapes are reshaped in C
+# (row-major) order with a warning, and only 2-D values can be reshaped.
+# `shape` is `c(n_obs, n_vars)`.
+coerce_x_shape <- function(value, shape, call) {
+  if (is_plain_vector(value)) {
+    if (length(value) == 1L) {
+      warn_future(
+        "The ability to set {.field X} with a scalar value will be removed in
+         the future.",
+        call = call
+      )
+      return(matrix(value, shape[[1L]], shape[[2L]]))
+    }
+    dims <- length(value)
+  } else {
+    value <- as_anndata_matrix(
+      value,
+      allow_array = TRUE,
+      what = "X",
+      call = call
+    )
+    dims <- dim(value)
+  }
+  if (!identical(as.integer(dims[1:2]), shape)) {
+    if (length(dims) > 2L) {
+      abort_dimension(
+        "Cannot set {.field X} from an array of shape ({dims}): its leading
+         two dimensions do not match the shape ({shape}). Automatic reshaping
+         is only supported for 2-D inputs.",
+        what = "X",
+        call = call
+      )
+    }
+    warn_future(
+      "Automatic reshaping when setting {.field X} will be removed in the
+       future.",
+      call = call
+    )
+    value <- reshape_x(value, shape, call)
+  } else if (length(dims) > 2L) {
+    anndata_warn(
+      "{.field X} must be 2-dimensional, but got an array with shape ({dims}).
+       Higher-dimensional arrays violate the AnnData specification and cannot
+       be written to disk.",
+      "anndata_non_2d_warning",
+      call = call
+    )
+  }
+  value
+}
+
+reshape_x <- function(value, shape, call) {
+  if (is_sparse(value)) {
+    abort_dimension(
+      "Cannot reshape a sparse {.field X} to ({shape}).",
+      what = "X",
+      call = call
+    )
+  }
+  if (length(value) != prod(shape)) {
+    abort_dimension(
+      "Cannot reshape {.field X} of size {length(value)} into shape
+       ({shape}).",
+      what = "X",
+      call = call
+    )
+  }
+  flat <- if (is.null(dim(value))) value else as.vector(t(value))
+  copy_dtype(matrix(flat, shape[[1L]], shape[[2L]], byrow = TRUE), value)
+}
+
 #' @noRd
 AnnDataClass <- R6Class(
   "AnnData",
@@ -343,17 +421,7 @@ AnnDataClass <- R6Class(
         }
         return(invisible(NULL))
       }
-      value <- as_anndata_matrix(value, what = "X", call = call)
-      if (!identical(as.integer(dim(value)[1:2]), self$shape)) {
-        abort_dimension(
-          c(
-            "{.field X} must have shape ({self$shape[[1]]}, {self$shape[[2]]}),
-             not ({dim(value)[[1]]}, {dim(value)[[2]]})."
-          ),
-          what = "X",
-          call = call
-        )
-      }
+      value <- coerce_x_shape(value, self$shape, call)
       others <- if (length(position)) {
         private$.layers[-position]
       } else {

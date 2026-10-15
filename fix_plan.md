@@ -24,6 +24,8 @@ The human owns the order of the Queue.
 - [x] core-object/02: obs and var data frame handling (`.scratch/core-object/issues/02-dataframe-inputs.md`)
 - [x] core-object/03: AnnData class and basic construction (`.scratch/core-object/issues/03-anndata-class-construction.md`)
 - [ ] core-object/04: X assignment and validation (`.scratch/core-object/issues/04-x-assignment.md`)
+  - [x] `X` setter rules (scalar, reshape, 3-D, NULL)
+  - [ ] `adata$layers[[NA]]` assignment, once ticket 06 provides layers
 - [ ] core-object/05: aligned mappings: obsm, varm, obsp, varp (`.scratch/core-object/issues/05-aligned-mappings.md`)
 - [ ] core-object/06: layers (`.scratch/core-object/issues/06-layers.md`)
 - [ ] core-object/07: obs, var, names and uns assignment (`.scratch/core-object/issues/07-obs-var-names-uns-assignment.md`)

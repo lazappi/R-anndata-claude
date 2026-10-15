@@ -238,10 +238,6 @@ test_that("setting X validates its shape and removes it with NULL", {
   adata <- AnnData(dense_x)
   adata$X <- dense_x * 2
   expect_identical(adata$X, dense_x * 2)
-  expect_anndata_condition(
-    adata$X <- matrix(0, 2, 2),
-    "anndata_dimension_error"
-  )
   expect_anndata_condition(adata$X <- "a", "anndata_unsupported_value_error")
   adata$X <- csr_x()
   expect_identical(adata$X, csr_x())
@@ -264,4 +260,89 @@ test_that("the on-disk dtype record is kept on X", {
   x <- dense_x
   attr(x, "anndata_dtype") <- "float32"
   expect_identical(attr(AnnData(x)$X, "anndata_dtype"), "float32")
+})
+
+# Python's X setter: a scalar fills the matrix with a FutureWarning
+test_that("a scalar X fills the matrix and warns", {
+  adata <- AnnData(shape = c(3L, 2L))
+  expect_anndata_condition(adata$X <- 5, "anndata_future_warning")
+  suppressWarnings(adata$X <- 5)
+  expect_identical(adata$X, matrix(5, 3, 2))
+  suppressWarnings(adata$X <- 2L)
+  expect_identical(adata$X, matrix(2L, 3, 2))
+})
+
+# Python reshapes (C order) any 2-D or 1-D value of the right size, with a
+# FutureWarning, so a vector fits a single row or column
+test_that("a value of the right size is reshaped with a warning", {
+  adata <- AnnData(shape = c(3L, 1L))
+  expect_anndata_condition(adata$X <- c(1, 2, 3), "anndata_future_warning")
+  suppressWarnings(adata$X <- c(1, 2, 3))
+  expect_identical(adata$X, matrix(c(1, 2, 3), 3, 1))
+
+  adata <- AnnData(shape = c(1L, 2L))
+  suppressWarnings(adata$X <- matrix(c(1, 2), 2, 1))
+  expect_identical(adata$X, matrix(c(1, 2), 1, 2))
+
+  # numpy: arange(6).reshape(2, 3) set on shape (3, 2) is [[0,1],[2,3],[4,5]]
+  adata <- AnnData(shape = c(3L, 2L))
+  value <- matrix(0:5, 2, 3, byrow = TRUE)
+  expect_anndata_condition(adata$X <- value, "anndata_future_warning")
+  suppressWarnings(adata$X <- value)
+  expect_identical(adata$X, matrix(0:5, 3, 2, byrow = TRUE))
+})
+
+# Python raises after the reshape warning when sizes differ or the value is
+# sparse
+test_that("values that cannot be reshaped error", {
+  adata <- AnnData(dense_x)
+  expect_anndata_condition(
+    adata$X <- matrix(0, 2, 2),
+    "anndata_future_warning"
+  )
+  for (value in list(matrix(0, 2, 2), c(1, 2, 3), matrix(0, 3, 1))) {
+    expect_anndata_condition(
+      suppressWarnings(adata$X <- value),
+      "anndata_dimension_error"
+    )
+  }
+  expect_anndata_condition(
+    suppressWarnings(adata$X <- Matrix::t(csc_x())),
+    "anndata_dimension_error"
+  )
+  expect_identical(adata$X, dense_x)
+})
+
+# Python allows 3-D X with a UserWarning, and refuses to reshape it
+test_that("more than 2 dimensions warn or error", {
+  adata <- AnnData(dense_x)
+  ok <- array(0, c(3, 2, 2))
+  expect_anndata_condition(adata$X <- ok, "anndata_non_2d_warning")
+  suppressWarnings(adata$X <- ok)
+  expect_identical(adata$X, ok)
+  expect_anndata_condition(
+    adata$X <- array(0, c(2, 3, 2)),
+    "anndata_dimension_error"
+  )
+})
+
+# Python: removing X twice is fine
+test_that("NULL X can be assigned repeatedly", {
+  adata <- AnnData(dense_x)
+  adata$X <- NULL
+  expect_no_condition(adata$X <- NULL)
+  expect_null(adata$X)
+})
+
+# The sparse format and dtype record must survive assignment
+test_that("assigning keeps the sparse format and dtype record", {
+  adata <- AnnData(shape = c(3L, 2L))
+  for (x in list(csc_x(), csr_x())) {
+    adata$X <- x
+    expect_identical(class(adata$X), class(x))
+  }
+  x <- matrix(0, 3, 2)
+  attr(x, "anndata_dtype") <- "float32"
+  adata$X <- x
+  expect_identical(attr(adata$X, "anndata_dtype"), "float32")
 })
