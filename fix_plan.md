@@ -33,7 +33,7 @@ The human owns the order of the Queue.
 - [x] core-object/09: remaining construction forms (`.scratch/core-object/issues/09-construction-forms.md`)
 - [x] core-object/10: subsetting (`.scratch/core-object/issues/10-subsetting.md`)
 - [x] core-object/11: copy and transpose (`.scratch/core-object/issues/11-copy-and-transpose.md`)
-- [ ] core-object/12: obs_names_make_unique and var_names_make_unique (`.scratch/core-object/issues/12-make-unique.md`)
+- [x] core-object/12: obs_names_make_unique and var_names_make_unique (`.scratch/core-object/issues/12-make-unique.md`)
 - [ ] core-object/13: to_df, obs_vector, var_vector and key methods (`.scratch/core-object/issues/13-data-access-methods.md`)
 - [ ] core-object/14: strings_to_categoricals and rename_categories (`.scratch/core-object/issues/14-categorical-methods.md`)
 - [ ] core-object/15: printing (`.scratch/core-object/issues/15-printing.md`)

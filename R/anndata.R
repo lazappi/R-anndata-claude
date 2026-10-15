@@ -469,6 +469,31 @@ AnnDataClass <- R6Class(
         }
       )
     },
+    #' @description Makes `obs_names` unique in place by appending `join` and a
+    #'   counter to repeated names (the first is kept, `NA` is ignored).
+    #' @param join String between a name and its counter.
+    obs_names_make_unique = function(join = "-") {
+      call <- rlang::caller_env()
+      check_join(join, call)
+      private$set_names(
+        "obs",
+        make_names_unique(rownames(private$.obs), join, call),
+        call
+      )
+      invisible(self)
+    },
+    #' @description As `obs_names_make_unique()` for `var_names`.
+    #' @param join String between a name and its counter.
+    var_names_make_unique = function(join = "-") {
+      call <- rlang::caller_env()
+      check_join(join, call)
+      private$set_names(
+        "var",
+        make_names_unique(rownames(private$.var), join, call),
+        call
+      )
+      invisible(self)
+    },
     #' @description A new `AnnData` with observations and variables swapped.
     #'   X and layers are transposed, obsm and varm and obsp and varp swap
     #'   places, `uns` is kept and the Raw is dropped.
