@@ -138,6 +138,7 @@ Python references: `src/anndata/_io/h5ad.py` (written as `h5ad.py`) and `registr
 - The root group gets `encoding-type: anndata` and `encoding-version: 0.1.0`
 - obsm, varm, obsp, varp, layers and uns are always written as `dict` groups, even when empty, as Python does.
   The fixtures confirm the exact layout for empty Slots.
+- The `NA` layer (X, ADR 0004) is written to `/X` and never inside `/layers`, as Python does with `layers[None]` (`h5ad.py:96-106`)
 - Reading a file with no `X` gives `adata$X` equal to `NULL`
 - Files with a higher-than-2-D X or layer read with a warning, as in Python (release note 0.13.0)
 

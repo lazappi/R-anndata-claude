@@ -53,8 +53,12 @@ Out:
 - `uns` is a named list, nested to any depth
 - Values read from disk may carry metadata recording their On-disk dtype (defined in `h5ad-io`), and every operation in this spec must keep that metadata where the values are kept
 
-`X` is stored separately from layers (ADR 0004).
-Python's `layers[None]` is exposed only as `X`, and `names(adata$layers)` lists only named layers.
+`X` is stored in `layers` under the `NA` key, mirroring Python's `layers[None]` (ADR 0004).
+- `adata$X` is an alias for `adata$layers[[NA]]`, for both getting and setting
+- `adata$layers[[NA]]` and `adata$layers[[NA_character_]]` both address X
+- `names(adata$layers)` includes `NA` when X is present, in the position Python's key order gives `None` (confirm with fixtures)
+- `as.list(adata$layers)` includes X under the `NA` name
+- X has the same validation whichever way it is set
 
 ## Construction
 
@@ -99,7 +103,8 @@ Assignment validates and coerces as in Python, and invalid values raise classed 
   - axis arrays (`:288-310`): the first dimension equals n_obs (or n_vars), and a data frame value must have row names equal to the obs_names (or var_names), with the matching error otherwise
   - pairwise arrays (`:440-465`): both dimensions equal n_obs (or n_vars)
   - layers (`:371-386`): the first two dimensions equal the shape, and more than 2 dimensions warns
-- Clearing or replacing all `layers` keeps `X` and raises the warning Python raises (`aligned_mapping.py:349-370`, release note 0.13.2)
+- Clearing or replacing all `layers` (`adata$layers <- list()`, `adata$layers$clear()`) keeps `X` and raises the warning Python raises.
+  `adata$layers$clear(keep_x = TRUE/FALSE)` controls this explicitly, as Python's `clear(keep_x=)` does (`aligned_mapping.py:349-370`, release note 0.13.2).
 - `adata$uns <- list(...)` must be a named list (or empty), and `adata$uns[["k"]] <- v` sets one entry
 - `adata$raw <- other` requires an `AnnData` and stores its X, var and varm (`anndata.py:723-735`).
   `adata$raw <- NULL` removes it.
@@ -182,7 +187,7 @@ AnnData object with n_obs × n_vars = 100 × 50
 
 - The Slot order, quoting and separators match Python's `iter_outer` order.
   Read it from the reference and confirm it with a Python-generated expected output.
-- `layers` lists `None (.X)` first when X is not `NULL`, as Python does
+- `layers` lists the X entry as `None (.X)`, exactly as Python does, in Python's key order
 - Empty Slots are omitted
 - The `View of ` prefix and ` backed at '<file>'` suffix are added by later sub-projects
 
