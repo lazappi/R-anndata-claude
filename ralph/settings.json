@@ -43,7 +43,14 @@
       "Edit(PROMPT.md)",
       "Edit(ralph/**)",
       "Edit(.claude/**)",
-      "Edit(scripts/ralph.sh)"
+      "Edit(scripts/ralph*)",
+      "ScheduleWakeup",
+      "CronCreate",
+      "CronDelete",
+      "RemoteTrigger",
+      "PushNotification",
+      "EnterWorktree",
+      "ExitWorktree"
     ]
   }
 }
