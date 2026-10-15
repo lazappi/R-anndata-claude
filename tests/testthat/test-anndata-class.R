@@ -187,7 +187,7 @@ test_that("filename and filemode are not yet supported", {
 
 # Slots whose tickets are not yet done must not be silently dropped
 test_that("slot arguments that are not yet implemented error", {
-  for (slot in c("uns", "layers", "raw")) {
+  for (slot in c("layers", "raw")) {
     args <- list(dense_x)
     args[[slot]] <- list(a = 1)
     expect_anndata_condition(

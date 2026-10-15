@@ -27,11 +27,13 @@ AnnData(
 \item{obs, var}{Annotations of observations and variables as \code{NULL}, a named
 list, a \code{data.frame} or a \code{DataFrame}.}
 
-\item{uns}{Unstructured annotation (not yet supported).}
+\item{uns}{Unstructured annotation, a named list or \code{NULL}.}
 
 \item{...}{Must be empty, so that the arguments after \code{uns} are named.}
 
-\item{obsm, varm, obsp, varp, layers, raw}{Further Slots (not yet supported).}
+\item{obsm, varm, obsp, varp}{Aligned mappings as named lists or \code{NULL}.}
+
+\item{layers, raw}{Further Slots (not yet supported).}
 
 \item{shape}{Integer vector \code{c(n_obs, n_vars)} used when \code{X} is \code{NULL}.}
 
@@ -58,6 +60,7 @@ Without names, observations and variables are named \code{"0"}, \code{"1"}, ...,
 
 \itemize{
 \item \code{X}: the data matrix, or \code{NULL}
+\item \code{uns}: unstructured annotation, a named list
 \item \code{obs}, \code{var}: annotation \code{S4Vectors::DataFrame}s
 \item \code{obs_names}, \code{var_names}: character names
 \item \code{n_obs}, \code{n_vars}, \code{shape}: dimensions

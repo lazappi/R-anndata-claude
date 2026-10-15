@@ -121,6 +121,18 @@ aligned_mapping_class <- R6Class(
       private$store <- store
       invisible(self)
     },
+    #' @description Give every data frame the names of the parent axis.
+    #' @param new_names,index_name The names and their index name.
+    rename_frames = function(new_names, index_name) {
+      for (key in names(private$store)) {
+        value <- private$store[[key]]
+        if (is_frame(value)) {
+          value <- with_frame_names(value, new_names)
+          private$store[[key]] <- with_index_name(value, index_name)
+        }
+      }
+      invisible(self)
+    },
     #' @description The keys in insertion order.
     keys = function() {
       names(private$store) %||% character()

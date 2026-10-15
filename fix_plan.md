@@ -28,7 +28,7 @@ The human owns the order of the Queue.
   - [ ] `adata$layers[[NA]]` assignment, once ticket 06 provides layers
 - [x] core-object/05: aligned mappings: obsm, varm, obsp, varp (`.scratch/core-object/issues/05-aligned-mappings.md`)
 - [ ] core-object/06: layers (`.scratch/core-object/issues/06-layers.md`)
-- [ ] core-object/07: obs, var, names and uns assignment (`.scratch/core-object/issues/07-obs-var-names-uns-assignment.md`)
+- [x] core-object/07: obs, var, names and uns assignment (`.scratch/core-object/issues/07-obs-var-names-uns-assignment.md`)
 - [ ] core-object/08: raw class and raw slot (`.scratch/core-object/issues/08-raw.md`)
 - [ ] core-object/09: remaining construction forms (`.scratch/core-object/issues/09-construction-forms.md`)
 - [ ] core-object/10: subsetting (`.scratch/core-object/issues/10-subsetting.md`)
@@ -54,6 +54,8 @@ The human owns the order of the Queue.
 ## Discovered
 
 - [x] `.Rbuildignore` excludes `^tests/python$`, but ticket 06 needs `tests/python` available inside `R CMD check` (tests are copied into the check directory). Fix as part of foundations/06.
+
+- [ ] Deadlock: core-object/06 has `Blocked by: 04`, but 04's last sub-item (`layers[[NA]]` assignment) needs 06. The human should remove 04 from 06's `Blocked by:` (06 can then finish 04's sub-item).
 
 ## Blocked
 

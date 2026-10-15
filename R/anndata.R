@@ -14,6 +14,7 @@
 #'
 #' @section Fields:
 #' * `X`: the data matrix, or `NULL`
+#' * `uns`: unstructured annotation, a named list
 #' * `obs`, `var`: annotation `S4Vectors::DataFrame`s
 #' * `obs_names`, `var_names`: character names
 #' * `n_obs`, `n_vars`, `shape`: dimensions
@@ -26,9 +27,10 @@
 #' @param X A numeric or logical matrix, or a `Matrix` sparse matrix, or `NULL`.
 #' @param obs,var Annotations of observations and variables as `NULL`, a named
 #'   list, a `data.frame` or a `DataFrame`.
-#' @param uns Unstructured annotation (not yet supported).
+#' @param uns Unstructured annotation, a named list or `NULL`.
 #' @param ... Must be empty, so that the arguments after `uns` are named.
-#' @param obsm,varm,obsp,varp,layers,raw Further Slots (not yet supported).
+#' @param obsm,varm,obsp,varp Aligned mappings as named lists or `NULL`.
+#' @param layers,raw Further Slots (not yet supported).
 #' @param shape Integer vector `c(n_obs, n_vars)` used when `X` is `NULL`.
 #' @param filename,filemode Backed mode (not yet supported).
 #'
@@ -269,7 +271,7 @@ AnnDataClass <- R6Class(
           call = call
         )
       }
-      slots <- list(uns = uns, layers = layers, raw = raw)
+      slots <- list(layers = layers, raw = raw)
       for (slot in names(slots)) {
         if (!is.null(slots[[slot]])) {
           abort_slot_not_supported(slot, call)
@@ -309,6 +311,7 @@ AnnDataClass <- R6Class(
         call
       )
       private$.layers <- list()
+      private$set_uns(uns %||% list(), call)
       if (!is.null(X)) {
         private$set_x(X, call)
       }
@@ -337,17 +340,17 @@ AnnDataClass <- R6Class(
     },
     #' @field obs Annotation of observations, a `DataFrame`.
     obs = function(value) {
-      if (!missing(value)) {
-        abort_read_only("obs")
+      if (missing(value)) {
+        return(private$.obs)
       }
-      private$.obs
+      private$set_frame("obs", value, rlang::caller_env())
     },
     #' @field var Annotation of variables, a `DataFrame`.
     var = function(value) {
-      if (!missing(value)) {
-        abort_read_only("var")
+      if (missing(value)) {
+        return(private$.var)
       }
-      private$.var
+      private$set_frame("var", value, rlang::caller_env())
     },
     #' @field obsm,varm Aligned mappings of axis arrays, see
     #'   `anndata-aligned-mappings`. Assigning a named list replaces them.
@@ -366,17 +369,25 @@ AnnDataClass <- R6Class(
     },
     #' @field obs_names Names of observations.
     obs_names = function(value) {
-      if (!missing(value)) {
-        abort_read_only("obs_names")
+      if (missing(value)) {
+        return(rownames(private$.obs))
       }
-      rownames(private$.obs)
+      private$set_names("obs", value, rlang::caller_env())
     },
     #' @field var_names Names of variables.
     var_names = function(value) {
-      if (!missing(value)) {
-        abort_read_only("var_names")
+      if (missing(value)) {
+        return(rownames(private$.var))
       }
-      rownames(private$.var)
+      private$set_names("var", value, rlang::caller_env())
+    },
+    #' @field uns Unstructured annotation, a named list. Assigning replaces it
+    #'   and `adata$uns[["k"]] <- v` sets one entry.
+    uns = function(value) {
+      if (missing(value)) {
+        return(private$.uns)
+      }
+      private$set_uns(value, rlang::caller_env())
     },
     #' @field n_obs Number of observations.
     n_obs = function(value) {
@@ -425,6 +436,7 @@ AnnDataClass <- R6Class(
     .obs = NULL,
     .var = NULL,
     .layers = NULL,
+    .uns = NULL,
     .obsm = NULL,
     .varm = NULL,
     .obsp = NULL,
@@ -439,6 +451,56 @@ AnnDataClass <- R6Class(
       if (!identical(value, mapping)) {
         mapping$replace(value, call = call)
       }
+      invisible(NULL)
+    },
+    # Replaces obs or var, which takes its names from the value (Python resets
+    # them to "0", "1", ... when the value has none) and passes them on
+    set_frame = function(attr, value, call) {
+      field <- paste0(".", attr)
+      n <- nrow(private[[field]])
+      private[[field]] <- as_annotation_frame(value, attr, n, "shape", call)
+      private$rename_mapped_frames(attr)
+    },
+    # Sets obs_names or var_names, and a plain vector has no index name
+    set_names = function(attr, value, call) {
+      field <- paste0(".", attr)
+      frame <- private[[field]]
+      if (is.factor(value)) {
+        value <- as.character(value)
+      }
+      if (!is.atomic(value) || is.null(value) || is.object(value)) {
+        abort_invalid_argument(
+          "{.field {attr}_names} must be a vector of names.",
+          call
+        )
+      }
+      if (length(value) != nrow(frame)) {
+        abort_dimension(
+          "Length of passed value for {.field {attr}_names} is
+           {length(value)}, but this AnnData has shape ({self$shape}).",
+          what = paste0(attr, "_names"),
+          call = call
+        )
+      }
+      frame <- with_frame_names(frame, as.character(unname(value)))
+      private[[field]] <- with_index_name(frame, NULL)
+      private$rename_mapped_frames(attr)
+    },
+    # Data frames in obsm and varm share the names of their axis
+    rename_mapped_frames = function(attr) {
+      frame <- private[[paste0(".", attr)]]
+      mapping <- private[[paste0(".", attr, "m")]]
+      mapping$rename_frames(rownames(frame), frame_index_name(frame))
+      invisible(NULL)
+    },
+    set_uns = function(value, call) {
+      keys <- names(value)
+      named <- !is.null(keys) && !anyNA(keys) && all(nzchar(keys))
+      valid <- is.list(value) && !is.object(value) && (named || !length(value))
+      if (!valid) {
+        abort_invalid_argument("{.field uns} must be a named list.", call)
+      }
+      private$.uns <- value
       invisible(NULL)
     },
     # Validates X and stores it first in the layers storage under the `NA` key
