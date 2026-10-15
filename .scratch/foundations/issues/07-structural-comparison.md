@@ -1,6 +1,6 @@
 # Structural comparison helpers
 
-Status: ready-for-agent
+Status: in-progress
 Type: task
 Blocked by: 06
 
@@ -25,3 +25,11 @@ Add the Python scripts and R expectations used to check Structural equivalence a
 ## References
 
 - `.reference/anndata/src/anndata/tests/helpers.py:620` (`assert_equal`)
+
+## Comments
+
+2026-10-15 (human, recovering an interrupted run): The run building this ticket was killed while its checker ran the full check (the check had been moved to the background, see the setup fixes).
+Its work is committed as-is in a work-in-progress commit.
+`scripts/check.sh` passed on this state when re-run by hand (coverage 81.29%).
+`tests/python/pyproject.toml` gained `pytest`, `dask` and `fast-array-utils`, because `anndata.tests.helpers` imports them.
+Still to do: confirm every acceptance criterion, run the reviewer (which now reviews all changes since the last tag), then do the bookkeeping, version bump and tag.

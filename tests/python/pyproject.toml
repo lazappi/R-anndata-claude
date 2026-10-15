@@ -9,6 +9,10 @@ dependencies = [
     "h5py",
     "numpy",
     "scipy",
+    # needed to import anndata.tests.helpers (used by compare.py)
+    "pytest",
+    "dask",
+    "fast-array-utils>=1.2.3",
 ]
 
 [tool.uv]
