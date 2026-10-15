@@ -97,6 +97,8 @@ To mark it blocked:
 ## Tools and permissions
 
 - Prefer the Read, Grep, Glob, Edit and Write tools over shell equivalents (`cat`, `grep`, `find`, `sed`)
+- Create and change files only with Write and Edit (including scripts in `.ralph/oracle/`).
+  Never use heredocs, `sed -i`, `>` or `>>` redirects or inline scripts to write files, because those commands are denied.
 - Every run and subagent starts in the repository root.
   Never use `cd` or `git -C`, because commands in those forms do not match the allowlist and are denied.
 - Run one command per Bash call.
