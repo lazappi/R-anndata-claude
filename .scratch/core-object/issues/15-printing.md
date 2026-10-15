@@ -1,6 +1,6 @@
 # Printing
 
-Status: ready-for-agent
+Status: done
 Type: task
 Blocked by: 06, 08
 
@@ -19,3 +19,9 @@ Blocked by: 06, 08
 - `scripts/check.sh` passes
 
 ## Comments
+
+2026-10-15: Added `format.AnnData` and `print.AnnData` (`R/printing.R`).
+- Expectations come from `tests/python/repr_cases.py` (a separate JSON script, registered in `scripts/regenerate-fixtures.sh`, rather than `generate_fixtures.py`, since no h5ad file is needed) with a freshness test
+- Python lists X last in `layers` (`'counts', None (.X)`), so R puts `None (.X)` last regardless of storage order
+- `View of` and `backed at` prefixes are omitted until views and backed mode exist
+- Not covered: control characters in keys (Python's `repr` escapes `\n` and `\t`)

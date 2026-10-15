@@ -38,7 +38,7 @@ The human owns the order of the Queue.
 - [ ] core-object/14: strings_to_categoricals and rename_categories (`.scratch/core-object/issues/14-categorical-methods.md`)
   - [x] `strings_to_categoricals` and `rename_categories` on obs and var
   - [ ] `rename_categories` renaming of scanpy `uns` rec-array fields (needs rec-array structure from h5ad-io/08)
-- [ ] core-object/15: printing (`.scratch/core-object/issues/15-printing.md`)
+- [x] core-object/15: printing (`.scratch/core-object/issues/15-printing.md`)
 - [ ] core-object/16: R generics and comparison error (`.scratch/core-object/issues/16-generics-and-comparison.md`)
 - [ ] h5ad-io/03: element registry and error classes (`.scratch/h5ad-io/issues/03-element-registry.md`)
 - [ ] h5ad-io/04: on-disk dtype preservation mechanism (`.scratch/h5ad-io/issues/04-on-disk-dtype-records.md`)
@@ -60,6 +60,8 @@ The human owns the order of the Queue.
 - [x] Deadlock: core-object/06 has `Blocked by: 04`, but 04's last sub-item (`layers[[NA]]` assignment) needs 06. The human should remove 04 from 06's `Blocked by:` (06 can then finish 04's sub-item).
 
 - [ ] Python 0.13.4 marks `obs_vector`, `var_vector` and the `*_keys()` methods deprecated (they warn). core-object/13 does not warn, because the spec is silent. The human should decide whether to add an `anndata_deprecated_warning`.
+
+- [ ] `format.AnnData` does not escape control characters in keys as Python's `repr` does (`\n`, `\t`), see `quote_key()` in `R/printing.R`
 
 ## Blocked
 

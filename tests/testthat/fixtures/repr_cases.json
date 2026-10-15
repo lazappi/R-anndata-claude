@@ -1,0 +1,70 @@
+{
+  "empty": {
+    "repr": "AnnData object with n_obs \u00d7 n_vars = 3 \u00d7 2\n    layers: None (.X)",
+    "layer_keys": [
+      null
+    ]
+  },
+  "obs_var": {
+    "repr": "AnnData object with n_obs \u00d7 n_vars = 3 \u00d7 2\n    obs: 'a', 'b'\n    var: 'gene'\n    layers: None (.X)",
+    "layer_keys": [
+      null
+    ]
+  },
+  "uns": {
+    "repr": "AnnData object with n_obs \u00d7 n_vars = 3 \u00d7 2\n    uns: 'first', 'second', 'a'\n    layers: None (.X)",
+    "layer_keys": [
+      null
+    ]
+  },
+  "obsm_varm": {
+    "repr": "AnnData object with n_obs \u00d7 n_vars = 3 \u00d7 2\n    obsm: 'X_pca', 'X_umap'\n    varm: 'PCs'\n    layers: None (.X)",
+    "layer_keys": [
+      null
+    ]
+  },
+  "obsp_varp": {
+    "repr": "AnnData object with n_obs \u00d7 n_vars = 3 \u00d7 2\n    obsp: 'connectivities'\n    varp: 'corr'\n    layers: None (.X)",
+    "layer_keys": [
+      null
+    ]
+  },
+  "layers": {
+    "repr": "AnnData object with n_obs \u00d7 n_vars = 3 \u00d7 2\n    layers: 'counts', 'logcounts', None (.X)",
+    "layer_keys": [
+      "counts",
+      "logcounts",
+      null
+    ]
+  },
+  "layers_only_counts": {
+    "repr": "AnnData object with n_obs \u00d7 n_vars = 3 \u00d7 2\n    layers: 'counts', None (.X)",
+    "layer_keys": [
+      "counts",
+      null
+    ]
+  },
+  "raw": {
+    "repr": "AnnData object with n_obs \u00d7 n_vars = 3 \u00d7 2\n    obs: 'a'\n    layers: None (.X)",
+    "layer_keys": [
+      null
+    ]
+  },
+  "all_slots": {
+    "repr": "AnnData object with n_obs \u00d7 n_vars = 3 \u00d7 2\n    obs: 'a', 'b'\n    var: 'gene'\n    uns: 'u'\n    obsm: 'X_pca'\n    varm: 'PCs'\n    obsp: 'c'\n    varp: 'd'\n    layers: 'counts', None (.X)",
+    "layer_keys": [
+      "counts",
+      null
+    ]
+  },
+  "quotes": {
+    "repr": "AnnData object with n_obs \u00d7 n_vars = 3 \u00d7 2\n    obs: \"it's\", 'say \"hi\"', 'plain'\n    uns: \"a'b\"\n    layers: None (.X)",
+    "layer_keys": [
+      null
+    ]
+  },
+  "no_x": {
+    "repr": "AnnData object with n_obs \u00d7 n_vars = 3 \u00d7 2\n    obs: 'a'\n    var: 'gene'",
+    "layer_keys": []
+  }
+}

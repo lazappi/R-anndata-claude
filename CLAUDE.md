@@ -63,4 +63,5 @@ Kept brief and current by the loop.
 - Non-h5ad Python expectations are JSON written by a `tests/python/*_cases.py` script into `tests/testthat/fixtures/`, run from `scripts/regenerate-fixtures.sh` and guarded by a freshness test (see `make_unique_cases.py`)
 - Python's `logger.info` calls become `rlang::signal(class = "anndata_info_message")` (silent unless handled), test them with `withCallingHandlers()`
 - In Python fixture scripts pass plain lists to `pd.DataFrame(..., index=)`, because a `pd.Series` with a default index is reindexed to all `NA`
+- `air format` rewrites `×` escapes to literal characters, which gives an R CMD check non-ASCII WARNING, so build such characters with `intToUtf8()`
 - Python is only used through `uv run --project tests/python ...`, in tests via `run_python()` which sets a private `TMPDIR` (uv lock files left in the check temp dir cause a NOTE)
