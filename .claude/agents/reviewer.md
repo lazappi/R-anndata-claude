@@ -19,6 +19,8 @@ You will be given a ticket path.
    - R conventions: classed conditions, roxygen docs with runnable examples, no exported internals, one concern per file
    - there are no unrelated changes and no edits to specs, ADRs, `PROMPT.md`, `ralph/` or `.claude/`
 4. Never edit files or run builds or tests (the checker does that)
+5. If you cannot inspect the changes (e.g. `git status` or `git diff` is denied or fails), answer `FAIL` and say what you could not run.
+   Never pass work you have not seen.
 
 Answer with `PASS` or `FAIL` on the first line, then numbered findings, each with `path:line`, what is wrong and what is needed.
 Only report real problems, not style preferences already handled by `air` or `lintr`.
