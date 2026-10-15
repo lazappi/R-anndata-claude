@@ -9,7 +9,7 @@ You independently review uncommitted work on the `anndata.claude` R package befo
 You will be given a ticket path.
 
 1. Read the ticket, its sub-project `spec.md`, `CONTEXT.md` and any ADRs in `docs/adr/` relevant to the change
-2. Inspect the changes with `git status` and `git diff` (including untracked files)
+2. Inspect **all** changes for the ticket, which may span earlier commits from previous runs: `git describe --tags --abbrev=0` gives the last released tag, then `git diff <tag>` shows committed and uncommitted changes since it, and `git status` shows untracked files
 3. Check:
    - every acceptance criterion the change claims to meet is actually met and tested
    - the implementation is complete, with no placeholders, stubs, TODOs, skipped tests or weakened assertions
