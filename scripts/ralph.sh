@@ -10,7 +10,9 @@
 #   - RALPH_MAX_IDLE (default 3) runs in a row produce no commit
 #   - the working tree is dirty before a run starts
 #
-# Each run is logged to .ralph/logs/<timestamp>-<run>.jsonl (stream-json).
+# Each run is logged to .ralph/logs/<timestamp>-<run>.jsonl (stream-json) and shown
+# live as readable progress (scripts/ralph-format.py). Follow a run from another
+# terminal with scripts/ralph-watch.sh.
 # Runs use ralph/settings.json on top of the project settings: Sonnet as the main
 # model, plugins disabled, only project subagents, and no edits to specs, ADRs or
 # loop configuration. Anything not allowlisted is denied (dontAsk mode).
@@ -48,8 +50,8 @@ for ((run = 1; run <= MAX_RUNS; run++)); do
         --disable-slash-commands \
         --output-format stream-json \
         --verbose \
-        <PROMPT.md >"$log" 2>&1
-    status=$?
+        <PROMPT.md 2>&1 | tee "$log" | python3 scripts/ralph-format.py
+    status=${PIPESTATUS[0]}
 
     # Print the run's final summary
     python3 - "$log" <<'EOF'
