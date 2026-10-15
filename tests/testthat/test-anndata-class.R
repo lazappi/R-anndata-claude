@@ -185,14 +185,6 @@ test_that("filename and filemode are not yet supported", {
   )
 })
 
-# Slots whose tickets are not yet done must not be silently dropped
-test_that("slot arguments that are not yet implemented error", {
-  expect_anndata_condition(
-    AnnData(dense_x, raw = list(a = 1)),
-    "anndata_not_supported_error"
-  )
-})
-
 # Python makes everything after uns keyword-only
 test_that("arguments after uns must be named", {
   expect_error(AnnData(dense_x, NULL, NULL, NULL, list()))

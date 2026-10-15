@@ -1,6 +1,6 @@
 # Raw class and raw slot
 
-Status: ready-for-agent
+Status: done
 Type: task
 Blocked by: 05, 07
 
@@ -20,3 +20,12 @@ The `Raw` R6 class (`src/anndata/_core/raw.py`) and the `raw` Slot (`anndata.py:
 - `scripts/check.sh` passes
 
 ## Comments
+
+### 2026-10-15
+
+Implemented `Raw` (`R/raw.R`), the `raw` Slot and constructor argument, and `R/index.R` (index normalisation and slot subsetting helpers).
+- `normalize_index()` raises `anndata_index_error` for NA, zero, unknown names, out-of-range, mixed signs and wrong logical length. Ticket 10 should reuse it, and `subset_slots()` (an independent copy without raw, no category removal) is the base for `adata[i, j]`.
+- `raw[i, j]` gives the Raw a parent that is a `subset_slots()` copy on observations.
+- Python quirk kept: a Raw made without `X` (including `adata$raw <- other` with `other$X` NULL) is built from the parent.
+- Deviation: `raw$X` and `raw$var` are assignable (validated) so `adata$raw$var$col <- v` works, Python modifies them in place.
+- Zero indices error rather than being dropped as base R does.

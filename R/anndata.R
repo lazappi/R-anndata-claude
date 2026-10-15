@@ -31,7 +31,9 @@
 #' @param ... Must be empty, so that the arguments after `uns` are named.
 #' @param obsm,varm,obsp,varp,layers Aligned mappings as named lists or `NULL`.
 #'   An `NA` name in `layers` addresses X.
-#' @param raw Further Slot (not yet supported).
+#' @param raw An `AnnData` or a named list with the elements `X`, `var` and
+#'   `varm`, whose contents become the Raw, or `NULL`. Without `X` the Raw is
+#'   made from the X, var and varm of the new object.
 #' @param shape Integer vector `c(n_obs, n_vars)` used when `X` is `NULL`.
 #' @param filename,filemode Backed mode (not yet supported).
 #'
@@ -91,15 +93,6 @@ abort_invalid_argument <- function(message, call, .envir = parent.frame()) {
     "anndata_invalid_argument_error",
     call = call,
     .envir = .envir
-  )
-}
-
-# Slot arguments whose assignment is implemented by later tickets, so that
-# values are never silently dropped
-abort_slot_not_supported <- function(slot, call) {
-  abort_not_supported(
-    "Constructing with {.arg {slot}} is not yet supported.",
-    call = call
   )
 }
 
@@ -267,9 +260,6 @@ AnnDataClass <- R6Class(
           call = call
         )
       }
-      if (!is.null(raw)) {
-        abort_slot_not_supported("raw", call)
-      }
       # Python takes X from layers[None] when X is not given
       layers_x <- if (is.list(layers)) layers[is.na(names(layers))] else list()
       if (length(layers_x) && !is.null(layers_x[[1L]])) {
@@ -332,6 +322,7 @@ AnnDataClass <- R6Class(
         check_names_unique(rownames(private$.obs), "obs", call = call)
         check_names_unique(rownames(private$.var), "var", call = call)
       }
+      private$.raw <- make_raw(self, raw, call)
       invisible(self)
     }
   ),
@@ -402,6 +393,14 @@ AnnDataClass <- R6Class(
       }
       private$set_uns(value, rlang::caller_env())
     },
+    #' @field raw The raw `X`, `var` and `varm`, or `NULL`. Assigning an
+    #'   `AnnData` stores its X, var and varm, and `NULL` removes the Raw.
+    raw = function(value) {
+      if (missing(value)) {
+        return(private$.raw)
+      }
+      private$set_raw(value, rlang::caller_env())
+    },
     #' @field n_obs Number of observations.
     n_obs = function(value) {
       if (!missing(value)) {
@@ -454,6 +453,29 @@ AnnDataClass <- R6Class(
     .varm = NULL,
     .obsp = NULL,
     .varp = NULL,
+    .raw = NULL,
+    # Python accepts only an AnnData. Assigning the Raw itself is what
+    # `adata$raw$var$col <- v` does after the Raw changed.
+    set_raw = function(value, call) {
+      if (is.null(value)) {
+        private$.raw <- NULL
+      } else if (!identical(value, private$.raw)) {
+        if (!inherits(value, "AnnData")) {
+          abort_invalid_argument(
+            "{.field raw} can only be set from an {.cls AnnData}.",
+            call
+          )
+        }
+        private$.raw <- raw_class$new(
+          self,
+          value$X,
+          value$var,
+          value$varm,
+          call = call
+        )
+      }
+      invisible(NULL)
+    },
     # Gets an aligned mapping, or replaces its contents. Assigning the mapping
     # itself is what `adata$obsm[["k"]] <- v` does after the mapping changed.
     aligned = function(attr, value, get, call) {

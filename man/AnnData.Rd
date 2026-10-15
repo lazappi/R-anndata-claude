@@ -34,7 +34,9 @@ list, a \code{data.frame} or a \code{DataFrame}.}
 \item{obsm, varm, obsp, varp, layers}{Aligned mappings as named lists or \code{NULL}.
 An \code{NA} name in \code{layers} addresses X.}
 
-\item{raw}{Further Slot (not yet supported).}
+\item{raw}{An \code{AnnData} or a named list with the elements \code{X}, \code{var} and
+\code{varm}, whose contents become the Raw, or \code{NULL}. Without \code{X} the Raw is
+made from the X, var and varm of the new object.}
 
 \item{shape}{Integer vector \code{c(n_obs, n_vars)} used when \code{X} is \code{NULL}.}
 
