@@ -152,7 +152,15 @@ python_rewrite <- function(files, .local_envir = parent.frame()) {
 #
 # `rec_array_paths` are datasets whose field dtypes are exempt (ADR 0005), so
 # their `dtype` and `digest` are not compared, and nothing else is relaxed
-h5_tree_differences <- function(a, b, rec_array_paths = character()) {
+#
+# `sorted_paths` are sparse `data` and `indices` datasets that may be stored
+# unsorted in the second file (ADR 0006), so only their `digest` is skipped
+h5_tree_differences <- function(
+  a,
+  b,
+  rec_array_paths = character(),
+  sorted_paths = character()
+) {
   diffs <- character()
   note <- function(...) diffs <<- c(diffs, paste0(...))
   show <- function(x) jsonlite::toJSON(x, auto_unbox = TRUE, null = "null")
@@ -169,6 +177,9 @@ h5_tree_differences <- function(a, b, rec_array_paths = character()) {
     props <- c("kind", "dtype", "shape", "digest")
     if (path %in% rec_array_paths) {
       props <- c("kind", "shape")
+    }
+    if (path %in% sorted_paths) {
+      props <- setdiff(props, "digest")
     }
     for (prop in props) {
       if (!identical(x[[prop]], y[[prop]])) {
@@ -217,9 +228,15 @@ h5_tree_differences <- function(a, b, rec_array_paths = character()) {
 expect_structurally_equivalent <- function(
   a,
   b,
-  rec_array_paths = character()
+  rec_array_paths = character(),
+  sorted_paths = character()
 ) {
-  diffs <- h5_tree_differences(h5_tree(a), h5_tree(b), rec_array_paths)
+  diffs <- h5_tree_differences(
+    h5_tree(a),
+    h5_tree(b),
+    rec_array_paths,
+    sorted_paths
+  )
   testthat::expect(
     length(diffs) == 0L,
     paste0(
@@ -235,12 +252,18 @@ expect_structurally_equivalent <- function(
 expect_all_equivalent <- function(
   a,
   b,
-  rec_array_paths = character()
+  rec_array_paths = character(),
+  sorted_paths = character()
 ) {
   stopifnot(length(a) == length(b))
   prefetch_h5_trees(c(a, b))
   for (i in seq_along(a)) {
-    expect_structurally_equivalent(a[[i]], b[[i]], rec_array_paths)
+    expect_structurally_equivalent(
+      a[[i]],
+      b[[i]],
+      rec_array_paths,
+      sorted_paths
+    )
   }
   invisible(a)
 }

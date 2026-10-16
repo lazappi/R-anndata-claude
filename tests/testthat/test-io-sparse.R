@@ -244,3 +244,25 @@ test_that("a subset keeps its sparse dtype record on write", {
     subset
   )
 })
+
+# scipy allows unsorted indices within a major slice but Matrix does not, so
+# reading sorts them with their data (ADR 0006) and the matrix keeps its values
+test_that("unsorted sparse indices are sorted on read", {
+  for (format in c("csr", "csc")) {
+    store <- local_h5_store()
+    expected <- sparse_expected(format)
+    write_elem(store, "x", expected)
+    group <- rhdf5::H5Gopen(store, "x")
+    indices <- if (format == "csr") expected@j else expected@i
+    data <- expected@x
+    indptr <- expected@p
+    # Reverse the entries within each major slice
+    slice <- rep.int(seq_along(diff(indptr)), diff(indptr))
+    ord <- order(slice, -seq_along(slice))
+    rhdf5::H5Ldelete(group, "indices")
+    rhdf5::H5Ldelete(group, "data")
+    write_dataset(group, "indices", as.integer(indices[ord]))
+    write_dataset(group, "data", as.double(data[ord]))
+    expect_equal(read_elem(store, "x"), expected, info = format)
+  }
+})

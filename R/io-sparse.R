@@ -169,6 +169,14 @@ read_sparse_elem <- function(elem, path, store) {
     p = indptr$values,
     Dim = as.integer(shape)
   )
+  # scipy allows unsorted indices within a major slice but Matrix does not
+  counts <- diff(indptr$values)
+  slice <- rep.int(seq_along(counts), counts)
+  ord <- order(slice, indices$values)
+  if (is.unsorted(ord)) {
+    indices$values <- indices$values[ord]
+    args$x <- args$x[ord]
+  }
   args[[if (csr) "j" else "i"]] <- indices$values
   matrix <- do.call(methods::new, args)
 

@@ -1,6 +1,6 @@
 # Real-world file test
 
-Status: in-progress
+Status: done
 Type: task
 Blocked by: 12
 
@@ -22,3 +22,12 @@ Fix or record in `fix_plan.md` anything it finds.
 - The test may download a different file from scanpy's `pbmc3k_processed` as long as the ticket comment names the source
 
 ## Comments
+
+2026-10-16: done.
+- Source: `https://raw.githubusercontent.com/chanzuckerberg/cellxgene/main/example-dataset/pbmc3k.h5ad` (the PBMC 3k processed example), downloaded with `utils::download.file()`, skipping offline, on CRAN or with `ANNDATA_SKIP_NETWORK=true`.
+  I could not confirm it is byte-identical to scanpy's `pbmc3k_processed`.
+- The download is in a legacy format that `read_h5ad()` rejects, so the test has Python rewrite it with the current encodings and uses that file as the original (recorded in `fix_plan.md` Discovered).
+- Found and fixed: sparse matrices with unsorted indices crashed the read (ADR 0006), now sorted on read with a unit test for CSR and CSC in `test-io-sparse.R`.
+- Per the decisions: `/raw/X/data` and `/raw/X/indices` skip the digest comparison (new `sorted_paths` argument of the equivalence helpers, any other unsorted sparse Element would still fail) and `raw$X` is compared by value.
+  `/uns/rank_genes_groups/{names,scores}` are rec-arrays compared with `expect_rec_array_values_equal()`.
+- `expect_python_equal()` is not used, because Python would compare the `scores` field dtype (`<f4` against `<f8`, ADR 0005), so the test checks Python can read the written file by rewriting it instead.
