@@ -83,4 +83,5 @@ Kept brief and current by the loop.
 - `expect_python_equal()` and `rewrite.py` differ in scope: the first compares whole AnnData files, the second rewrites with Python's default settings
 - A `local_anndata_settings()` call inside a test loop leaks to later iterations, so call it from a function run per case
 - Python is only used through `uv run --project tests/python ...`, in tests via `run_python()` which sets a private `TMPDIR` (uv lock files left in the check temp dir cause a NOTE), and which finds the uv interpreter once and calls it directly
+- Deprecated methods call `warn_deprecated(method, advice, rlang::caller_env())` (`anndata_deprecated_warning` + `anndata_future_warning`), tests wrap them in `quiet_deprecated()`, and the lifecycle badge goes in the `AnnData()` help page because the R6 class is `@noRd`
 - Each Python start costs 0.3s (`h5_tree.py`) to 1.8s (anything importing anndata), so never call it per case: write all files first, then use `prefetch_h5_trees()`, `python_rewrite()` and `expect_all_equivalent()` (testthat's per-test times do not show this cost)

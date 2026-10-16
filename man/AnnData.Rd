@@ -81,6 +81,16 @@ The dimension and backing fields are read-only and assigning to them raises
 an \code{anndata_read_only_error}.
 }
 
+\section{Deprecated methods}{
+
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}
+
+Python 0.13.4 deprecates these methods, so they warn on every call with
+the classes \code{anndata_deprecated_warning} and \code{anndata_future_warning}:
+\code{obs_keys()}, \code{var_keys()}, \code{obsm_keys()}, \code{varm_keys()}, \code{uns_keys()},
+\code{obs_vector()} and \code{var_vector()}.
+}
+
 \examples{
 adata <- AnnData(matrix(as.numeric(1:6), nrow = 3))
 adata$shape

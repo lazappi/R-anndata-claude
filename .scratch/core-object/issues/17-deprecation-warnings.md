@@ -1,6 +1,6 @@
 # Deprecation warnings
 
-Status: ready-for-agent
+Status: done
 Type: task
 Blocked by: 13
 
@@ -20,3 +20,10 @@ core-object/13 implemented them without warnings.
 - `scripts/check.sh` passes
 
 ## Comments
+
+2026-10-16: Done. python-oracle found the only deprecated items the R core implements are `obs_keys`, `var_keys`, `obsm_keys`, `varm_keys`, `uns_keys`, `obs_vector` and `var_vector`.
+They are Python `FutureWarning`s, so `warn_deprecated()` (`R/conditions.R`) signals `anndata_deprecated_warning` plus `anndata_future_warning`, with Python's message and advice.
+Every call warns, even with an invalid key.
+Python also deprecates `isview`, `as_dict`, `write_loom` and the `copy_on_write_X` and `zarr_write_format` settings, none of which exist in R, so the tickets that add them must warn too.
+The badge sits in a "Deprecated methods" section of the `AnnData()` help page because the R6 class is `@noRd`.
+Tests of deprecated methods wrap calls in `quiet_deprecated()` (`helper-conditions.R`).

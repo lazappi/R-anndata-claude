@@ -136,6 +136,28 @@ warn_implicit_modification <- function(
   )
 }
 
+#' Warn that a method is deprecated, as Python's `@deprecated` does
+#' (a `FutureWarning`, so the class also has `anndata_future_warning`).
+#' @noRd
+warn_deprecated <- function(method, advice, call = rlang::caller_env()) {
+  anndata_warn(
+    # Braces in the Python advice must not be interpolated by cli
+    gsub(
+      "([{}])",
+      "\\1\\1",
+      paste0(
+        "The method `",
+        method,
+        "` is deprecated and will be removed in the future. ",
+        advice
+      )
+    ),
+    c("anndata_deprecated_warning", "anndata_future_warning"),
+    method = method,
+    call = call
+  )
+}
+
 warn_future <- function(
   message,
   ...,

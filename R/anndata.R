@@ -24,6 +24,14 @@
 #' The dimension and backing fields are read-only and assigning to them raises
 #' an `anndata_read_only_error`.
 #'
+#' @section Deprecated methods:
+#' `r lifecycle::badge("deprecated")`
+#'
+#' Python 0.13.4 deprecates these methods, so they warn on every call with
+#' the classes `anndata_deprecated_warning` and `anndata_future_warning`:
+#' `obs_keys()`, `var_keys()`, `obsm_keys()`, `varm_keys()`, `uns_keys()`,
+#' `obs_vector()` and `var_vector()`.
+#'
 #' @param X A numeric or logical matrix, or a `Matrix` sparse matrix, or `NULL`.
 #'   An `AnnData` supplies all its Slots, and then `obs`, `var`, `uns`, `obsm`,
 #'   `varm`, `obsp` and `varp` must not be given.
@@ -539,30 +547,114 @@ AnnDataClass <- R6Class(
     to_df = function(layer = NULL) {
       adata_to_df(self, layer, rlang::caller_env())
     },
-    #' @description Values of obs column `k`, or of variable `k` across
+    #' @description `r lifecycle::badge("deprecated")`
+    #'
+    #'   Values of obs column `k`, or of variable `k` across
     #'   observations (from X or `layer`).
+    #'   Warns as Python does, even if `k` is invalid.
     #' @param k A column of `obs` or a name in `var_names`.
     #' @param layer Key of a layer, or `NULL` for X.
     obs_vector = function(k, layer = NULL) {
+      warn_deprecated(
+        "obs_vector",
+        paste0(
+          "Use anndata.acc.A instead of obs_vector. ",
+          "E.g. `vec = adata[A.obs['foo']]` or ",
+          "`vec = adata[A.layers['l']['bar', :]]`"
+        ),
+        rlang::caller_env()
+      )
       adata_vector(self, k, "obs", layer, rlang::caller_env())
     },
-    #' @description Values of var column `k`, or of observation `k` across
+    #' @description `r lifecycle::badge("deprecated")`
+    #'
+    #'   Values of var column `k`, or of observation `k` across
     #'   variables (from X or `layer`).
+    #'   Warns as Python does, even if `k` is invalid.
     #' @param k A column of `var` or a name in `obs_names`.
     #' @param layer Key of a layer, or `NULL` for X.
     var_vector = function(k, layer = NULL) {
+      warn_deprecated(
+        "var_vector",
+        paste0(
+          "Use anndata.acc.A instead of var_vector. ",
+          "E.g. `vec = adata[A.var['foo']]` or ",
+          "`vec = adata[A.layers['l'][:, 'bar']]`"
+        ),
+        rlang::caller_env()
+      )
       adata_vector(self, k, "var", layer, rlang::caller_env())
     },
-    #' @description Column names of `obs`.
-    obs_keys = function() colnames(private$.obs),
-    #' @description Column names of `var`.
-    var_keys = function() colnames(private$.var),
-    #' @description Keys of `obsm`.
-    obsm_keys = function() private$.obsm$keys(),
-    #' @description Keys of `varm`.
-    varm_keys = function() private$.varm$keys(),
-    #' @description Sorted keys of `uns`.
-    uns_keys = function() sort(names(private$.uns) %||% character()),
+    #' @description `r lifecycle::badge("deprecated")`
+    #'
+    #'   Column names of `obs`.
+    obs_keys = function() {
+      warn_deprecated(
+        "obs_keys",
+        paste0(
+          "Use obs instead of obs_keys. ",
+          "(e.g. `k in adata.obs` or `str(adata.obs.columns.tolist())`)"
+        ),
+        rlang::caller_env()
+      )
+      colnames(private$.obs)
+    },
+    #' @description `r lifecycle::badge("deprecated")`
+    #'
+    #'   Column names of `var`.
+    var_keys = function() {
+      warn_deprecated(
+        "var_keys",
+        paste0(
+          "Use var instead of var_keys. ",
+          "(e.g. `k in adata.var` or `str(adata.var.columns.tolist())`)"
+        ),
+        rlang::caller_env()
+      )
+      colnames(private$.var)
+    },
+    #' @description `r lifecycle::badge("deprecated")`
+    #'
+    #'   Keys of `obsm`.
+    obsm_keys = function() {
+      warn_deprecated(
+        "obsm_keys",
+        paste0(
+          "Use obsm instead of obsm_keys. ",
+          "(e.g. `k in adata.obsm` or `adata.obsm.keys() | {'u'}`)"
+        ),
+        rlang::caller_env()
+      )
+      private$.obsm$keys()
+    },
+    #' @description `r lifecycle::badge("deprecated")`
+    #'
+    #'   Keys of `varm`.
+    varm_keys = function() {
+      warn_deprecated(
+        "varm_keys",
+        paste0(
+          "Use varm instead of varm_keys. ",
+          "(e.g. `k in adata.varm` or `adata.varm.keys() | {'u'}`)"
+        ),
+        rlang::caller_env()
+      )
+      private$.varm$keys()
+    },
+    #' @description `r lifecycle::badge("deprecated")`
+    #'
+    #'   Sorted keys of `uns`.
+    uns_keys = function() {
+      warn_deprecated(
+        "uns_keys",
+        paste0(
+          "Use uns instead of uns_keys. ",
+          "(e.g. `k in adata.uns` or `sorted(adata.uns)`)"
+        ),
+        rlang::caller_env()
+      )
+      sort(names(private$.uns) %||% character())
+    },
     #' @description A new `AnnData` with observations and variables swapped.
     #'   X and layers are transposed, obsm and varm and obsp and varp swap
     #'   places, `uns` is kept and the Raw is dropped.
