@@ -83,32 +83,6 @@ register_writer <- function(class, type, version, fn) {
   invisible(NULL)
 }
 
-# Python's `proc_spec` and `get_spec`, with an unset attribute giving ""
-read_elem_attr <- function(elem, name) {
-  if (!rhdf5::H5Aexists(elem, name)) {
-    return("")
-  }
-  attr <- rhdf5::H5Aopen(elem, name)
-  on.exit(rhdf5::H5Aclose(attr), add = TRUE)
-  as.character(rhdf5::H5Aread(attr))
-}
-
-set_elem_attr <- function(elem, name, value) {
-  rhdf5::h5writeAttribute(
-    value,
-    elem,
-    name,
-    encoding = "UTF-8",
-    variableLengthString = TRUE,
-    asScalar = TRUE
-  )
-}
-
-elem_path <- function(store, key) {
-  parent <- rhdf5::H5Iget_name(store)
-  if (identical(parent, "/")) paste0("/", key) else paste0(parent, "/", key)
-}
-
 abort_legacy <- function(path, what, call = rlang::caller_env()) {
   abort_not_supported(
     c(
@@ -140,13 +114,13 @@ abort_awkward <- function(path, call = rlang::caller_env()) {
 
 #' @rdname io-registry
 read_elem <- function(store, path) {
-  elem <- rhdf5::H5Oopen(store, path)
-  on.exit(rhdf5::H5Oclose(elem), add = TRUE)
+  elem <- node_open(store, path)
+  on.exit(node_close(elem), add = TRUE)
   read_elem_object(elem, store)
 }
 
 read_elem_object <- function(elem, store, call = rlang::caller_env()) {
-  path <- rhdf5::H5Iget_name(elem)
+  path <- node_path(elem)
   type <- read_elem_attr(elem, "encoding-type")
   version <- read_elem_attr(elem, "encoding-version")
 
@@ -210,11 +184,11 @@ write_elem <- function(
   dataset_kwargs = list(),
   call = rlang::caller_env()
 ) {
-  if (identical(rhdf5::H5Iget_type(store), "H5I_FILE")) {
-    store <- rhdf5::H5Gopen(store, "/")
-    on.exit(rhdf5::H5Gclose(store), add = TRUE)
+  if (is_store_file(store)) {
+    store <- group_root(store)
+    on.exit(node_close(store), add = TRUE)
   }
-  store_name <- rhdf5::H5Iget_name(store)
+  store_name <- node_path(store)
 
   if (identical(key, "/")) {
     if (!identical(store_name, "/")) {
@@ -223,8 +197,8 @@ write_elem <- function(
         "anndata_invalid_key_error"
       )
     }
-    for (name in rhdf5::h5ls(store, recursive = FALSE)$name) {
-      rhdf5::H5Ldelete(store, name)
+    for (name in group_members(store)) {
+      member_delete(store, name)
     }
   } else {
     # Stores may have a prefix like /uns, written to with keys like /uns/foo
@@ -252,8 +226,8 @@ write_elem <- function(
          version."
       )
     }
-    if (rhdf5::H5Lexists(store, key)) {
-      rhdf5::H5Ldelete(store, key)
+    if (member_exists(store, key)) {
+      member_delete(store, key)
     }
   }
 
@@ -261,12 +235,12 @@ write_elem <- function(
   writer <- find_writer(value, path, call)
   writer$fn(store, key, value, dataset_kwargs, path)
 
-  elem <- rhdf5::H5Oopen(store, if (identical(key, "/")) "." else key)
-  on.exit(rhdf5::H5Oclose(elem), add = TRUE)
-  if (!rhdf5::H5Aexists(elem, "encoding-type")) {
+  elem <- node_open(store, if (identical(key, "/")) "." else key)
+  on.exit(node_close(elem), add = TRUE)
+  if (!attr_exists(elem, "encoding-type")) {
     set_elem_attr(elem, "encoding-type", writer$type)
   }
-  if (!rhdf5::H5Aexists(elem, "encoding-version")) {
+  if (!attr_exists(elem, "encoding-version")) {
     set_elem_attr(elem, "encoding-version", writer$version)
   }
   invisible(NULL)

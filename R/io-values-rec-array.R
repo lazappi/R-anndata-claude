@@ -121,8 +121,7 @@ write_rec_array <- function(store, key, value, dataset_kwargs, path) {
     class = "data.frame",
     row.names = seq_len(nrow(value))
   )
-  # `level = 0` stops rhdf5 compressing, and a chunk is required to write
-  rhdf5::h5writeDataset(frame, store, key, level = 0L, chunk = nrow(frame))
+  table_write(store, key, frame)
   invisible(NULL)
 }
 
@@ -139,7 +138,7 @@ rec_array_read_field <- function(field) {
 
 read_rec_array_elem <- function(elem, path, store) {
   call <- rlang::caller_env()
-  info <- h5_info(store, path)
+  info <- array_info(store, path)
   if (as.integer(info$rank) != 1L) {
     abort_io_registry(
       "Cannot read {.path {path}}, a rec-array must be one-dimensional.",
@@ -147,11 +146,7 @@ read_rec_array_elem <- function(elem, path, store) {
       call = call
     )
   }
-  # rhdf5 only warns when a 64-bit value reaches 2^53 and is no longer exact
-  values <- withCallingHandlers(
-    suppressMessages(rhdf5::H5Dread(elem, bit64conversion = "double")),
-    warning = function(w) abort_dtype_precision(path, "int64", call)
-  )
+  values <- table_read(store, path, call)
   fields <- lapply(values, rec_array_read_field)
   frame <- structure(
     fields,

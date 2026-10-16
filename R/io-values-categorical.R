@@ -52,14 +52,9 @@ categories_as_levels <- function(categories) {
 #' @rdname io-categorical
 write_factor <- function(store, key, value, dataset_kwargs, path) {
   call <- rlang::caller_env()
-  group <- rhdf5::H5Gcreate(store, key)
-  on.exit(rhdf5::H5Gclose(group), add = TRUE)
-  rhdf5::h5writeAttribute(
-    is.ordered(value),
-    group,
-    "ordered",
-    asScalar = TRUE
-  )
+  group <- group_create(store, key)
+  on.exit(node_close(group), add = TRUE)
+  attr_write(group, "ordered", is.ordered(value))
 
   levels <- levels(value)
   codes <- as.integer(value) - 1L

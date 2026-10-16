@@ -1,0 +1,15 @@
+suppressMessages(pkgload::load_all(quiet = TRUE))
+store <- rhdf5::H5Fcreate(tempfile(fileext = ".h5"))
+m <- matrix(as.double(1:12), 3, 4)
+write_dataset(store, "num", m)
+write_bool_dataset(store, "bool", m > 4, FALSE, rlang::current_env())
+write_string_dataset(store, "str", matrix(as.character(1:12), 3, 4), FALSE, rlang::current_env())
+for (n in c("num", "bool", "str")) {
+  cat(n, "\n")
+  print(array_read(store, paste0("/", n), list(c(1, 3), c(2, 4))))
+}
+cat("rows\n")
+print(array_read(store, "/num", list(2L, NULL)))
+cat("bad\n")
+print(try(array_read(store, "/num", list(c(3, 1), NULL))))
+print(try(array_read(store, "/num", list(1L))))

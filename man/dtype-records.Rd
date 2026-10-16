@@ -30,7 +30,7 @@ write_dtype(x, path, call = rlang::caller_env())
 
 sparse_write_dtypes(x, path, call = rlang::caller_env())
 
-read_dataset(loc, name, call = rlang::caller_env())
+read_dataset(loc, name, selection = NULL, call = rlang::caller_env())
 
 write_dataset(
   loc,
@@ -53,6 +53,8 @@ write_dataset(
 \item{loc}{An open rhdf5 file or group handle.}
 
 \item{name}{Name or path of a dataset below \code{loc}.}
+
+\item{selection}{A selection of the array to read, see \link{io-store}.}
 
 \item{scalar}{Whether to write a scalar dataspace.}
 

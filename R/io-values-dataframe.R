@@ -97,26 +97,6 @@ frame_column <- function(column, name, path, call) {
   as_array(column)
 }
 
-set_string_array_attr <- function(group, name, values) {
-  if (length(values) > 0L) {
-    rhdf5::h5writeAttribute(
-      values,
-      group,
-      name,
-      encoding = "UTF-8",
-      variableLengthString = TRUE,
-      asScalar = FALSE
-    )
-    return(invisible(NULL))
-  }
-  # h5py writes an empty list as an empty float64 array
-  space <- rhdf5::H5Screate_simple(0L)
-  on.exit(rhdf5::H5Sclose(space), add = TRUE)
-  attr <- rhdf5::H5Acreate(group, name, "H5T_IEEE_F64LE", space)
-  rhdf5::H5Aclose(attr)
-  invisible(NULL)
-}
-
 #' @rdname io-dataframe
 write_dataframe <- function(store, key, value, dataset_kwargs, path) {
   call <- rlang::caller_env()
@@ -144,9 +124,9 @@ write_dataframe <- function(store, key, value, dataset_kwargs, path) {
     }
   }
 
-  group <- rhdf5::H5Gcreate(store, key)
-  on.exit(rhdf5::H5Gclose(group), add = TRUE)
-  set_string_array_attr(group, "column-order", col_names)
+  group <- group_create(store, key)
+  on.exit(node_close(group), add = TRUE)
+  attr_write(group, "column-order", col_names, scalar = FALSE)
   set_elem_attr(group, "_index", index_key)
   write_elem(group, index_key, index, dataset_kwargs, call)
   for (name in col_names) {
@@ -162,21 +142,14 @@ write_dataframe <- function(store, key, value, dataset_kwargs, path) {
 }
 
 read_attr_strings <- function(elem, name, path, call) {
-  if (!rhdf5::H5Aexists(elem, name)) {
+  if (!attr_exists(elem, name)) {
     abort_io_registry(
       "Cannot read {.path {path}}, it has no attribute {.field {name}}.",
       path = path,
       call = call
     )
   }
-  attr <- rhdf5::H5Aopen(elem, name)
-  on.exit(rhdf5::H5Aclose(attr), add = TRUE)
-  space <- rhdf5::H5Aget_space(attr)
-  on.exit(rhdf5::H5Sclose(space), add = TRUE, after = FALSE)
-  if (any(rhdf5::H5Sget_simple_extent_dims(space)$size == 0L)) {
-    return(character())
-  }
-  as.character(rhdf5::H5Aread(attr))
+  as.character(attr_read(elem, name))
 }
 
 read_dataframe_elem <- function(elem, path, store) {

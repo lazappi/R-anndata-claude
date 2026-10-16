@@ -94,11 +94,11 @@ write_anndata <- function(store, key, value, dataset_kwargs, path) {
   call <- rlang::caller_env()
   check_x_and_layers_are_2d(value, call)
   group <- if (identical(key, "/")) {
-    rhdf5::H5Gopen(store, "/")
+    group_root(store)
   } else {
-    rhdf5::H5Gcreate(store, key)
+    group_create(store, key)
   }
-  on.exit(rhdf5::H5Gclose(group), add = TRUE)
+  on.exit(node_close(group), add = TRUE)
   set_elem_attr(group, "encoding-type", "anndata")
   set_elem_attr(group, "encoding-version", "0.1.0")
 
@@ -127,8 +127,8 @@ write_anndata <- function(store, key, value, dataset_kwargs, path) {
 #' @rdname io-anndata
 write_raw <- function(store, key, value, dataset_kwargs, path) {
   call <- rlang::caller_env()
-  group <- rhdf5::H5Gcreate(store, key)
-  on.exit(rhdf5::H5Gclose(group), add = TRUE)
+  group <- group_create(store, key)
+  on.exit(node_close(group), add = TRUE)
   set_elem_attr(group, "encoding-type", "raw")
   set_elem_attr(group, "encoding-version", "0.1.0")
   write_x_elem(group, value$X, "raw/X", dataset_kwargs, call)
@@ -209,7 +209,7 @@ dense_as_sparse <- function(x, path, call) {
 
 read_anndata_elem <- function(elem, path, store) {
   call <- rlang::caller_env()
-  members <- rhdf5::h5ls(elem, recursive = FALSE)$name
+  members <- group_members(elem)
   prefix <- if (identical(path, "/")) "/" else paste0(path, "/")
   slots <- list()
   for (key in intersect(anndata_slot_keys, members)) {

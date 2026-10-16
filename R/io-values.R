@@ -154,6 +154,34 @@ write_bool_dataset <- function(
   call,
   dataset_kwargs = list()
 ) {
+  store_backend(loc)$bool_write(loc, name, x, scalar, call, dataset_kwargs)
+}
+
+#' @rdname io-values
+write_complex_dataset <- function(
+  loc,
+  name,
+  x,
+  scalar,
+  call,
+  dataset_kwargs = list()
+) {
+  store_backend(loc)$complex_write(loc, name, x, scalar, call, dataset_kwargs)
+}
+
+#' @rdname io-values
+write_string_dataset <- function(
+  loc,
+  name,
+  x,
+  scalar,
+  call,
+  dataset_kwargs = list()
+) {
+  store_backend(loc)$string_write(loc, name, x, scalar, call, dataset_kwargs)
+}
+
+h5_write_bool <- function(loc, name, x, scalar, call, dataset_kwargs) {
   dims <- dim(x) %||% length(x)
   space <- h5_space(dims, scalar)
   on.exit(rhdf5::H5Sclose(space), add = TRUE)
@@ -172,15 +200,7 @@ write_bool_dataset <- function(
   invisible(NULL)
 }
 
-#' @rdname io-values
-write_complex_dataset <- function(
-  loc,
-  name,
-  x,
-  scalar,
-  call,
-  dataset_kwargs = list()
-) {
+h5_write_complex <- function(loc, name, x, scalar, call, dataset_kwargs) {
   dims <- dim(x) %||% length(x)
   space <- h5_space(dims, scalar)
   on.exit(rhdf5::H5Sclose(space), add = TRUE)
@@ -195,15 +215,7 @@ write_complex_dataset <- function(
   invisible(NULL)
 }
 
-#' @rdname io-values
-write_string_dataset <- function(
-  loc,
-  name,
-  x,
-  scalar,
-  call,
-  dataset_kwargs = list()
-) {
+h5_write_string <- function(loc, name, x, scalar, call, dataset_kwargs) {
   dims <- dim(x) %||% length(x)
   space <- h5_space(dims, scalar)
   on.exit(rhdf5::H5Sclose(space), add = TRUE)
@@ -293,18 +305,15 @@ write_values <- function(store, key, value, dataset_kwargs, path) {
       )
     }
   )
-  elem <- rhdf5::H5Oopen(store, key)
-  on.exit(rhdf5::H5Oclose(elem), add = TRUE)
+  elem <- node_open(store, key)
+  on.exit(node_close(elem), add = TRUE)
   set_elem_attr(elem, "encoding-type", value_encoding(plain, scalar))
   set_elem_attr(elem, "encoding-version", "0.2.0")
   invisible(NULL)
 }
 
 write_null <- function(store, key, value, dataset_kwargs, path) {
-  space <- rhdf5::H5Screate("H5S_NULL")
-  on.exit(rhdf5::H5Sclose(space), add = TRUE)
-  dset <- rhdf5::H5Dcreate(store, key, "H5T_IEEE_F32LE", space)
-  on.exit(rhdf5::H5Dclose(dset), add = TRUE, after = FALSE)
+  null_write(store, key)
   invisible(NULL)
 }
 
@@ -317,13 +326,13 @@ abort_dataset_type <- function(path, what, call) {
   )
 }
 
-read_bool_dataset <- function(loc, name, call) {
+h5_read_bool <- function(loc, name, selection, call) {
   dset <- rhdf5::H5Dopen(loc, name)
   on.exit(rhdf5::H5Dclose(dset), add = TRUE)
   if (rhdf5::H5Tget_nmembers(rhdf5::H5Dget_type(dset)) != 2L) {
     abort_dataset_type(name, "it is an enum that is not a boolean", call)
   }
-  values <- rhdf5::H5Dread(dset)
+  values <- h5_dread(dset, selection)
   # `as.logical()` drops the dims that rhdf5 gives the factor
   logical <- array(
     as.character(values) == "TRUE",
@@ -332,7 +341,7 @@ read_bool_dataset <- function(loc, name, call) {
   from_row_major(logical)
 }
 
-read_complex_dataset <- function(loc, name, call) {
+h5_read_complex <- function(loc, name, selection, call) {
   dset <- rhdf5::H5Dopen(loc, name)
   on.exit(rhdf5::H5Dclose(dset), add = TRUE)
   if (!identical(rhdf5::H5Tget_size(rhdf5::H5Dget_type(dset)), 16L)) {
@@ -342,34 +351,21 @@ read_complex_dataset <- function(loc, name, call) {
       call
     )
   }
-  from_row_major(rhdf5::H5Dread(dset))
+  from_row_major(h5_dread(dset, selection, in_r = TRUE))
 }
 
-read_string_dataset <- function(loc, name, call) {
+h5_read_string <- function(loc, name, selection, call) {
   dset <- rhdf5::H5Dopen(loc, name)
   on.exit(rhdf5::H5Dclose(dset), add = TRUE)
-  from_row_major(rhdf5::H5Dread(dset))
-}
-
-# Reads a dataset of any class a numeric or string Element can hold
-read_values <- function(loc, path, info, call) {
-  switch(
-    info$dclass,
-    INTEGER = ,
-    FLOAT = read_dataset(loc, path, call = call),
-    ENUM = read_bool_dataset(loc, path, call),
-    COMPOUND = read_complex_dataset(loc, path, call),
-    STRING = read_string_dataset(loc, path, call),
-    abort_dataset_type(path, "its class is not supported", call)
-  )
+  from_row_major(h5_dread(dset, selection, in_r = TRUE))
 }
 
 # A 1-element 1-d array keeps `dim` 1 so it is written back as an array, a
 # scalar dataspace has no `dim`
 read_values_with_shape <- function(loc, path, scalar) {
   call <- rlang::caller_env()
-  info <- h5_info(loc, path)
-  values <- read_values(loc, path, info, call)
+  info <- array_info(loc, path)
+  values <- array_read(loc, path, call = call)
   one_element <- length(values) == 1L && as.integer(info$rank) == 1L
   if (one_element && !scalar) {
     dim(values) <- 1L
@@ -391,7 +387,7 @@ read_null_elem <- function(elem, path, store) {
 
 # Python reads bytes as `bytes`, which R holds as `raw`
 read_bytes_elem <- function(elem, path, store) {
-  charToRaw(read_string_dataset(store, path, rlang::caller_env()))
+  charToRaw(string_read(store, path, rlang::caller_env()))
 }
 
 for (r_class in c(

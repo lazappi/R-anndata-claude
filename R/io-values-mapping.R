@@ -48,11 +48,11 @@ write_mapping <- function(store, key, value, dataset_kwargs, path) {
   }
 
   group <- if (identical(key, "/")) {
-    rhdf5::H5Gopen(store, "/")
+    group_root(store)
   } else {
-    rhdf5::H5Gcreate(store, key)
+    group_create(store, key)
   }
-  on.exit(rhdf5::H5Gclose(group), add = TRUE)
+  on.exit(node_close(group), add = TRUE)
   set_elem_attr(group, "encoding-type", "dict")
   set_elem_attr(group, "encoding-version", "0.1.0")
   for (i in seq_along(value)) {
@@ -63,7 +63,7 @@ write_mapping <- function(store, key, value, dataset_kwargs, path) {
 }
 
 read_mapping_elem <- function(elem, path, store) {
-  keys <- rhdf5::h5ls(elem, recursive = FALSE)$name
+  keys <- group_members(elem)
   prefix <- if (identical(path, "/")) "/" else paste0(path, "/")
   result <- vector("list", length(keys))
   for (i in seq_along(keys)) {

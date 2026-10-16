@@ -33,11 +33,7 @@ NULL
 
 #' @rdname io-sparse
 write_shape_attr <- function(group, shape) {
-  space <- rhdf5::H5Screate_simple(length(shape))
-  on.exit(rhdf5::H5Sclose(space), add = TRUE)
-  attr <- rhdf5::H5Acreate(group, "shape", "H5T_STD_I64LE", space)
-  on.exit(rhdf5::H5Aclose(attr), add = TRUE, after = FALSE)
-  rhdf5::H5Awrite(attr, as.double(shape))
+  attr_write(group, "shape", as.double(shape), dtype = "int64")
 }
 
 #' @rdname io-sparse
@@ -53,8 +49,8 @@ write_sparse <- function(store, key, value, dataset_kwargs, path) {
   }
   dtypes <- sparse_write_dtypes(value, path, call)
 
-  group <- rhdf5::H5Gcreate(store, key)
-  on.exit(rhdf5::H5Gclose(group), add = TRUE)
+  group <- group_create(store, key)
+  on.exit(node_close(group), add = TRUE)
   type <- if (is_csr(value)) "csr_matrix" else "csc_matrix"
   set_elem_attr(group, "encoding-type", type)
   set_elem_attr(group, "encoding-version", "0.1.0")
@@ -79,21 +75,18 @@ write_sparse <- function(store, key, value, dataset_kwargs, path) {
 }
 
 read_sparse_part <- function(store, path, call) {
-  info <- h5_info(store, path)
-  read_values(store, path, info, call)
+  array_read(store, path, call = call)
 }
 
 read_shape_attr <- function(elem, path, call) {
-  if (!rhdf5::H5Aexists(elem, "shape")) {
+  if (!attr_exists(elem, "shape")) {
     abort_io_registry(
       "Cannot read {.path {path}}, it has no {.field shape} attribute.",
       path = path,
       call = call
     )
   }
-  attr <- rhdf5::H5Aopen(elem, "shape")
-  on.exit(rhdf5::H5Aclose(attr), add = TRUE)
-  as.vector(rhdf5::H5Aread(attr, bit64conversion = "double"))
+  as.vector(attr_read(elem, "shape"))
 }
 
 # Indices and pointers are R integers, so the values must fit in int32

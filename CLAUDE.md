@@ -97,4 +97,6 @@ Kept brief and current by the loop.
 - Real-world downloads are legacy format, so `python_rewrite_h5ad()` them first, and `expect_all_equivalent(sorted_paths =)` skips the digest of sparse datasets stored unsorted (ADR 0006)
 - `.lintr` excludes `.scratch`, so throwaway scripts there are not linted (air still formats them)
 - zarr uses `Rarr` devel (`Remotes: Huber-group-EMBL/Rarr@devel`), verdicts in `.scratch/zarr-io/zarr-spike.md`: always pass `data_type` to `write_zarr_array()` (it narrows integers), use `write_zarr_group(path, group = "")` for the root, and use `"|b1"` for bool
+- Encodings never call rhdf5: they use the store layer (`R/io-store.R`, wrappers over `store_backend(store)$op()`, HDF5 in `R/io-store-h5.R`), a list of functions and not S3 methods because `.lintr` rejects dotted names, and a zarr backend adds its own list
+- `array_read(store, path, selection)` takes strictly increasing indices per dimension in numpy order, and strings and complex are read whole and subset in R because HDF5 crashes reading them through a memory dataspace
 - Each Python start costs 0.3s (`h5_tree.py`) to 1.8s (anything importing anndata), so never call it per case: write all files first, then use `prefetch_h5_trees()`, `python_rewrite()` and `expect_all_equivalent()` (testthat's per-test times do not show this cost)

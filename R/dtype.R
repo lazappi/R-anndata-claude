@@ -40,6 +40,7 @@
 #' @param scalar Whether to write a scalar dataspace.
 #' @param dataset_kwargs A list of dataset creation options, see
 #'   [io-compression].
+#' @param selection A selection of the array to read, see [io-store].
 #' @param call The call reported by errors.
 #'
 #' @name dtype-records
@@ -301,11 +302,11 @@ abort_dtype_precision <- function(path, dtype, call) {
   )
 }
 
-read_h5_values <- function(dset, dtype, path, call) {
+read_h5_values <- function(dset, dtype, path, call, selection = NULL) {
   if (dtype %in% c("int64", "uint64", "uint32")) {
     lossy <- FALSE
     values <- withCallingHandlers(
-      rhdf5::H5Dread(dset, bit64conversion = "double"),
+      h5_dread(dset, selection, bit64conversion = "double"),
       warning = function(w) {
         lossy <<- TRUE
         rlang::cnd_muffle(w)
@@ -317,7 +318,7 @@ read_h5_values <- function(dset, dtype, path, call) {
     return(values)
   }
   # rhdf5 reads -2^31 as NA and prints a message about it
-  values <- suppressMessages(rhdf5::H5Dread(dset))
+  values <- suppressMessages(h5_dread(dset, selection))
   if (is.raw(values)) {
     # A scalar dataspace has no dim
     if (is.null(dim(values))) {
@@ -334,7 +335,28 @@ read_h5_values <- function(dset, dtype, path, call) {
 }
 
 #' @rdname dtype-records
-read_dataset <- function(loc, name, call = rlang::caller_env()) {
+read_dataset <- function(
+  loc,
+  name,
+  selection = NULL,
+  call = rlang::caller_env()
+) {
+  store_backend(loc)$dataset_read(loc, name, selection, call)
+}
+
+#' @rdname dtype-records
+write_dataset <- function(
+  loc,
+  name,
+  x,
+  scalar = FALSE,
+  dataset_kwargs = list(),
+  call = rlang::caller_env()
+) {
+  store_backend(loc)$dataset_write(loc, name, x, scalar, dataset_kwargs, call)
+}
+
+h5_read_dataset <- function(loc, name, selection, call) {
   dset <- rhdf5::H5Dopen(loc, name)
   on.exit(rhdf5::H5Dclose(dset), add = TRUE)
   path <- rhdf5::H5Iget_name(dset)
@@ -347,7 +369,7 @@ read_dataset <- function(loc, name, call = rlang::caller_env()) {
       call = call
     )
   }
-  values <- read_h5_values(dset, dtype, path, call)
+  values <- read_h5_values(dset, dtype, path, call, selection)
   dims <- dim(values)
   if (length(dims) == 1L) {
     dim(values) <- NULL
@@ -357,15 +379,7 @@ read_dataset <- function(loc, name, call = rlang::caller_env()) {
   record_dtype(values, dtype)
 }
 
-#' @rdname dtype-records
-write_dataset <- function(
-  loc,
-  name,
-  x,
-  scalar = FALSE,
-  dataset_kwargs = list(),
-  call = rlang::caller_env()
-) {
+h5_write_dataset <- function(loc, name, x, scalar, dataset_kwargs, call) {
   path <- elem_path(loc, name)
   dtype <- write_dtype(x, path, call)
   values <- as.vector(drop_dtype(x))

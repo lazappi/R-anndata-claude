@@ -95,8 +95,8 @@ write_nullable <- function(
     }
   }
 
-  group <- rhdf5::H5Gcreate(store, key)
-  on.exit(rhdf5::H5Gclose(group), add = TRUE)
+  group <- group_create(store, key)
+  on.exit(node_close(group), add = TRUE)
   filler <- switch(
     kind,
     "nullable-string-array" = "",

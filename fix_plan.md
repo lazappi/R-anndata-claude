@@ -57,7 +57,7 @@ The human owns the order of the Queue.
 - [x] h5ad-io/14: package vignette (`.scratch/h5ad-io/issues/14-vignette.md`)
 - [x] zarr-io/01: zarr library spike (`.scratch/zarr-io/issues/01-zarr-library-spike.md`), re-run against Rarr devel and zarr main (see Decisions)
 - [x] 🛑 Human checkpoint: review `.scratch/zarr-io/zarr-spike.md`, then grill the rest of the zarr-io spec and write its tickets
-- [ ] zarr-io/02: backend-neutral store layer (`.scratch/zarr-io/issues/02-store-abstraction.md`)
+- [x] zarr-io/02: backend-neutral store layer (`.scratch/zarr-io/issues/02-store-abstraction.md`)
 - [ ] zarr-io/03: zarr fixtures and encoding table (`.scratch/zarr-io/issues/03-zarr-fixtures-and-encoding-table.md`)
 - [ ] zarr-io/04: reading zarr stores (`.scratch/zarr-io/issues/04-zarr-read-backend.md`)
 - [ ] zarr-io/05: writing zarr stores (`.scratch/zarr-io/issues/05-zarr-write-backend.md`)
