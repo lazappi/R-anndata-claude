@@ -1,6 +1,6 @@
 # Package vignette
 
-Status: needs-info
+Status: ready-for-agent
 Type: task
 Blocked by: 12, core-object/16
 
@@ -15,6 +15,11 @@ Add the vignette build dependencies without causing a check NOTE.
 - The vignette builds under `scripts/check.sh` with no NOTE
 - Every exported function from this sub-project is documented
 - The coverage target for the MVP is met
+
+## Decisions (human, 2026-10-16)
+
+- pandoc is now installed (`/usr/local/bin/pandoc`), so keep R Markdown with knitr and add `VignetteBuilder: knitr`
+- Restore the earlier work with `git stash pop` (stash "h5ad-io/14: vignette") and finish the ticket
 
 ## Comments
 

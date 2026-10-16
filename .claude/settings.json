@@ -87,7 +87,8 @@
       "Bash(ANNDATA_SKIP_PYTHON=true Rscript:*)",
       "Bash(_R_CHECK_SYSTEM_CLOCK_=false Rscript:*)",
       "Bash(/Users/luke/Documents/Code/lazappi/R-anndata-claude/scripts/check.sh:*)",
-      "Bash(git stash push:*)"
+      "Bash(git stash push:*)",
+      "Bash(git stash pop)"
     ]
   }
 }
