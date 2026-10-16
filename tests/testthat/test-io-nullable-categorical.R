@@ -105,24 +105,30 @@ test_that("nullable and categorical Elements round trip through R", {
 # dtypes, attributes and values of the fixture
 test_that("R rewrites every nullable and categorical fixture equivalently", {
   skip_if_no_python()
-  for (name in names(nullable_categorical_values())) {
-    original <- fixture_path(file.path("h5ad", paste0(name, ".h5")))
-    expect_structurally_equivalent(
-      write_fixture_like(read_fixture_elem(name)),
-      original
-    )
+  case_names <- names(nullable_categorical_values())
+  written <- character()
+  for (name in case_names) {
+    written[[name]] <- write_fixture_like(read_fixture_elem(name))
   }
+  originals <- fixture_path(file.path("h5ad", paste0(case_names, ".h5")))
+  expect_all_equivalent(written, originals)
 })
 
 # R -> Python -> R: Python reads what R writes and writes it back unchanged
 test_that("Python reads and rewrites nullable and categorical Elements", {
   skip_if_no_python()
   expected <- nullable_categorical_values()
+  written <- character()
   for (name in names(expected)) {
-    written <- write_fixture_like(expected[[name]])
-    rewritten <- withr::local_tempfile(fileext = ".h5")
-    run_python("rewrite.py", written, rewritten)
-    expect_identical(read_written(rewritten), expected[[name]], info = name)
+    written[[name]] <- write_fixture_like(expected[[name]])
+  }
+  rewritten <- python_rewrite(written)
+  for (i in seq_along(expected)) {
+    expect_identical(
+      read_written(rewritten[[i]]),
+      expected[[i]],
+      info = names(expected)[[i]]
+    )
   }
 })
 

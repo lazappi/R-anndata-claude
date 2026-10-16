@@ -50,14 +50,13 @@ test_that("regenerated fixtures are deterministic and match the committed", {
     readLines(file.path(first, "manifest.json")),
     readLines(file.path(second, "manifest.json"))
   )
-  for (case in manifest$cases) {
-    expect_structurally_equivalent(
-      file.path(first, case$file),
-      file.path(second, case$file)
-    )
-    expect_structurally_equivalent(
-      file.path(first, case$file),
-      fixture_path(case$file)
-    )
-  }
+  files <- vapply(manifest$cases, function(case) case$file, character(1))
+  expect_all_equivalent(
+    file.path(first, files),
+    file.path(second, files)
+  )
+  expect_all_equivalent(
+    file.path(first, files),
+    fixture_path(files)
+  )
 })

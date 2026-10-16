@@ -82,11 +82,19 @@ test_that("rec-arrays round trip through R", {
 # dtypes (ADR 0005), and Python sees the same field values
 test_that("R rewrites the ASCII rec-array fixtures with the same values", {
   skip_if_no_python()
-  for (name in setdiff(names(rec_array_cases()), rec_array_non_ascii)) {
-    original <- fixture_path(file.path("h5ad", paste0(name, ".h5")))
-    written <- write_fixture_like(read_fixture_elem(name))
-    expect_structurally_equivalent(written, original, rec_array_paths = "/x")
-    expect_rec_array_values_equal(written, original)
+  case_names <- setdiff(names(rec_array_cases()), rec_array_non_ascii)
+  written <- character()
+  for (name in case_names) {
+    written[[name]] <- write_fixture_like(read_fixture_elem(name))
+  }
+  originals <- fixture_path(file.path("h5ad", paste0(case_names, ".h5")))
+  expect_all_equivalent(
+    written,
+    originals,
+    rec_array_paths = "/x"
+  )
+  for (i in seq_along(written)) {
+    expect_rec_array_values_equal(written[[i]], originals[[i]])
   }
 })
 
@@ -108,15 +116,18 @@ test_that("the rec-array relaxation still reports different values", {
 # values, and R reads the rewrite as the same rec-array
 test_that("Python reads and rewrites the rec-arrays R writes", {
   skip_if_no_python()
-  for (name in names(rec_array_writable())) {
-    written <- write_fixture_like(rec_array_writable()[[name]])
-    rewritten <- withr::local_tempfile(fileext = ".h5")
-    run_python("rewrite.py", written, rewritten)
-    expect_rec_array_values_equal(written, rewritten)
+  case_names <- names(rec_array_writable())
+  written <- character()
+  for (name in case_names) {
+    written[[name]] <- write_fixture_like(rec_array_writable()[[name]])
+  }
+  rewritten <- python_rewrite(written)
+  for (i in seq_along(case_names)) {
+    expect_rec_array_values_equal(written[[i]], rewritten[[i]])
     expect_identical(
-      read_written(rewritten),
-      rec_array_written(name),
-      info = name
+      read_written(rewritten[[i]]),
+      rec_array_written(case_names[[i]]),
+      info = case_names[[i]]
     )
   }
 })

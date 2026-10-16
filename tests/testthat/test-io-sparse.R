@@ -123,22 +123,31 @@ test_that("sparse matrices round trip through R", {
 # Python -> R -> Python: R must write what Python wrote, dtypes included
 test_that("R rewrites every sparse fixture structurally equivalent to Python", {
   skip_if_no_python()
-  for (name in names(sparse_cases())) {
-    original <- fixture_path(file.path("h5ad", paste0(name, ".h5")))
-    value <- read_fixture_elem(name)
-    expect_structurally_equivalent(write_fixture_like(value), original)
+  case_names <- names(sparse_cases())
+  written <- character()
+  for (name in case_names) {
+    written[[name]] <- write_fixture_like(read_fixture_elem(name))
   }
+  originals <- fixture_path(file.path("h5ad", paste0(case_names, ".h5")))
+  expect_all_equivalent(written, originals)
 })
 
 # R -> Python -> R: Python reads what R writes and R reads Python's rewrite as
 # the same matrix
 test_that("Python reads and rewrites the sparse matrices R writes", {
   skip_if_no_python()
-  for (name in names(sparse_cases())) {
-    value <- sparse_cases()[[name]]
-    rewritten <- withr::local_tempfile(fileext = ".h5")
-    run_python("rewrite.py", write_fixture_like(value), rewritten)
-    expect_identical(read_written(rewritten), value, info = name)
+  cases <- sparse_cases()
+  written <- character()
+  for (name in names(cases)) {
+    written[[name]] <- write_fixture_like(cases[[name]])
+  }
+  rewritten <- python_rewrite(written)
+  for (i in seq_along(cases)) {
+    expect_identical(
+      read_written(rewritten[[i]]),
+      cases[[i]],
+      info = names(cases)[[i]]
+    )
   }
 })
 

@@ -16,23 +16,50 @@ python_project <- function() {
   )
 }
 
+# The interpreter of the uv environment, found once per test process because
+# `uv run` costs a few hundred milliseconds on every call (uv still creates and
+# syncs the environment on the first one)
+python_interpreter <- local({
+  path <- NULL
+  function() {
+    if (is.null(path)) {
+      out <- system2(
+        "uv",
+        c(
+          "run",
+          "--project",
+          python_project(),
+          "python",
+          "-I",
+          "-c",
+          shQuote("import sys; print(sys.executable)")
+        ),
+        stdout = TRUE,
+        stderr = FALSE,
+        env = paste0("TMPDIR=", withr::local_tempdir())
+      )
+      if (length(out) == 0L) {
+        stop("`uv run` did not print the Python interpreter path")
+      }
+      path <<- out[[length(out)]]
+    }
+    path
+  }
+})
+
 # Runs a script from tests/python in the reference environment and returns
 # its stdout lines, stderr text and exit status without judging the result
 run_python_raw <- function(script, ...) {
   project <- python_project()
   stderr_file <- withr::local_tempfile()
   args <- c(
-    "run",
-    "--project",
-    project,
-    "python",
     "-I",
     file.path(project, script),
     as.character(c(...))
   )
   out <- suppressWarnings(
     system2(
-      "uv",
+      python_interpreter(),
       args,
       stdout = TRUE,
       stderr = stderr_file,
@@ -69,13 +96,56 @@ fixture_path <- function(name) {
   testthat::test_path("fixtures", name)
 }
 
-# Reads the h5_tree.py description of a file as a list of nodes keyed by path
-h5_tree <- function(file) {
-  nodes <- jsonlite::fromJSON(
-    paste(run_python("h5_tree.py", file), collapse = ""),
+name_h5_nodes <- function(nodes) {
+  stats::setNames(nodes, vapply(nodes, function(node) node$path, character(1)))
+}
+
+# Trees computed ahead by `prefetch_h5_trees()`, keyed by file path
+h5_tree_cache <- new.env(parent = emptyenv())
+
+# Computes the h5_tree() of many files with one Python process, because starting
+# Python for each file dominates the run time of the comparison tests
+#
+# Each tree is used (and dropped) by the next `h5_tree()` of that path, so the
+# files must not change in between
+prefetch_h5_trees <- function(files) {
+  files <- unique(as.character(files))
+  if (length(files) == 0L) {
+    return(invisible())
+  }
+  # One file prints its own list of nodes and several print one list per file
+  trees <- jsonlite::fromJSON(
+    paste(run_python("h5_tree.py", files), collapse = ""),
     simplifyVector = FALSE
   )
-  stats::setNames(nodes, vapply(nodes, function(node) node$path, character(1)))
+  if (length(files) == 1L) {
+    trees <- list(trees)
+  }
+  for (i in seq_along(files)) {
+    assign(files[[i]], name_h5_nodes(trees[[i]]), envir = h5_tree_cache)
+  }
+  invisible()
+}
+
+# Reads the h5_tree.py description of a file as a list of nodes keyed by path
+h5_tree <- function(file) {
+  if (exists(file, envir = h5_tree_cache, inherits = FALSE)) {
+    tree <- get(file, envir = h5_tree_cache, inherits = FALSE)
+    rm(list = file, envir = h5_tree_cache)
+    return(tree)
+  }
+  prefetch_h5_trees(file)
+  h5_tree(file)
+}
+
+# Python's rewrite (read then write with `anndata.io`) of many files in one
+# Python process, returning the paths of the rewritten files (in the temporary
+# directory of the calling test)
+python_rewrite <- function(files, .local_envir = parent.frame()) {
+  out_dir <- withr::local_tempdir(.local_envir = .local_envir)
+  rewritten <- file.path(out_dir, paste0(seq_along(files), ".h5"))
+  run_python("rewrite.py", as.vector(rbind(files, rewritten)))
+  rewritten
 }
 
 # Lists every path and property that differs between two h5_tree() results
@@ -157,6 +227,21 @@ expect_structurally_equivalent <- function(
       paste0("* ", diffs, collapse = "\n")
     )
   )
+  invisible(a)
+}
+
+# Runs `expect_structurally_equivalent(a[[i]], b[[i]])` for every pair, reading
+# all the files with one Python process
+expect_all_equivalent <- function(
+  a,
+  b,
+  rec_array_paths = character()
+) {
+  stopifnot(length(a) == length(b))
+  prefetch_h5_trees(c(a, b))
+  for (i in seq_along(a)) {
+    expect_structurally_equivalent(a[[i]], b[[i]], rec_array_paths)
+  }
   invisible(a)
 }
 

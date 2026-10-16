@@ -1,6 +1,6 @@
 """Print a JSON description of every group and dataset in an HDF5 file.
 
-Usage: h5_tree.py <file>
+Usage: h5_tree.py <file> [<file> ...]
 
 Each node has its path, kind, attributes (value and stored type), and for
 datasets the dtype, shape and a digest of the values.
@@ -95,14 +95,23 @@ def describe(path, obj):
     return node
 
 
-def main(path):
+def tree(path):
     nodes = []
     with h5py.File(path, "r") as f:
         nodes.append(describe("/", f))
         f.visititems(lambda name, obj: nodes.append(describe("/" + name, obj)))
     nodes.sort(key=lambda n: n["path"])
-    print(json.dumps(nodes))
+    return nodes
+
+
+def main(paths):
+    # One file prints its list of nodes, several files print one list per file
+    # (starting Python once for many files is much faster in the tests)
+    if len(paths) == 1:
+        print(json.dumps(tree(paths[0])))
+    else:
+        print(json.dumps([tree(path) for path in paths]))
 
 
 if __name__ == "__main__":
-    main(sys.argv[1])
+    main(sys.argv[1:])

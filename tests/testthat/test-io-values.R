@@ -127,27 +127,30 @@ test_that("Elements round trip through R", {
 # fixture's groups, dtypes, shapes, attributes and values
 test_that("R rewrites every fixture structurally equivalent to Python", {
   skip_if_no_python()
-  for (name in names(expected_values())) {
-    original <- fixture_path(file.path("h5ad", paste0(name, ".h5")))
-    value <- read_fixture_elem(name)
-    expect_structurally_equivalent(write_fixture_like(value), original)
+  case_names <- names(expected_values())
+  written <- character()
+  for (name in case_names) {
+    written[[name]] <- write_fixture_like(read_fixture_elem(name))
   }
+  originals <- fixture_path(file.path("h5ad", paste0(case_names, ".h5")))
+  expect_all_equivalent(written, originals)
 })
 
 # R -> Python -> R: Python must read what R writes and write it back so that R
 # sees the same value
 test_that("Python reads and rewrites what R writes", {
   skip_if_no_python()
-  for (name in names(expected_values())) {
-    # Python cannot write a complex scalar it has read back (it reads a Python
-    # `complex`, which has no writer)
-    if (name == "scalar_complex128") {
-      next
-    }
+  # Python cannot write a complex scalar it has read back (it reads a Python
+  # `complex`, which has no writer)
+  case_names <- setdiff(names(expected_values()), "scalar_complex128")
+  written <- character()
+  for (name in case_names) {
+    written[[name]] <- write_fixture_like(expected_values()[[name]])
+  }
+  rewritten <- python_rewrite(written)
+  for (i in seq_along(case_names)) {
+    name <- case_names[[i]]
     value <- expected_values()[[name]]
-    written <- write_fixture_like(value)
-    rewritten <- withr::local_tempfile(fileext = ".h5")
-    run_python("rewrite.py", written, rewritten)
     # Python's reader turns a scalar into a Python int or float, which it
     # writes as int64 or float64, so the dtype changes in Python and not in R
     if (grepl("^scalar_u?int", name)) {
@@ -155,7 +158,7 @@ test_that("Python reads and rewrites what R writes", {
     } else if (name == "scalar_float32") {
       value <- drop_dtype(value)
     }
-    expect_identical(read_written(rewritten), value, info = name)
+    expect_identical(read_written(rewritten[[i]]), value, info = name)
   }
 })
 

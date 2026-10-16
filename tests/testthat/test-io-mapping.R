@@ -40,22 +40,31 @@ test_that("dicts round trip through R", {
 # Python -> R -> Python: R must write the same groups, members and attributes
 test_that("R rewrites every dict fixture structurally equivalent to Python", {
   skip_if_no_python()
-  for (name in names(mapping_cases())) {
-    original <- fixture_path(file.path("h5ad", paste0(name, ".h5")))
-    value <- read_fixture_elem(name)
-    expect_structurally_equivalent(write_fixture_like(value), original)
+  case_names <- names(mapping_cases())
+  written <- character()
+  for (name in case_names) {
+    written[[name]] <- write_fixture_like(read_fixture_elem(name))
   }
+  originals <- fixture_path(file.path("h5ad", paste0(case_names, ".h5")))
+  expect_all_equivalent(written, originals)
 })
 
 # R -> Python -> R: Python reads and rewrites what R writes, and R reads that
 # back as the same list
 test_that("Python reads and rewrites the dicts R writes", {
   skip_if_no_python()
-  for (name in names(mapping_cases())) {
-    value <- mapping_cases()[[name]]
-    rewritten <- withr::local_tempfile(fileext = ".h5")
-    run_python("rewrite.py", write_fixture_like(value), rewritten)
-    expect_identical(read_written(rewritten), value, info = name)
+  cases <- mapping_cases()
+  written <- character()
+  for (name in names(cases)) {
+    written[[name]] <- write_fixture_like(cases[[name]])
+  }
+  rewritten <- python_rewrite(written)
+  for (i in seq_along(cases)) {
+    expect_identical(
+      read_written(rewritten[[i]]),
+      cases[[i]],
+      info = names(cases)[[i]]
+    )
   }
 })
 

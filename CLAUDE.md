@@ -82,4 +82,5 @@ Kept brief and current by the loop.
 - Dataframes (`R/io-values-dataframe.R`): a non-string index lives in `metadata(df)$index_source`, and a string read from a plain `string-array` carries the nullable record `FALSE` (written back as `string-array`)
 - `expect_python_equal()` and `rewrite.py` differ in scope: the first compares whole AnnData files, the second rewrites with Python's default settings
 - A `local_anndata_settings()` call inside a test loop leaks to later iterations, so call it from a function run per case
-- Python is only used through `uv run --project tests/python ...`, in tests via `run_python()` which sets a private `TMPDIR` (uv lock files left in the check temp dir cause a NOTE)
+- Python is only used through `uv run --project tests/python ...`, in tests via `run_python()` which sets a private `TMPDIR` (uv lock files left in the check temp dir cause a NOTE), and which finds the uv interpreter once and calls it directly
+- Each Python start costs 0.3s (`h5_tree.py`) to 1.8s (anything importing anndata), so never call it per case: write all files first, then use `prefetch_h5_trees()`, `python_rewrite()` and `expect_all_equivalent()` (testthat's per-test times do not show this cost)

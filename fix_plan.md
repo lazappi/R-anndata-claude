@@ -45,7 +45,7 @@ The human owns the order of the Queue.
 - [x] h5ad-io/05: dense arrays, string arrays, scalars, null and bytes (`.scratch/h5ad-io/issues/05-dense-scalar-null.md`)
 - [x] h5ad-io/06: nullable and categorical arrays (`.scratch/h5ad-io/issues/06-nullable-categorical.md`)
 - [x] h5ad-io/07: sparse matrices (`.scratch/h5ad-io/issues/07-sparse-matrices.md`)
-- [ ] foundations/09: faster test suite (`.scratch/foundations/issues/09-test-speed.md`)
+- [x] foundations/09: faster test suite (`.scratch/foundations/issues/09-test-speed.md`)
 - [ ] core-object/17: deprecation warnings (`.scratch/core-object/issues/17-deprecation-warnings.md`)
 - [ ] core-object/18: escape keys in printing like Python's repr (`.scratch/core-object/issues/18-repr-key-escaping.md`)
 - [ ] h5ad-io/08: dict and rec-array (`.scratch/h5ad-io/issues/08-dict-rec-array.md`), implemented, finish with the 2026-10-16 decisions

@@ -125,29 +125,42 @@ test_that("every dataframe fixture round trips through R", {
 # Python -> R -> Python: R writes the groups, dtypes and attributes Python did
 test_that("R rewrites every dataframe fixture equivalently", {
   skip_if_no_python()
+  test_env <- environment()
+  written <- character()
+  originals <- character()
   for_each_fixture(function(name) {
-    expect_structurally_equivalent(
-      write_fixture_like(read_fixture_elem(name)),
-      fixture_path(file.path("h5ad", paste0(name, ".h5")))
+    written[[name]] <<- write_fixture_like(
+      read_fixture_elem(name),
+      env = test_env
     )
+    originals[[name]] <<- fixture_path(file.path("h5ad", paste0(name, ".h5")))
   })
+  expect_all_equivalent(written, originals)
 })
 
 # R -> Python -> R: Python reads what R writes and writes it back unchanged
 test_that("Python reads and rewrites the dataframes R writes", {
   skip_if_no_python()
+  test_env <- environment()
+  values <- list()
+  written <- character()
   for_each_fixture(function(name) {
     # rewrite.py uses Python's default setting, which writes nullable strings
     if (name %in% setting_off_fixtures) {
       return(invisible())
     }
-    value <- read_fixture_elem(name)
-    written <- write_fixture_like(value)
-    rewritten <- withr::local_tempfile(fileext = ".h5")
-    run_python("rewrite.py", written, rewritten)
-    expect_identical(read_written(rewritten), value, info = name)
-    expect_structurally_equivalent(rewritten, written)
+    values[[name]] <<- read_fixture_elem(name)
+    written[[name]] <<- write_fixture_like(values[[name]], env = test_env)
   })
+  rewritten <- python_rewrite(written)
+  for (i in seq_along(values)) {
+    expect_identical(
+      read_written(rewritten[[i]]),
+      values[[i]],
+      info = names(values)[[i]]
+    )
+  }
+  expect_all_equivalent(rewritten, written)
 })
 
 # New frames built in R pick the encodings Python writes for the equivalent
@@ -206,8 +219,7 @@ test_that("a DataFrame built in R round trips through Python", {
     "cell"
   )
   written <- write_fixture_like(df)
-  rewritten <- withr::local_tempfile(fileext = ".h5")
-  run_python("rewrite.py", written, rewritten)
+  rewritten <- python_rewrite(written)
   expect_identical(read_written(rewritten), read_written(written))
   expect_structurally_equivalent(rewritten, written)
 })
