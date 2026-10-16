@@ -67,19 +67,49 @@ slot_keys <- function(x, slot) {
 }
 
 # Python's `repr` of a string: single quotes unless the string has a single
-# quote and no double quote
+# quote and no double quote, with backslash, control and non-printable
+# characters escaped
 quote_key <- function(keys) {
   vapply(
     keys,
     function(key) {
-      key <- gsub("\\", "\\\\", key, fixed = TRUE)
-      if (grepl("'", key, fixed = TRUE) && !grepl("\"", key, fixed = TRUE)) {
-        paste0("\"", key, "\"")
-      } else {
-        paste0("'", gsub("'", "\\'", key, fixed = TRUE), "'")
-      }
+      use_double <- grepl("'", key, fixed = TRUE) &&
+        !grepl("\"", key, fixed = TRUE)
+      quote <- if (use_double) "\"" else "'"
+      chars <- vapply(
+        intToUtf8(utf8ToInt(key), multiple = TRUE),
+        escape_char,
+        character(1),
+        quote = quote,
+        USE.NAMES = FALSE
+      )
+      paste0(quote, paste(chars, collapse = ""), quote)
     },
     character(1),
     USE.NAMES = FALSE
   )
+}
+
+# One character as it appears inside Python's `repr` of a string
+escape_char <- function(char, quote) {
+  code <- utf8ToInt(char)
+  if (char == quote || char == "\\") {
+    paste0("\\", char)
+  } else if (char == "\n") {
+    "\\n"
+  } else if (char == "\r") {
+    "\\r"
+  } else if (char == "\t") {
+    "\\t"
+  } else if (char != " " && grepl("^[\\p{C}\\p{Z}]$", char, perl = TRUE)) {
+    if (code < 0x100) {
+      sprintf("\\x%02x", code)
+    } else if (code < 0x10000) {
+      sprintf("\\u%04x", code)
+    } else {
+      sprintf("\\U%08x", code)
+    }
+  } else {
+    char
+  }
 }

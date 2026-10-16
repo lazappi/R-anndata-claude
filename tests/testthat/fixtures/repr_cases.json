@@ -63,6 +63,12 @@
       null
     ]
   },
+  "escapes": {
+    "repr": "AnnData object with n_obs \u00d7 n_vars = 3 \u00d7 2\n    obs: 'new\\nline', 'tab\\there', 'back\\\\slash', 'caf\u00e9', '\\x01'\n    uns: 'both\\'\"', 'nbsp\\xa0x', 'zero\\u200bwidth', 'emoji\ud83d\ude00', \"it's\\n\", 'a\"b'\n    layers: None (.X)",
+    "layer_keys": [
+      null
+    ]
+  },
   "no_x": {
     "repr": "AnnData object with n_obs \u00d7 n_vars = 3 \u00d7 2\n    obs: 'a'\n    var: 'gene'",
     "layer_keys": []

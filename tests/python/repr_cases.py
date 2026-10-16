@@ -61,6 +61,22 @@ def cases():
         obs=frame(3, ["it's", 'say "hi"', "plain"], "o"),
         uns={"a'b": 1},
     )
+    # Characters are built with chr() so the source holds no invisible ones
+    out["escapes"] = base(
+        obs=frame(
+            3,
+            ["new\nline", "tab\there", "back\\slash", "caf" + chr(0xE9), "\x01"],
+            "o",
+        ),
+        uns={
+            "both'\"": 1,
+            "nbsp" + chr(0xA0) + "x": 2,
+            "zero" + chr(0x200B) + "width": 3,
+            "emoji" + chr(0x1F600): 4,
+            "it's\n": 5,
+            'a"b': 6,
+        },
+    )
     out["no_x"] = ad.AnnData(
         obs=frame(3, ["a"], "o"), var=frame(2, ["gene"], "v")
     )

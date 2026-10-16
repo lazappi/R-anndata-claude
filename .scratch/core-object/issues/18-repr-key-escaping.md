@@ -1,6 +1,6 @@
 # Escape keys in printing like Python's repr
 
-Status: ready-for-agent
+Status: done
 Type: task
 Blocked by: 15
 
@@ -17,3 +17,6 @@ Blocked by: 15
 - `scripts/check.sh` passes
 
 ## Comments
+
+2026-10-16: `quote_key()` now escapes like `repr(str)` through `escape_char()`: backslash, the quote in use, `\n`, `\r`, `\t`, and `\x`/`\u`/`\U` for Unicode categories C* and Z* other than a plain space.
+Added an `escapes` case to `repr_cases.py` and `test-printing.R` (newline, tab, backslash, control char, nbsp, zero-width space, emoji, both quote kinds, double quote only) and regenerated the fixture.

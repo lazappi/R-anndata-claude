@@ -56,6 +56,32 @@ repr_objects <- function() {
       obs = repr_frame(3, c("it's", "say \"hi\"", "plain"), "o"),
       uns = list("a'b" = 1)
     ),
+    # Control, non-printable and non-ASCII characters are escaped as repr does
+    escapes = AnnData(
+      m(3, 2),
+      obs = repr_frame(
+        3,
+        c(
+          "new\nline",
+          "tab\there",
+          "back\\slash",
+          paste0("caf", intToUtf8(0xE9)),
+          "\001"
+        ),
+        "o"
+      ),
+      uns = stats::setNames(
+        as.list(1:6),
+        c(
+          "both'\"",
+          paste0("nbsp", intToUtf8(0xA0), "x"),
+          paste0("zero", intToUtf8(0x200B), "width"),
+          paste0("emoji", intToUtf8(0x1F600)),
+          "it's\n",
+          "a\"b"
+        )
+      )
+    ),
     no_x = AnnData(
       obs = repr_frame(3, "a", "o"),
       var = repr_frame(2, "gene", "v")
