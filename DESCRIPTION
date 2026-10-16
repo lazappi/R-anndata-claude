@@ -1,6 +1,6 @@
 Package: anndata.claude
 Title: Annotated Data Matrices and Their On-Disk Formats
-Version: 0.0.1.9000
+Version: 0.0.1.9001
 Authors@R:
     person("Luke", "Zappia", , "luke.zappia@gmail.com", role = c("aut", "cre"))
 Description: An R port of Python 'anndata' (reference release 0.13.4) for
@@ -18,8 +18,8 @@ Imports:
     lifecycle,
     methods,
     Matrix,
-    pizzarr,
     R6,
+    Rarr (>= 2.1.48),
     rhdf5,
     rlang,
     S4Vectors
@@ -32,6 +32,8 @@ Suggests:
     rmarkdown,
     testthat (>= 3.0.0),
     withr
+Remotes:
+    Huber-group-EMBL/Rarr@devel
 VignetteBuilder: knitr
 Config/testthat/edition: 3
 Config/testthat/parallel: true

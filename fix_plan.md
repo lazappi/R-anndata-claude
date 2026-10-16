@@ -55,7 +55,7 @@ The human owns the order of the Queue.
 - [x] h5ad-io/12: realistic and compressed fixtures (`.scratch/h5ad-io/issues/12-realistic-fixtures.md`)
 - [x] h5ad-io/13: real-world file test (`.scratch/h5ad-io/issues/13-real-world-file.md`)
 - [x] h5ad-io/14: package vignette (`.scratch/h5ad-io/issues/14-vignette.md`)
-- [ ] zarr-io/01: zarr library spike (`.scratch/zarr-io/issues/01-zarr-library-spike.md`), re-run against Rarr devel and zarr main (see Decisions)
+- [x] zarr-io/01: zarr library spike (`.scratch/zarr-io/issues/01-zarr-library-spike.md`), re-run against Rarr devel and zarr main (see Decisions)
 - [ ] 🛑 Human checkpoint: review `.scratch/zarr-io/zarr-spike.md`, then grill the rest of the zarr-io spec and write its tickets
 
 ## Discovered

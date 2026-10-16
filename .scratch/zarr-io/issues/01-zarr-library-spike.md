@@ -1,6 +1,6 @@
 # zarr library spike
 
-Status: ready-for-agent
+Status: done
 Type: research
 Blocked by: none
 
@@ -88,3 +88,19 @@ Nothing was changed in the repository besides this note.
 The stash `zarr-io/01: pizzarr verdict tests` is untouched.
 
 Recommended answer to 1 (earlier note): accept `blosc` in Suggests only (v2 blosc reading and tests then skip when it is absent), pending the human's call.
+
+2026-10-16 (loop run, development versions re-run)
+
+Done: re-ran against Rarr 2.1.48 (devel) and zarr 0.5.1.9000 (main), pizzarr main skipped (needs Rust, per the decision), pizzarr 0.2.1 kept for comparison.
+`.scratch/zarr-io/zarr-spike.md` is rewritten with verdict tables for the development versions, the release results as a short note, and a recommendation.
+New probes in `.scratch/zarr-io/spike/` (`probe-write-rarr-devel.R`, `probe-rarr-dtypes.R`, `probe-rarr-misc.R`), `out/` is git-ignored.
+
+Recommendation: **Rarr devel**.
+It reads every dtype, v3 strings, scalars and sharded arrays, writes groups, attributes and consolidated metadata, needs no `blosc` package (so the earlier `R CMD check` problem, which was an undeclared package, does not apply) and has an MIT licence.
+`DESCRIPTION` now has `Rarr (>= 2.1.48)` in Imports with `Remotes: Huber-group-EMBL/Rarr@devel`, and `pizzarr` is removed.
+`tests/testthat/test-zarr-spike.R` (Rarr verdicts, replaces the stashed pizzarr tests) passes under the full `scripts/check.sh`.
+
+Remaining gaps (need our own code on the write side): variable-length strings (Rarr writes fixed-width bytes), 0-d arrays (cannot write), the default narrow integer type (always pass `data_type`), 64-bit from doubles, writing shards and zip stores.
+Python's `auto_shard_zarr_v3` defaults to `True`, so the human should decide whether R-written v3 stores may be unsharded.
+
+The stash `zarr-io/01: pizzarr verdict tests (fail under R CMD check, blosc)` is obsolete (the pizzarr tests were superseded) and can be dropped by the human.

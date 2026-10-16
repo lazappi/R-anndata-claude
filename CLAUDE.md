@@ -96,4 +96,5 @@ Kept brief and current by the loop.
 - `gen_adata` needs `awkward`, which the uv environment lacks, so `_realistic_adata()` stubs `helpers.gen_awkward` and seeds the global `np.random` too
 - Real-world downloads are legacy format, so `python_rewrite_h5ad()` them first, and `expect_all_equivalent(sorted_paths =)` skips the digest of sparse datasets stored unsorted (ADR 0006)
 - `.lintr` excludes `.scratch`, so throwaway scripts there are not linted (air still formats them)
+- zarr uses `Rarr` devel (`Remotes: Huber-group-EMBL/Rarr@devel`), verdicts in `.scratch/zarr-io/zarr-spike.md`: always pass `data_type` to `write_zarr_array()` (it narrows integers), use `write_zarr_group(path, group = "")` for the root, and use `"|b1"` for bool
 - Each Python start costs 0.3s (`h5_tree.py`) to 1.8s (anything importing anndata), so never call it per case: write all files first, then use `prefetch_h5_trees()`, `python_rewrite()` and `expect_all_equivalent()` (testthat's per-test times do not show this cost)
