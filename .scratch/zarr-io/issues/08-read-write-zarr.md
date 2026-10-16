@@ -1,6 +1,6 @@
 # read_zarr, write_zarr and settings
 
-Status: in-progress
+Status: done
 Type: task
 Blocked by: 07
 
@@ -43,3 +43,10 @@ Python's `AnnData.write_zarr()` rejects these kwargs, ours forwards `...` (a sup
 Rarr's gzip is zlib, not gzip, which Python rejects, so gzip chunks are written uncompressed by Rarr and gzipped in R (`zarr_gzip_chunks()`).
 Rarr ignores zstd levels, so the level is only recorded in the metadata.
 Tests in `test-io-zarr-anndata.R`, with Python decoding every compressor.
+
+2026-10-17, part 3 (done): `read_elem()`/`write_elem()` on zarr groups with paths now have tests in `test-io-zarr-basic.R` (absolute keys, `"/"`, forward slashes, registry error), the review found that Python always rejects `/` in keys for a zarr group (`registry.py:394-400`), so `write_elem()` now does too, whatever `disallow_forward_slash_in_h5ad` says.
+`unwriteable(store_type = "zarr")` was already tested against Python in `test-io-h5ad.R`.
+Python's `zarr_write_format = 2` DeprecationWarning is emitted when writing v2, so it belongs to ticket 11 (R refuses v2 until then).
+The settings help text still says shards are not written, ticket 09 updates it.
+NEWS mentions compression.
+Status set to done.

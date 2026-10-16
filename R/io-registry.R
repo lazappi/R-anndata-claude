@@ -213,7 +213,11 @@ write_elem <- function(
       key <- substring(key, nchar(prefix) + 1L)
     }
     if (grepl("/", key, fixed = TRUE)) {
-      if (anndata_settings$disallow_forward_slash_in_h5ad) {
+      # Python always refuses them in a zarr group, whatever the setting
+      if (
+        inherits(store, "zarr_node") ||
+          anndata_settings$disallow_forward_slash_in_h5ad
+      ) {
         anndata_abort(
           "Forward slashes are not allowed in keys, found {.val {key}} in
            {.path {store_name}}.",

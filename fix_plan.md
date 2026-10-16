@@ -65,12 +65,12 @@ The human owns the order of the Queue.
 - [x] zarr-io/07: zarr v3 nullable, categorical, dataframe, dict and rec-array Elements (`.scratch/zarr-io/issues/07-zarr-v3-compound-elements.md`)
   - [x] nullable arrays, categorical, dataframe and dict
   - [x] rec-array: zarr `table_read`/`table_write` for the v3 `struct` data type (own chunk packing, zstd via Rarr), three round-trip directions on the `rec_array_*` fixtures
-- [ ] zarr-io/08: read_zarr, write_zarr and settings (`.scratch/zarr-io/issues/08-read-write-zarr.md`)
+- [x] zarr-io/08: read_zarr, write_zarr and settings (`.scratch/zarr-io/issues/08-read-write-zarr.md`)
   - [x] `read_zarr()`, `write_zarr()`, `adata$write_zarr()`, `chunks`, settings, whole-AnnData round trips and cross-format checks
   - [x] dataset arguments: compression (`compressor`/`compressors` with zstd, gzip, blosc) and `shards` (the sharding itself is ticket 09), dropped for scalars and nulls
-  - [ ] Python's warning for `zarr_write_format = 2` (writing v2 is ticket 11) and the zarr `unwriteable` details
-  - [ ] vignette-independent NEWS entry for zarr, and the settings help text once sharding is written
-  - [ ] `read_elem()`/`write_elem()` tests on zarr groups with a path and error parity with h5ad (forward slashes, bad keys)
+  - [x] Python's warning for `zarr_write_format = 2` (moved to ticket 11, as v2 is refused until then) and the zarr `unwriteable` details (already tested in `test-io-h5ad.R`)
+  - [x] vignette-independent NEWS entry for zarr (the settings help text changes with ticket 09, sharding)
+  - [x] `read_elem()`/`write_elem()` tests on zarr groups with a path and error parity with h5ad (forward slashes, bad keys)
 - [ ] zarr-io/09: writing sharded zarr v3 (`.scratch/zarr-io/issues/09-zarr-shard-writing.md`)
 - [ ] zarr-io/10: reading zarr v2 (`.scratch/zarr-io/issues/10-zarr-v2-read.md`)
 - [ ] zarr-io/11: writing zarr v2 (`.scratch/zarr-io/issues/11-zarr-v2-write.md`)
@@ -99,6 +99,8 @@ The human owns the order of the Queue.
 
 - [x] Writing a large int64 (or complex) array to zarr through the split-parts writer hangs: a 2^19 x 3 int64 matrix never finished in `zarr_write_read()` (zarr-io/05 shrank the test with the `anndata.zarr_chunk_limit` option instead of finding the cause). Find and fix the slow path, then add a test that writes a 2^19 x 3 int64 matrix in seconds.
   Cause was the read, not the write: Rarr warns once per out-of-range value and the muffling handler made it take minutes. `zarr_numeric_read()` now reads int64, uint64 and uint32 from 16-bit parts always.
+
+- [ ] zarr-io/11 must emit Python's `DeprecationWarning` when `zarr_write_format = 2` is used for writing (`zarr.py:244-256`), and zarr-io/09 must update the `auto_shard_zarr_v3` help text once shards are written
 
 ## Blocked
 

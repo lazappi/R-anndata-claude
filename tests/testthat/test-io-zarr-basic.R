@@ -156,3 +156,67 @@ test_that("a missing raw is written as a null Element", {
   )
   expect_null(read_elem(store, "x"))
 })
+
+# read_elem()/write_elem() take a zarr group with a path like an rhdf5 handle,
+# with the same key errors (parity with test-io-registry.R)
+test_that("write_elem and read_elem accept a zarr group and absolute keys", {
+  store <- zarr_create(withr::local_tempdir())
+  group <- group_create(store, "uns")
+
+  write_elem(group, "a", c(1, 2))
+  write_elem(group, "/uns/b", "text")
+
+  expect_equal(drop_dtype(read_elem(group, "a")), c(1, 2))
+  expect_equal(drop_dtype(read_elem(store, "uns/b")), "text")
+  expect_anndata_condition(
+    write_elem(group, "/other/a", 1),
+    "anndata_invalid_key_error"
+  )
+})
+
+test_that("write_elem to '/' on zarr clears the root and needs the root", {
+  store <- zarr_create(withr::local_tempdir())
+  write_elem(store, "old", 1)
+  group <- group_create(store, "sub")
+
+  expect_anndata_condition(
+    write_elem(group, "/", 1),
+    "anndata_invalid_key_error"
+  )
+  write_elem(store, "/", NULL)
+
+  expect_false(member_exists(store, "old"))
+  expect_false(member_exists(store, "sub"))
+  expect_null(read_elem(store, "/"))
+})
+
+# Unlike h5ad, Python refuses these for a zarr group even when
+# `disallow_forward_slash_in_h5ad` is off (registry.py:394-400)
+test_that("write_elem on zarr always rejects forward slashes in keys", {
+  store <- zarr_create(withr::local_tempdir())
+  group_create(store, "a")
+
+  cnd <- expect_anndata_condition(
+    write_elem(store, "a/b", 1),
+    "anndata_forward_slash_key_error"
+  )
+  expect_s3_class(cnd, "anndata_error")
+
+  local_anndata_settings(list(disallow_forward_slash_in_h5ad = FALSE))
+  expect_anndata_condition(
+    write_elem(store, "a/b", 1),
+    "anndata_forward_slash_key_error"
+  )
+  expect_false(member_exists(store, "a/b"))
+})
+
+test_that("writing an unencodable value to a zarr group is a registry error", {
+  store <- zarr_create(withr::local_tempdir())
+  group <- group_create(store, "uns")
+
+  cnd <- expect_anndata_condition(
+    write_elem(group, "key", function(x) x),
+    "anndata_io_registry_error"
+  )
+  expect_equal(cnd$path, "/uns/key")
+})

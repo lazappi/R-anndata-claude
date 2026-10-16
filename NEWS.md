@@ -1,6 +1,7 @@
 # anndata.claude (development version)
 
 * `read_zarr()` and `write_zarr()` (also `adata$write_zarr()`) read and write zarr v3 stores that round trip with Python.
+  Dataset arguments `compressors` (zstd, gzip, blosc or none) and `chunks` are supported.
   The settings `zarr_write_format` and `auto_shard_zarr_v3` are added (writing v2 and shards are not yet supported).
 
 # anndata.claude 0.0.1
