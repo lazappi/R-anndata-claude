@@ -176,6 +176,22 @@
       "file": "h5ad/csc_float64.h5",
       "python": "csc_matrix float64, index int32"
     },
+    "csc_indices_int64": {
+      "file": "h5ad/csc_indices_int64.h5",
+      "python": "csc_matrix float64, index int64"
+    },
+    "csc_indices_int64_min_dtype": {
+      "file": "h5ad/csc_indices_int64_min_dtype.h5",
+      "python": "csc_matrix float64, index int64"
+    },
+    "csc_indices_min_dtype": {
+      "file": "h5ad/csc_indices_min_dtype.h5",
+      "python": "csc_matrix float64, index int32"
+    },
+    "csc_int16": {
+      "file": "h5ad/csc_int16.h5",
+      "python": "csc_matrix int16, index int32"
+    },
     "csc_int32": {
       "file": "h5ad/csc_int32.h5",
       "python": "csc_matrix int32, index int32"
@@ -187,6 +203,30 @@
     "csc_int8": {
       "file": "h5ad/csc_int8.h5",
       "python": "csc_matrix int8, index int32"
+    },
+    "csc_uint16": {
+      "file": "h5ad/csc_uint16.h5",
+      "python": "csc_matrix uint16, index int32"
+    },
+    "csc_uint32": {
+      "file": "h5ad/csc_uint32.h5",
+      "python": "csc_matrix uint32, index int32"
+    },
+    "csc_uint64": {
+      "file": "h5ad/csc_uint64.h5",
+      "python": "csc_matrix uint64, index int32"
+    },
+    "csc_uint8": {
+      "file": "h5ad/csc_uint8.h5",
+      "python": "csc_matrix uint8, index int32"
+    },
+    "csc_wide": {
+      "file": "h5ad/csc_wide.h5",
+      "python": "csc_matrix float64, index int32"
+    },
+    "csc_wide_min_dtype": {
+      "file": "h5ad/csc_wide_min_dtype.h5",
+      "python": "csc_matrix float64, index int32"
     },
     "csr_0_rows": {
       "file": "h5ad/csr_0_rows.h5",
@@ -224,6 +264,10 @@
       "file": "h5ad/csr_indices_min_dtype.h5",
       "python": "csr_matrix float64, index int32"
     },
+    "csr_int16": {
+      "file": "h5ad/csr_int16.h5",
+      "python": "csr_matrix int16, index int32"
+    },
     "csr_int32": {
       "file": "h5ad/csr_int32.h5",
       "python": "csr_matrix int32, index int32"
@@ -235,6 +279,22 @@
     "csr_int8": {
       "file": "h5ad/csr_int8.h5",
       "python": "csr_matrix int8, index int32"
+    },
+    "csr_uint16": {
+      "file": "h5ad/csr_uint16.h5",
+      "python": "csr_matrix uint16, index int32"
+    },
+    "csr_uint32": {
+      "file": "h5ad/csr_uint32.h5",
+      "python": "csr_matrix uint32, index int32"
+    },
+    "csr_uint64": {
+      "file": "h5ad/csr_uint64.h5",
+      "python": "csr_matrix uint64, index int32"
+    },
+    "csr_uint8": {
+      "file": "h5ad/csr_uint8.h5",
+      "python": "csr_matrix uint8, index int32"
     },
     "df_all_types": {
       "file": "h5ad/df_all_types.h5",

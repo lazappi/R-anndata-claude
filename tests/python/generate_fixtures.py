@@ -156,6 +156,15 @@ def _csr(dtype, fmt="csr", indices=None):
     return mat
 
 
+def _csc_wide():
+    # 300 rows, so the minor axis needs uint16 indices when shrunk
+    import scipy.sparse as sp
+
+    return sp.csc_matrix(
+        ([1.0, 2.0, 3.0], ([0, 299, 150], [0, 0, 1])), shape=(300, 2)
+    )
+
+
 def _categorical(n_categories, ordered=False, numeric=False, missing=False):
     import pandas as pd
 
@@ -240,9 +249,23 @@ def _element_cases():
     cases["dict_with_null"] = lambda: {"nothing": None, "x": 1.0}
     for name, value in _rec_arrays().items():
         cases[name] = lambda v=value: v
-    for name in ("float64", "float32", "int64", "int32", "int8", "bool"):
+    for name in (
+        "float64",
+        "float32",
+        "int64",
+        "int32",
+        "int16",
+        "int8",
+        "uint64",
+        "uint32",
+        "uint16",
+        "uint8",
+        "bool",
+    ):
         cases[f"csr_{name}"] = lambda n=name: _csr(n)
         cases[f"csc_{name}"] = lambda n=name: _csr(n, "csc")
+    cases["csc_indices_int64"] = lambda: _csr("float64", "csc", indices="int64")
+    cases["csc_wide"] = _csc_wide
     cases["csr_array_float64"] = lambda: __import__("scipy.sparse").sparse.csr_array(
         _csr("float64")
     )
@@ -387,6 +410,18 @@ SETTING_CASES = {
     ),
     "csr_indices_int64_min_dtype": (
         "csr_indices_int64",
+        {"write_csr_csc_indices_with_min_possible_dtype": True},
+    ),
+    "csc_indices_min_dtype": (
+        "csc_float64",
+        {"write_csr_csc_indices_with_min_possible_dtype": True},
+    ),
+    "csc_indices_int64_min_dtype": (
+        "csc_indices_int64",
+        {"write_csr_csc_indices_with_min_possible_dtype": True},
+    ),
+    "csc_wide_min_dtype": (
+        "csc_wide",
         {"write_csr_csc_indices_with_min_possible_dtype": True},
     ),
 }
