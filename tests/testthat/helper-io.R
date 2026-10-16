@@ -20,7 +20,10 @@ local_h5_store <- function(env = parent.frame()) {
 }
 
 read_fixture_elem <- function(name, env = parent.frame()) {
-  store <- rhdf5::H5Fopen(fixture_path(file.path("h5ad", paste0(name, ".h5"))))
+  store <- rhdf5::H5Fopen(
+    fixture_path(file.path("h5ad", paste0(name, ".h5"))),
+    flags = "H5F_ACC_RDONLY"
+  )
   withr::defer(rhdf5::h5closeAll(), envir = env)
   read_elem(store, "x")
 }
@@ -36,7 +39,7 @@ write_fixture_like <- function(value, env = parent.frame()) {
 }
 
 read_written <- function(path) {
-  store <- rhdf5::H5Fopen(path)
+  store <- rhdf5::H5Fopen(path, flags = "H5F_ACC_RDONLY")
   on.exit(rhdf5::h5closeAll())
   read_elem(store, "x")
 }

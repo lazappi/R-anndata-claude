@@ -3,7 +3,9 @@
 #
 # Usage:
 #   scripts/check.sh                          full check, stops at the first failing step:
-#                                             air format, lintr, document, R CMD check, coverage
+#                                             air format, lintr, document, R CMD check
+#   scripts/check.sh --coverage               covr::package_coverage() report (not part of the
+#                                             full check, because it runs the tests a second time)
 #   scripts/check.sh --quick [test files...]  air format, lintr on changed R files and
 #                                             devtools::test() on the given test files (all if none)
 set -euo pipefail
@@ -17,6 +19,12 @@ fail() { printf '\nFAILED: %s\n' "$1" >&2; exit 1; }
 doc_state() {
     find man NAMESPACE -type f -exec shasum {} + 2>/dev/null | sort
 }
+
+if [ "${1:-}" = "--coverage" ]; then
+    step "covr::package_coverage()"
+    Rscript -e 'print(covr::package_coverage())' || fail "covr::package_coverage()"
+    exit 0
+fi
 
 if [ "${1:-}" = "--quick" ]; then
     shift
@@ -50,22 +58,19 @@ if [ "${1:-}" = "--quick" ]; then
     exit 0
 fi
 
-step "1/5 air format --check"
+step "1/4 air format --check"
 air format --check . || fail "air format --check"
 
-step "2/5 lintr::lint_package()"
+step "2/4 lintr::lint_package()"
 Rscript -e 'pkgload::load_all(quiet = TRUE); lints <- lintr::lint_package(); if (length(lints)) { print(lints); quit(status = 1) }' || fail "lintr::lint_package()"
 
-step "3/5 devtools::document()"
+step "3/4 devtools::document()"
 before=$(doc_state)
 Rscript -e 'devtools::document()' || fail "devtools::document()"
 after=$(doc_state)
 [ "$before" = "$after" ] || fail "devtools::document() changed man/ or NAMESPACE, commit the regenerated files"
 
-step "4/5 devtools::check()"
+step "4/4 devtools::check()"
 Rscript -e 'devtools::check(error_on = "note")' || fail "devtools::check()"
-
-step "5/5 covr::package_coverage() (report only)"
-Rscript -e 'print(covr::package_coverage())' || fail "covr::package_coverage()"
 
 printf '\nAll checks passed\n'

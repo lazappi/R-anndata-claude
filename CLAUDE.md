@@ -39,6 +39,7 @@ Kept brief and current by the loop.
 
 - `scripts/fetch-reference.sh` fetches the Python reference to `.reference/anndata/`
 - `scripts/check.sh` is the full check that must pass before every commit, and `scripts/check.sh --quick <test files>` is for use during development (`--quick` takes test file paths and lints only changed R files)
+- Coverage is not part of the full check, run `scripts/check.sh --coverage` for the report (target at least 90%)
 - The full check fails on any NOTE (`error_on = "note"`) and sets `_R_CHECK_SYSTEM_CLOCK_=false` itself
 - `LICENSE` needs `ORGANIZATION` as well as `COPYRIGHT HOLDER`, otherwise check gives a note
 - Placeholder `@importFrom` lines in `R/anndata.claude-package.R` silence the unused-Imports note, remove each once real code uses that package
@@ -73,4 +74,5 @@ Kept brief and current by the loop.
 - Nullable Elements keep an `anndata_nullable` record and factors with non-string categories keep `anndata_categories`, `drop_dtype()` removes the first, and a write that passes the record on to a nested `write_elem()` recurses forever
 - Test helpers shared between files (`read_fixture_elem()`, `write_fixture_like()`, `read_written()`) live in `helper-io.R`
 - Sparse `data`, `indices` and `indptr` are plain datasets with no Encoding attributes, so `R/io-sparse.R` uses `write_dataset()` and `read_values()` and not `write_elem()`/`read_elem()` (which reject unencoded Elements)
+- Open files that are only read with `H5Fopen(path, flags = "H5F_ACC_RDONLY")`, because the default takes a write lock and breaks parallel tests that read the same fixture from h5py
 - Python is only used through `uv run --project tests/python ...`, in tests via `run_python()` which sets a private `TMPDIR` (uv lock files left in the check temp dir cause a NOTE)

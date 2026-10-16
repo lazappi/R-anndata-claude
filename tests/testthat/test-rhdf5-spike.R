@@ -363,7 +363,7 @@ test_that("complex128 reads correctly and complex64 is detectable", {
   expect_identical(spike_read("complex128"), c(1 + 2i, -3.5 + 0.25i))
 
   type_size <- function(name) {
-    fid <- rhdf5::H5Fopen(spike_file())
+    fid <- rhdf5::H5Fopen(spike_file(), flags = "H5F_ACC_RDONLY")
     withr::defer(rhdf5::H5Fclose(fid))
     did <- rhdf5::H5Dopen(fid, name)
     withr::defer(rhdf5::H5Dclose(did))
