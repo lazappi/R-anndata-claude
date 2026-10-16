@@ -1,0 +1,14 @@
+{
+  "layer_3d": true,
+  "no_x": false,
+  "obs_datetime": true,
+  "obsm_ok": false,
+  "plain": false,
+  "raw": false,
+  "uns_date": true,
+  "uns_function": true,
+  "uns_nested": false,
+  "uns_none": false,
+  "uns_object": true,
+  "x_3d": true
+}

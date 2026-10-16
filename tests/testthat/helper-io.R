@@ -44,6 +44,49 @@ read_written <- function(path) {
   read_elem(store, "x")
 }
 
+read_adata_fixture <- function(name) {
+  read_h5ad(fixture_path(file.path("h5ad", paste0(name, ".h5ad"))))
+}
+
+# The contents of an AnnData as plain R values, to compare two objects (frames
+# become lists because DataFrame metadata differs by how they were built)
+adata_parts <- function(adata) {
+  plain_frame <- function(df) {
+    list(
+      names = rownames(df),
+      index_name = frame_index_name(df),
+      columns = as.list(df)
+    )
+  }
+  # An empty list is unnamed when built and named when read from a dict
+  named <- function(x) {
+    if (length(x)) x else stats::setNames(list(), character())
+  }
+  mapping <- function(m) {
+    named(lapply(as.list(m), function(v) {
+      if (is.data.frame(v) || methods::is(v, "DataFrame")) plain_frame(v) else v
+    }))
+  }
+  raw <- adata$raw
+  list(
+    shape = adata$shape,
+    X = adata$X,
+    obs = plain_frame(adata$obs),
+    var = plain_frame(adata$var),
+    obsm = mapping(adata$obsm),
+    varm = mapping(adata$varm),
+    obsp = mapping(adata$obsp),
+    varp = mapping(adata$varp),
+    layers = mapping(adata$layers),
+    uns = named(adata$uns),
+    raw = if (is.null(raw)) {
+      NULL
+    } else {
+      list(X = raw$X, var = plain_frame(raw$var), varm = mapping(raw$varm))
+    }
+  )
+}
+
 # A trivial encoding `test-elem` 0.1.0, a group holding the attribute `n`, used
 # to test dispatch without any real encoding
 register_test_encoding <- function() {

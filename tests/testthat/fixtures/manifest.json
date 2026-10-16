@@ -18,6 +18,15 @@
     "anndata_no_x": {
       "file": "h5ad/anndata_no_x.h5ad"
     },
+    "anndata_raw_0_obs": {
+      "file": "h5ad/anndata_raw_0_obs.h5ad"
+    },
+    "anndata_raw_0_vars": {
+      "file": "h5ad/anndata_raw_0_vars.h5ad"
+    },
+    "anndata_raw_own_var": {
+      "file": "h5ad/anndata_raw_own_var.h5ad"
+    },
     "anndata_sparse_x": {
       "file": "h5ad/anndata_sparse_x.h5ad"
     },

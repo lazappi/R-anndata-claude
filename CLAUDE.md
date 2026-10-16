@@ -84,4 +84,8 @@ Kept brief and current by the loop.
 - A `local_anndata_settings()` call inside a test loop leaks to later iterations, so call it from a function run per case
 - Python is only used through `uv run --project tests/python ...`, in tests via `run_python()` which sets a private `TMPDIR` (uv lock files left in the check temp dir cause a NOTE), and which finds the uv interpreter once and calls it directly
 - Deprecated methods call `warn_deprecated(method, advice, rlang::caller_env())` (`anndata_deprecated_warning` + `anndata_future_warning`), tests wrap them in `quiet_deprecated()`, and the lifecycle badge goes in the `AnnData()` help page because the R6 class is `@noRd`
+- `AnnData()` rejects arrays above 2-D but the `X` and layers setters only warn, so build 3-D cases by assigning, and `read_anndata_elem()` sets them after construction
+- `expect_warning()` returns the condition not the value, so call the code again inside `suppressWarnings()` to inspect the result
+- `scripts/check.sh` lints only changed files, and a new R file that vanished from disk shows in `git status`, so check it is listed
+- `expect_python_equal()`, `python_rewrite_h5ad()` and `compare.py` take many files per Python process, use them for whole h5ad files
 - Each Python start costs 0.3s (`h5_tree.py`) to 1.8s (anything importing anndata), so never call it per case: write all files first, then use `prefetch_h5_trees()`, `python_rewrite()` and `expect_all_equivalent()` (testthat's per-test times do not show this cost)

@@ -1,8 +1,10 @@
-"""Check that two h5ad files read as equal AnnData objects.
+"""Check that pairs of h5ad files read as equal AnnData objects.
 
-Usage: compare.py <a.h5ad> <b.h5ad>
+Usage: compare.py <a.h5ad> <b.h5ad> [<a.h5ad> <b.h5ad> ...]
 
-Exits non-zero and prints the difference on failure.
+Several pairs share one process because importing anndata is slow. Every pair
+is compared, the differences are printed on stderr and make the exit status
+non-zero.
 """
 
 import sys
@@ -11,7 +13,7 @@ import anndata
 from anndata.tests.helpers import assert_equal
 
 
-def main(a_path, b_path):
+def compare(a_path, b_path):
     a = anndata.read_h5ad(a_path)
     b = anndata.read_h5ad(b_path)
     try:
@@ -22,5 +24,15 @@ def main(a_path, b_path):
     return 0
 
 
+def main(paths):
+    if len(paths) == 0 or len(paths) % 2 != 0:
+        print("usage: compare.py <a.h5ad> <b.h5ad> [...]", file=sys.stderr)
+        return 2
+    status = 0
+    for a_path, b_path in zip(paths[0::2], paths[1::2]):
+        status |= compare(a_path, b_path)
+    return status
+
+
 if __name__ == "__main__":
-    sys.exit(main(sys.argv[1], sys.argv[2]))
+    sys.exit(main(sys.argv[1:]))

@@ -10,4 +10,5 @@ uv run --project "$ROOT/tests/python" python -I "$ROOT/tests/python/generate_fix
 uv run --project "$ROOT/tests/python" python -I "$ROOT/tests/python/make_unique_cases.py" "$DEST/make_unique_cases.json"
 uv run --project "$ROOT/tests/python" python -I "$ROOT/tests/python/categorical_cases.py" "$DEST/categorical_cases.json"
 uv run --project "$ROOT/tests/python" python -I "$ROOT/tests/python/repr_cases.py" "$DEST/repr_cases.json"
+uv run --project "$ROOT/tests/python" python -I "$ROOT/tests/python/unwriteable_cases.py" "$DEST/unwriteable_cases.json"
 echo "Regenerated fixtures in $DEST"

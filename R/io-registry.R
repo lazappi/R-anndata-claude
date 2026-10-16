@@ -158,13 +158,21 @@ read_elem_object <- function(elem, store, call = rlang::caller_env()) {
   fn(elem, path, store)
 }
 
-find_writer <- function(value, path, call) {
+lookup_writer <- function(value) {
   # A dtype record adds an S3 class that hides the class the writer is under
   for (class in methods::is(drop_dtype(value))) {
     writer <- io_registry$write[[class]]
     if (!is.null(writer)) {
       return(writer)
     }
+  }
+  NULL
+}
+
+find_writer <- function(value, path, call) {
+  writer <- lookup_writer(value)
+  if (!is.null(writer)) {
+    return(writer)
   }
   r_class <- class(value)
   abort_io_registry(

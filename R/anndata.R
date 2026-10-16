@@ -655,6 +655,27 @@ AnnDataClass <- R6Class(
       )
       sort(names(private$.uns) %||% character())
     },
+    #' @description Writes the object to an `.h5ad` file, see [write_h5ad()].
+    #' @param filename Path of the file.
+    #' @param ... Further arguments of [write_h5ad()].
+    write_h5ad = function(filename, ...) {
+      write_h5ad(self, filename, ...)
+    },
+    #' @description Whether the object holds a value that cannot be written to
+    #'   disk, see [write_h5ad()].
+    #' @param store_type `NULL`, `"h5"` or `"zarr"`.
+    unwriteable = function(store_type = NULL) {
+      valid <- is.null(store_type) ||
+        identical(store_type, "h5") ||
+        identical(store_type, "zarr")
+      if (!valid) {
+        abort_invalid_argument(
+          "{.arg store_type} must be {.code NULL}, {.val h5} or {.val zarr}.",
+          rlang::caller_env()
+        )
+      }
+      adata_unwritable(self)
+    },
     #' @description A new `AnnData` with observations and variables swapped.
     #'   X and layers are transposed, obsm and varm and obsp and varp swap
     #'   places, `uns` is kept and the Raw is dropped.

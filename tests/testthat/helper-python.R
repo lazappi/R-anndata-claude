@@ -284,12 +284,23 @@ expect_rec_array_values_equal <- function(a, b, name = "/x") {
   invisible(a)
 }
 
-# Expects two h5ad files to read as equal AnnData objects in Python
+# Expects pairs of h5ad files (`a[i]` and `b[i]`) to read as equal AnnData
+# objects in Python, using one Python process for all the pairs
 expect_python_equal <- function(a, b) {
-  result <- run_python_raw("compare.py", a, b)
+  stopifnot(length(a) == length(b))
+  result <- run_python_raw("compare.py", as.vector(rbind(a, b)))
   testthat::expect(
     result$status == 0L,
     paste0("Python reads the files as different:\n", result$stderr)
   )
   invisible(a)
+}
+
+# Python's read and write of many h5ad files in one Python process, returning
+# the paths of the rewritten files (in the temporary directory of the caller)
+python_rewrite_h5ad <- function(files, .local_envir = parent.frame()) {
+  out_dir <- withr::local_tempdir(.local_envir = .local_envir)
+  rewritten <- file.path(out_dir, paste0(seq_along(files), ".h5ad"))
+  run_python("rewrite_h5ad.py", as.vector(rbind(files, rewritten)))
+  rewritten
 }

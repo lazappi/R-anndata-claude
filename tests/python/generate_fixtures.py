@@ -504,6 +504,20 @@ def _full_adata(raw=True):
     return adata
 
 
+def _raw_own_var_adata():
+    # Raw keeps all three variables and its own varm, the object keeps two
+    full = _full_adata(raw=False)
+    adata = full[:, :2].copy()
+    adata.raw = full
+    return adata
+
+
+def _raw_adata_of(x):
+    adata = anndata.AnnData(x)
+    adata.raw = adata
+    return adata
+
+
 def _adata_cases():
     import pandas as pd
     import scipy.sparse as sp
@@ -518,6 +532,9 @@ def _adata_cases():
         ),
         "anndata_0_obs": lambda: anndata.AnnData(np.zeros((0, 3), dtype="float32")),
         "anndata_0_vars": lambda: anndata.AnnData(np.zeros((2, 0), dtype="float32")),
+        "anndata_raw_own_var": _raw_own_var_adata,
+        "anndata_raw_0_obs": lambda: _raw_adata_of(np.zeros((0, 3), dtype="float32")),
+        "anndata_raw_0_vars": lambda: _raw_adata_of(np.zeros((2, 0), dtype="float32")),
     }
 
 
