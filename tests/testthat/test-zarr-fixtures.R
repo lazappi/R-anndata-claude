@@ -1,13 +1,6 @@
 # Guards the zarr fixtures, the zarr encoding table and the structural
 # comparison of zarr stores (ticket zarr-io/03)
 
-zarr_fixture_manifest <- function() {
-  jsonlite::fromJSON(
-    zarr_fixture_path("manifest.json"),
-    simplifyVector = FALSE
-  )
-}
-
 # The fixture store paths of a variant, keyed by case name
 zarr_variant_paths <- function(variant) {
   cases <- zarr_fixture_manifest()$variants[[variant]]$cases

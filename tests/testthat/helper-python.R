@@ -115,6 +115,14 @@ zarr_fixture_path <- function(name) {
   file.path(zarr_fixture_dir(), name)
 }
 
+# The manifest of the zarr fixtures: the variants and the cases of each
+zarr_fixture_manifest <- function() {
+  jsonlite::fromJSON(
+    zarr_fixture_path("manifest.json"),
+    simplifyVector = FALSE
+  )
+}
+
 name_h5_nodes <- function(nodes) {
   stats::setNames(nodes, vapply(nodes, function(node) node$path, character(1)))
 }

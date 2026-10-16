@@ -85,8 +85,8 @@ The backend-neutral layer between the encodings and a storage format.
 Encodings (\verb{R/io-*.R}) never call rhdf5 directly, they call the functions
 here, which dispatch on the class of the handle they are given to a backend
 (\code{store_backend()}).
-HDF5 (\code{h5_backend()}) is the only backend so far, a zarr backend adds its own
-list of the same operations.
+HDF5 (\code{h5_backend()}) and zarr (\code{zarr_backend()}, reading only so far) each
+have a list of the same operations.
 }
 \details{
 A \code{store} is an open file or group, and a \code{node} is an open group or array.
