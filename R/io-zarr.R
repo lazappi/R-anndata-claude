@@ -34,8 +34,18 @@
 #' @param consolidate_metadata Whether to write consolidated metadata, inline
 #'   in the root `zarr.json`, after all Elements.
 #' @param ... Dataset arguments for every array.
-#'   Compression and sharding arguments are not yet supported, so any argument
-#'   raises `anndata_not_supported_error`.
+#'   `compressors` is `NULL` for no compression, a name (`"zstd"`, `"gzip"`,
+#'   `"blosc"`) or a list with a `name` and the options of that compressor
+#'   (`level` for zstd and gzip, `cname`, `clevel` and `shuffle` for blosc),
+#'   for example `list(name = "gzip", level = 5)`.
+#'   The default is zstd.
+#'   Scalars take the same compressor and the `null` Element is always zstd,
+#'   as in Python.
+#'   `compressor` is accepted as Python's older name for `compressors`, but
+#'   scalars ignore it, as in Python.
+#'   `shards` must be `NULL` until sharded writing is supported (any other
+#'   value raises `anndata_not_supported_error`), and other arguments raise
+#'   `anndata_invalid_argument_error`.
 #'
 #' @return `read_zarr()` returns an [AnnData()] and `write_zarr()` returns
 #'   `NULL` invisibly.
@@ -127,12 +137,7 @@ write_zarr <- function(
   if (!is.null(chunks)) {
     check_chunks(chunks, call)
   }
-  if (...length() > 0L) {
-    abort_not_supported(
-      "Dataset arguments ({.arg ...}) are not yet supported for zarr stores.",
-      call = call
-    )
-  }
+  dataset_kwargs <- check_zarr_dataset_args(list(...), call)
   if (anndata_settings$zarr_write_format != 3) {
     abort_not_supported(
       "Writing zarr version 2 is not yet supported, set the
@@ -150,11 +155,46 @@ write_zarr <- function(
   }
   unlink(path, recursive = TRUE)
   root <- zarr_create(path)
-  write_elem(root, "/", adata, list(chunks = chunks), call = call)
+  dataset_kwargs$chunks <- chunks
+  write_elem(root, "/", adata, dataset_kwargs, call = call)
   if (consolidate_metadata) {
     zarr_consolidate(path)
   }
   invisible(NULL)
+}
+
+# The dataset arguments `...` of `write_zarr()`: `compressors` (or Python's
+# older name `compressor`) and `shards`. Python raises a `TypeError` for any
+# other argument, such as the h5py `compression`.
+check_zarr_dataset_args <- function(args, call) {
+  if (length(args) == 0L) {
+    return(list())
+  }
+  known <- c("compressors", "compressor", "shards")
+  if (is.null(names(args)) || !all(names(args) %in% known)) {
+    abort_invalid_argument(
+      "Dataset arguments of a zarr store must be named {.arg compressors} or
+       {.arg shards}.",
+      call
+    )
+  }
+  if ("compressor" %in% names(args)) {
+    # As Python, `compressor` replaces `compressors` when both are given
+    args <- args[names(args) != "compressors"]
+    names(args)[names(args) == "compressor"] <- "compressors"
+    args[["legacy_compressor"]] <- TRUE
+  }
+  if ("shards" %in% names(args)) {
+    if (!is.null(args[["shards"]])) {
+      abort_not_supported(
+        "Writing sharded zarr arrays is not yet supported, use
+         {.code shards = NULL}.",
+        call = call
+      )
+    }
+    args[["shards"]] <- NULL
+  }
+  args
 }
 
 check_chunks <- function(chunks, call) {

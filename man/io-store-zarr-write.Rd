@@ -49,7 +49,7 @@ and the chunk keys then lose that dimension, which is the inverse of
 \code{zarr_split_read()}
 }
 
-Compression arguments in \code{dataset_kwargs} are not used yet (every array gets
-Python's default \code{bytes} then \code{zstd} codecs) and nothing is sharded.
+The \code{compressors} dataset argument chooses the compressor (zstd by default,
+see \code{zarr_compressor_arg()}), and nothing is sharded yet.
 }
 \keyword{internal}

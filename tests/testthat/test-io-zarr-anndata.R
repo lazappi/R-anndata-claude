@@ -257,17 +257,154 @@ test_that("write_zarr checks its arguments", {
     write_zarr(adata, c("a", "b")),
     "anndata_invalid_argument_error"
   )
-  # Dataset arguments need the compression and shard tickets
-  expect_anndata_condition(
-    write_zarr(adata, path, compressor = "zstd"),
-    "anndata_not_supported_error"
-  )
   big <- AnnData(matrix(1, 2, 2))
   big$X <- array(1, c(2, 2, 2))
   expect_error(
     suppressWarnings(write_zarr(big, path)),
     class = "anndata_non_2d_error"
   )
+})
+
+# The codec names of an array in a store R wrote
+zarr_codec_names <- function(path, array) {
+  meta <- jsonlite::fromJSON(
+    file.path(path, array, "zarr.json"),
+    simplifyVector = FALSE
+  )
+  vapply(meta$codecs, function(codec) codec$name, character(1))
+}
+
+test_that("compressors sets the codec of every array and round trips", {
+  # Python's compressors dataset argument (zstd, gzip, blosc, none), applied to
+  # arrays, strings and scalars, with Python reading what R wrote
+  adata <- AnnData(
+    matrix(as.numeric(1:6), nrow = 3),
+    uns = list(n = 2.5, s = "text", big = c(2^40, 1))
+  )
+  specs <- list(
+    zstd = list("zstd", list(name = "zstd", level = 3)),
+    gzip = list("gzip", list(name = "gzip", level = 5)),
+    blosc = list("blosc", list(name = "blosc", cname = "zstd", clevel = 3)),
+    gzip_name = list("gzip", "gzip"),
+    none = list(character(), NULL)
+  )
+  paths <- character()
+  for (case in names(specs)) {
+    path <- withr::local_tempfile(fileext = ".zarr")
+    paths[[case]] <- path
+    write_zarr(adata, path, compressors = specs[[case]][[2]])
+    expected <- c("bytes", specs[[case]][[1]])
+    expect_identical(zarr_codec_names(path, "X"), expected, info = case)
+    expect_identical(
+      zarr_codec_names(path, "uns/s"),
+      c("vlen-utf8", specs[[case]][[1]]),
+      info = case
+    )
+    expect_identical(zarr_codec_names(path, "uns/n"), expected, info = case)
+    # The `null` Element ignores the argument, as in Python
+    expect_identical(
+      zarr_codec_names(path, "raw"),
+      c("bytes", "zstd"),
+      info = case
+    )
+    back <- read_zarr(path)
+    expect_identical(back$X, adata$X, info = case)
+    expect_identical(back$uns[["n"]], 2.5, info = case)
+    expect_identical(back$uns[["s"]], "text", info = case)
+    expect_identical(as.vector(back$uns[["big"]]), c(2^40, 1), info = case)
+  }
+  skip_if_no_python()
+  # Python must decode the chunks too (R's gzip is not Rarr's zlib)
+  for (case in names(paths)) {
+    nodes <- run_python("zarr_describe.py", paths[[case]])
+    for (key in c("X", "uns/big", "uns/n", "uns/s")) {
+      line <- nodes[grepl(paste0("^\\{\"/", key, "\""), nodes)]
+      node <- jsonlite::fromJSON(line, simplifyVector = FALSE)[[1]]
+      expect_null(node$error, info = case)
+      expect_true(!is.null(node$value), info = case)
+    }
+  }
+})
+
+test_that("compressed arrays with several chunks are read by R and Python", {
+  # Every chunk file must be compressed (the recursive walk of the gzip step)
+  withr::local_options(anndata.zarr_chunk_limit = 4)
+  adata <- AnnData(
+    matrix(as.numeric(1:30), nrow = 10),
+    uns = list(big = matrix(c(2^40, 1:11), nrow = 6))
+  )
+  for (name in c("gzip", "blosc")) {
+    path <- withr::local_tempfile(fileext = ".zarr")
+    write_zarr(adata, path, compressors = name)
+    expect_gt(
+      length(list.files(file.path(path, "X", "c"), recursive = TRUE)),
+      1
+    )
+    back <- read_zarr(path)
+    expect_identical(back$X, adata$X, info = name)
+    expect_identical(
+      as.vector(back$uns[["big"]]),
+      as.vector(adata$uns[["big"]]),
+      info = name
+    )
+    skip_if_no_python()
+    nodes <- run_python("zarr_describe.py", path)
+    for (key in c("X", "uns/big")) {
+      line <- nodes[grepl(paste0("^\\{\"/", key, "\""), nodes)]
+      node <- jsonlite::fromJSON(line, simplifyVector = FALSE)[[1]]
+      expect_null(node$error, info = name)
+    }
+  }
+})
+
+test_that("compressor is Python's older name for compressors", {
+  # zarr_v3_compressor_compat renames it, and it wins when both are given
+  adata <- AnnData(matrix(as.numeric(1:6), nrow = 3))
+  path <- withr::local_tempfile(fileext = ".zarr")
+  write_zarr(adata, path, compressor = "gzip")
+  expect_identical(zarr_codec_names(path, "X"), c("bytes", "gzip"))
+  # Python drops `compressor` for scalars (_remove_scalar_compression_args)
+  adata$uns[["n"]] <- 2.5
+  write_zarr(adata, path, compressor = "gzip")
+  expect_identical(zarr_codec_names(path, "uns/n"), c("bytes", "zstd"))
+  write_zarr(adata, path, compressors = "gzip")
+  expect_identical(zarr_codec_names(path, "uns/n"), c("bytes", "gzip"))
+  write_zarr(adata, path, compressors = "gzip", compressor = NULL)
+  expect_identical(zarr_codec_names(path, "X"), "bytes")
+  expect_identical(adata_parts(read_zarr(path)), adata_parts(adata))
+})
+
+test_that("invalid dataset arguments raise classed errors", {
+  # Python raises TypeError for h5py keywords and unknown names
+  adata <- AnnData(matrix(1, 2, 2))
+  path <- withr::local_tempfile(fileext = ".zarr")
+  for (args in list(
+    list(compression = "gzip"),
+    list(foo = 1),
+    list("gzip"),
+    list(compressors = "lzma"),
+    list(compressors = list(name = "zstd", level = 99)),
+    list(compressors = list(name = "gzip", cname = "lz4")),
+    list(compressors = list(name = "blosc", cname = "nope")),
+    list(compressors = 1)
+  )) {
+    expect_anndata_condition(
+      do.call(write_zarr, c(list(adata, path), args)),
+      "anndata_invalid_argument_error"
+    )
+  }
+})
+
+test_that("shards is not yet supported unless NULL", {
+  # Sharded writing is ticket zarr-io/09, NULL means unsharded as in Python
+  adata <- AnnData(matrix(1, 2, 2))
+  path <- withr::local_tempfile(fileext = ".zarr")
+  expect_anndata_condition(
+    write_zarr(adata, path, shards = c(2, 2)),
+    "anndata_not_supported_error"
+  )
+  write_zarr(adata, path, shards = NULL)
+  expect_identical(adata_parts(read_zarr(path)), adata_parts(adata))
 })
 
 test_that("write_zarr refuses a directory that is not a zarr store", {

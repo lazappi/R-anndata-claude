@@ -17,8 +17,8 @@
 #'   and the chunk keys then lose that dimension, which is the inverse of
 #'   `zarr_split_read()`
 #'
-#' Compression arguments in `dataset_kwargs` are not used yet (every array gets
-#' Python's default `bytes` then `zstd` codecs) and nothing is sharded.
+#' The `compressors` dataset argument chooses the compressor (zstd by default,
+#' see `zarr_compressor_arg()`), and nothing is sharded yet.
 #'
 #' @param path Path of the store directory.
 #' @param dtype A dtype name: `numeric_dtypes`, `"bool"`, `"complex128"` or
@@ -178,8 +178,168 @@ zarr_fill_value <- function(dtype) {
   )
 }
 
-# The codecs Python writes: the array to bytes codec, then zstd
-zarr_codecs <- function(dtype) {
+is_one_of <- function(x, choices) {
+  is.character(x) && length(x) == 1L && x %in% choices
+}
+
+is_whole_up_to <- function(x, max) {
+  is.numeric(x) &&
+    length(x) == 1L &&
+    !is.na(x) &&
+    x == round(x) &&
+    x >= 0 &&
+    x <= max
+}
+
+zarr_default_compressor <- list(name = "zstd", level = 0L)
+
+zarr_blosc_names <- c("lz4", "lz4hc", "blosclz", "zstd", "zlib", "snappy")
+
+# Bytes per value, which Python records as the blosc type size (1 for strings)
+zarr_type_size <- function(dtype) {
+  if (identical(dtype, "string")) 1L else zarr_value_sizes[[dtype]]
+}
+
+# The `compressors` dataset argument as a compressor: a list with a `name`
+# (`"zstd"`, `"gzip"`, `"blosc"` or `"none"`) and its options. `NULL` is no
+# compression, and a missing argument is Python's default (zstd).
+# `write_zarr()` renames `compressor` and marks it `legacy_compressor`, which
+# scalars ignore as Python's `_remove_scalar_compression_args` drops it.
+zarr_compressor_arg <- function(dataset_kwargs, call, scalar = FALSE) {
+  legacy <- isTRUE(dataset_kwargs[["legacy_compressor"]])
+  if (!"compressors" %in% names(dataset_kwargs) || (scalar && legacy)) {
+    return(zarr_default_compressor)
+  }
+  spec <- dataset_kwargs[["compressors"]]
+  if (is.null(spec)) {
+    return(list(name = "none"))
+  }
+  if (is.character(spec) && length(spec) == 1L) {
+    spec <- list(name = spec)
+  }
+  options <- list(
+    zstd = "level",
+    gzip = "level",
+    blosc = c("cname", "clevel", "shuffle"),
+    none = character()
+  )
+  name <- if (is.list(spec)) spec[["name"]]
+  valid <- is_one_of(name, names(options)) &&
+    all(names(spec) %in% c("name", options[[name]]))
+  if (!valid) {
+    abort_invalid_argument(
+      "{.arg compressors} must be {.code NULL}, a name or a list with a
+       {.field name} ({.val zstd}, {.val gzip}, {.val blosc} or {.val none})
+       and the options of that compressor.",
+      call
+    )
+  }
+  max_levels <- c(zstd = 22, gzip = 9, blosc = 9)
+  level <- spec[["level"]] %||% spec[["clevel"]]
+  if (!is.null(level) && !is_whole_up_to(level, max_levels[[name]])) {
+    abort_invalid_argument(
+      "The compression level of {.arg compressors} must be a whole number
+       from 0 to {max_levels[[name]]}.",
+      call
+    )
+  }
+  cname <- spec[["cname"]]
+  shuffle <- spec[["shuffle"]]
+  shuffles <- c("noshuffle", "shuffle", "bitshuffle")
+  blosc_ok <- (is.null(cname) || is_one_of(cname, zarr_blosc_names)) &&
+    (is.null(shuffle) || is_one_of(shuffle, shuffles))
+  if (!blosc_ok) {
+    abort_invalid_argument(
+      "{.field cname} and {.field shuffle} of a {.val blosc} compressor must be
+       valid blosc options.",
+      call
+    )
+  }
+  compressor <- list(name = name)
+  compressor$level <- switch(
+    name,
+    zstd = as.integer(level %||% 0L),
+    gzip = as.integer(level %||% 5L),
+    NULL
+  )
+  if (identical(name, "blosc")) {
+    compressor$cname <- cname %||% "lz4"
+    compressor$clevel <- as.integer(level %||% 5L)
+    compressor$shuffle <- shuffle
+  }
+  compressor
+}
+
+# The compressor codec of the metadata, or `NULL` for no compression
+zarr_compressor_codec <- function(compressor, dtype) {
+  switch(
+    compressor$name,
+    zstd = list(
+      name = "zstd",
+      configuration = list(level = compressor$level, checksum = FALSE)
+    ),
+    gzip = list(
+      name = "gzip",
+      configuration = list(level = compressor$level)
+    ),
+    blosc = {
+      size <- zarr_type_size(dtype)
+      list(
+        name = "blosc",
+        configuration = list(
+          typesize = size,
+          cname = compressor$cname,
+          clevel = compressor$clevel,
+          shuffle = compressor$shuffle %||%
+            if (size > 1L) "shuffle" else "bitshuffle",
+          blocksize = 0L
+        )
+      )
+    },
+    NULL
+  )
+}
+
+# Real gzip bytes (Rarr's gzip is zlib, which Python's gzip codec rejects)
+zarr_gzip <- function(bytes, level) {
+  file <- tempfile("zarr-gzip")
+  on.exit(unlink(file), add = TRUE)
+  con <- gzfile(file, "wb", compression = level)
+  writeBin(bytes, con)
+  close(con)
+  readBin(file, "raw", file.size(file))
+}
+
+# Compresses the chunk files Rarr wrote without compression, in place
+zarr_gzip_chunks <- function(dir, level) {
+  for (file in list.files(file.path(dir, "c"), recursive = TRUE)) {
+    file <- file.path(dir, "c", file)
+    bytes <- readBin(file, "raw", file.size(file))
+    writeBin(zarr_gzip(bytes, level), file)
+  }
+  invisible(NULL)
+}
+
+# The compressor as Rarr takes it, which ignores the level of zstd (it is only
+# recorded in the metadata, and any level decodes). gzip is left to
+# `zarr_gzip_chunks()`, so Rarr writes those chunks uncompressed.
+zarr_rarr_compressor <- function(compressor, dtype) {
+  switch(
+    compressor$name,
+    zstd = Rarr::use_zstd(0L),
+    blosc = Rarr::use_blosc(
+      compressor$cname,
+      compressor$clevel,
+      compressor$shuffle %||%
+        if (zarr_type_size(dtype) > 1L) "shuffle" else "bitshuffle",
+      typesize = zarr_type_size(dtype)
+    ),
+    NULL
+  )
+}
+
+# The codecs Python writes: the array to bytes codec, then the compressor
+zarr_codecs <- function(dtype, compressor = zarr_default_compressor) {
   array_bytes <- if (identical(dtype, "string")) {
     list(name = "vlen-utf8", configuration = empty_object())
   } else if (zarr_value_sizes[[dtype]] == 1L) {
@@ -187,13 +347,17 @@ zarr_codecs <- function(dtype) {
   } else {
     list(name = "bytes", configuration = list(endian = "little"))
   }
-  list(
-    array_bytes,
-    list(name = "zstd", configuration = list(level = 0L, checksum = FALSE))
-  )
+  codec <- zarr_compressor_codec(compressor, dtype)
+  if (is.null(codec)) list(array_bytes) else list(array_bytes, codec)
 }
 
-zarr_write_array_meta <- function(dir, dtype, dims, chunk) {
+zarr_write_array_meta <- function(
+  dir,
+  dtype,
+  dims,
+  chunk,
+  compressor = zarr_default_compressor
+) {
   meta <- list(
     shape = as.list(dims),
     data_type = dtype,
@@ -206,7 +370,7 @@ zarr_write_array_meta <- function(dir, dtype, dims, chunk) {
       configuration = list(separator = "/")
     ),
     fill_value = zarr_fill_value(dtype),
-    codecs = zarr_codecs(dtype),
+    codecs = zarr_codecs(dtype, compressor),
     attributes = empty_object(),
     zarr_format = 3L,
     node_type = "array",
@@ -287,6 +451,18 @@ zarr_vlen_encode <- function(values) {
 # only holds the fill value.
 #' @rdname io-store-zarr-write
 zarr_zstd <- function(payload) {
+  zarr_compress(payload, zarr_default_compressor, "uint8")
+}
+
+# `payload` compressed as `compressor` says (as `zarr_zstd()` does), and left
+# as it is without compression
+zarr_compress <- function(payload, compressor, dtype) {
+  if (identical(compressor$name, "none")) {
+    return(payload)
+  }
+  if (identical(compressor$name, "gzip")) {
+    return(zarr_gzip(payload, compressor$level))
+  }
   tmp <- tempfile("zarr-zstd")
   on.exit(unlink(tmp, recursive = TRUE), add = TRUE)
   suppressMessages(Rarr::write_zarr_array(
@@ -295,6 +471,7 @@ zarr_zstd <- function(payload) {
     chunk_dim = length(payload),
     data_type = "|u1",
     order = "C",
+    compressor = zarr_rarr_compressor(compressor, dtype),
     fill_value = if (any(payload != as.raw(0))) 0L else 1L,
     zarr_version = 3L
   ))
@@ -306,16 +483,26 @@ zarr_zstd <- function(payload) {
 # array), from its encoded bytes.
 # `write_chunk = FALSE` leaves the chunk out, as Python does for a value equal
 # to the fill value.
-zarr_write_single <- function(dir, dtype, dims, payload, write_chunk = TRUE) {
+zarr_write_single <- function(
+  dir,
+  dtype,
+  dims,
+  payload,
+  write_chunk = TRUE,
+  compressor = zarr_default_compressor
+) {
   dir.create(dir, recursive = TRUE, showWarnings = FALSE)
-  zarr_write_array_meta(dir, dtype, dims, pmax(dims, 1))
+  zarr_write_array_meta(dir, dtype, dims, pmax(dims, 1), compressor)
   if (!write_chunk || (length(dims) > 0L && prod(dims) == 0)) {
     return(invisible(NULL))
   }
   key <- if (length(dims) == 0L) "c" else c("c", rep("0", length(dims)))
   chunk_dir <- do.call(file.path, as.list(c(dir, key[-length(key)])))
   dir.create(chunk_dir, recursive = TRUE, showWarnings = FALSE)
-  writeBin(zarr_zstd(payload), file.path(chunk_dir, key[[length(key)]]))
+  writeBin(
+    zarr_compress(payload, compressor, dtype),
+    file.path(chunk_dir, key[[length(key)]])
+  )
   invisible(NULL)
 }
 
@@ -339,16 +526,23 @@ zarr_rarr_values <- function(values, dtype) {
   as.integer(values)
 }
 
-zarr_write_numeric <- function(dir, values, dtype, dims, chunk = NULL) {
+zarr_write_numeric <- function(
+  dir,
+  values,
+  dtype,
+  dims,
+  chunk = NULL,
+  compressor = zarr_default_compressor
+) {
   chunk <- chunk %||% zarr_chunk_shape(dims)
   dir.create(dir, recursive = TRUE, showWarnings = FALSE)
   if (length(values) == 0L) {
-    zarr_write_array_meta(dir, dtype, dims, chunk)
+    zarr_write_array_meta(dir, dtype, dims, chunk, compressor)
     return(invisible(NULL))
   }
   held <- zarr_rarr_values(values, dtype)
   if (is.null(held)) {
-    zarr_write_parts(dir, values, dtype, dims, chunk)
+    zarr_write_parts(dir, values, dtype, dims, chunk, compressor)
     return(invisible(NULL))
   }
   suppressMessages(Rarr::write_zarr_array(
@@ -357,17 +551,28 @@ zarr_write_numeric <- function(dir, values, dtype, dims, chunk = NULL) {
     chunk_dim = chunk,
     data_type = zarr_numpy_types[[dtype]],
     order = "C",
+    compressor = zarr_rarr_compressor(compressor, dtype),
     fill_value = if (identical(dtype, "bool")) FALSE else 0,
     zarr_version = 3L
   ))
-  zarr_write_array_meta(dir, dtype, dims, chunk)
+  if (identical(compressor$name, "gzip")) {
+    zarr_gzip_chunks(dir, compressor$level)
+  }
+  zarr_write_array_meta(dir, dtype, dims, chunk, compressor)
   invisible(NULL)
 }
 
 # Writes the array as 16-bit integer parts (or float64 parts for complex) with a
 # trailing dimension, and moves each chunk file to the key of the real array.
 # Missing chunks are zero, which is the fill value of the real array too.
-zarr_write_parts <- function(dir, values, dtype, dims, chunk) {
+zarr_write_parts <- function(
+  dir,
+  values,
+  dtype,
+  dims,
+  chunk,
+  compressor = zarr_default_compressor
+) {
   bytes <- zarr_encode_values(as.vector(values), dtype)
   if (identical(dtype, "complex128")) {
     count <- 2L
@@ -392,6 +597,7 @@ zarr_write_parts <- function(dir, values, dtype, dims, chunk) {
     chunk_dim = c(chunk, count),
     data_type = part_type,
     order = "C",
+    compressor = zarr_rarr_compressor(compressor, dtype),
     fill_value = 0,
     zarr_version = 3L
   ))
@@ -402,7 +608,10 @@ zarr_write_parts <- function(dir, values, dtype, dims, chunk) {
     unlink(dirname(file), recursive = TRUE)
     file.rename(moved, dirname(file))
   }
-  zarr_write_array_meta(dir, dtype, dims, chunk)
+  if (identical(compressor$name, "gzip")) {
+    zarr_gzip_chunks(dir, compressor$level)
+  }
+  zarr_write_array_meta(dir, dtype, dims, chunk, compressor)
 }
 
 # The on-disk shape of `x`, empty for a scalar
@@ -442,12 +651,14 @@ zarr_dataset_write <- function(loc, name, x, scalar, dataset_kwargs, call) {
   dtype <- write_dtype(x, elem_path(loc, name), call)
   values <- as.vector(drop_dtype(x))
   dims <- zarr_dims(x, scalar)
+  compressor <- zarr_compressor_arg(dataset_kwargs, call, scalar)
   if (scalar) {
     zarr_write_single(
       dir,
       dtype,
       dims,
-      zarr_encode_values(values, dtype)
+      zarr_encode_values(values, dtype),
+      compressor = compressor
     )
   } else {
     zarr_write_numeric(
@@ -455,7 +666,8 @@ zarr_dataset_write <- function(loc, name, x, scalar, dataset_kwargs, call) {
       values,
       dtype,
       dims,
-      zarr_chunk_arg(dataset_kwargs, dims, call)
+      zarr_chunk_arg(dataset_kwargs, dims, call),
+      compressor
     )
   }
   invisible(NULL)
@@ -465,15 +677,23 @@ zarr_bool_write <- function(loc, name, x, scalar, call, dataset_kwargs) {
   dir <- zarr_array_dir(loc, name)
   values <- as.vector(x)
   dims <- zarr_dims(x, scalar)
+  compressor <- zarr_compressor_arg(dataset_kwargs, call, scalar)
   if (scalar) {
-    zarr_write_single(dir, "bool", dims, zarr_encode_values(values, "bool"))
+    zarr_write_single(
+      dir,
+      "bool",
+      dims,
+      zarr_encode_values(values, "bool"),
+      compressor = compressor
+    )
   } else {
     zarr_write_numeric(
       dir,
       values,
       "bool",
       dims,
-      zarr_chunk_arg(dataset_kwargs, dims, call)
+      zarr_chunk_arg(dataset_kwargs, dims, call),
+      compressor
     )
   }
   invisible(NULL)
@@ -483,16 +703,24 @@ zarr_complex_write <- function(loc, name, x, scalar, call, dataset_kwargs) {
   dir <- zarr_array_dir(loc, name)
   values <- as.vector(x)
   dims <- zarr_dims(x, scalar)
+  compressor <- zarr_compressor_arg(dataset_kwargs, call, scalar)
   if (scalar) {
     zarr_write_single(
       dir,
       "complex128",
       dims,
-      zarr_encode_values(values, "complex128")
+      zarr_encode_values(values, "complex128"),
+      compressor = compressor
     )
   } else if (length(values) == 0L) {
     dir.create(dir, recursive = TRUE, showWarnings = FALSE)
-    zarr_write_array_meta(dir, "complex128", dims, zarr_chunk_shape(dims))
+    zarr_write_array_meta(
+      dir,
+      "complex128",
+      dims,
+      zarr_chunk_shape(dims),
+      compressor
+    )
   } else {
     dir.create(dir, recursive = TRUE, showWarnings = FALSE)
     zarr_write_parts(
@@ -500,7 +728,8 @@ zarr_complex_write <- function(loc, name, x, scalar, call, dataset_kwargs) {
       values,
       "complex128",
       dims,
-      zarr_chunk_shape(dims)
+      zarr_chunk_shape(dims),
+      compressor
     )
   }
   invisible(NULL)
@@ -510,7 +739,13 @@ zarr_string_write <- function(loc, name, x, scalar, call, dataset_kwargs) {
   dir <- zarr_array_dir(loc, name)
   dims <- zarr_dims(x, scalar)
   payload <- zarr_vlen_encode(as.vector(row_major(as.vector(x), dims)))
-  zarr_write_single(dir, "string", dims, payload)
+  zarr_write_single(
+    dir,
+    "string",
+    dims,
+    payload,
+    compressor = zarr_compressor_arg(dataset_kwargs, call, scalar)
+  )
   invisible(NULL)
 }
 

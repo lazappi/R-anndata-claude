@@ -34,8 +34,18 @@ to factors before writing.}
 in the root \code{zarr.json}, after all Elements.}
 
 \item{...}{Dataset arguments for every array.
-Compression and sharding arguments are not yet supported, so any argument
-raises \code{anndata_not_supported_error}.}
+\code{compressors} is \code{NULL} for no compression, a name (\code{"zstd"}, \code{"gzip"},
+\code{"blosc"}) or a list with a \code{name} and the options of that compressor
+(\code{level} for zstd and gzip, \code{cname}, \code{clevel} and \code{shuffle} for blosc),
+for example \code{list(name = "gzip", level = 5)}.
+The default is zstd.
+Scalars take the same compressor and the \code{null} Element is always zstd,
+as in Python.
+\code{compressor} is accepted as Python's older name for \code{compressors}, but
+scalars ignore it, as in Python.
+\code{shards} must be \code{NULL} until sharded writing is supported (any other
+value raises \code{anndata_not_supported_error}), and other arguments raise
+\code{anndata_invalid_argument_error}.}
 }
 \value{
 \code{read_zarr()} returns an \code{\link[=AnnData]{AnnData()}} and \code{write_zarr()} returns

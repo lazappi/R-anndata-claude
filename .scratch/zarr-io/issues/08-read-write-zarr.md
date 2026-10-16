@@ -32,3 +32,14 @@ Python quirk: its `read_zarr` returns `raw = None` for a Raw with no observation
 `tests/python/compare.py` and `rewrite_h5ad.py` now accept zarr stores (a `.zarr` output converts between formats).
 `adata_fixture_names` and `r_built_adatas()` moved to `helper-io.R`.
 Remaining parts are sub-items in `fix_plan.md`.
+
+2026-10-17, part 2 (done): dataset arguments of `write_zarr()`.
+`compressors` is `NULL` (none), a name, or `list(name =, level =)` / `list(name = "blosc", cname =, clevel =, shuffle =)`, default zstd, applied to arrays, strings and scalars.
+The `null` Element always gets zstd (Python ignores the kwargs there).
+`compressor` is accepted as the older name and wins over `compressors`, as in Python (a numcodecs object is a `TypeError` in Python, we have none), and scalars ignore it (`legacy_compressor` marker) as `_remove_scalar_compression_args` does.
+Unknown names (`compression`, `foo`, unnamed) raise `anndata_invalid_argument_error` (Python's `TypeError`).
+`shards = NULL` is accepted (unsharded), any other value raises `anndata_not_supported_error` until ticket 09.
+Python's `AnnData.write_zarr()` rejects these kwargs, ours forwards `...` (a superset).
+Rarr's gzip is zlib, not gzip, which Python rejects, so gzip chunks are written uncompressed by Rarr and gzipped in R (`zarr_gzip_chunks()`).
+Rarr ignores zstd levels, so the level is only recorded in the metadata.
+Tests in `test-io-zarr-anndata.R`, with Python decoding every compressor.
