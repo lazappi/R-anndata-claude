@@ -232,6 +232,15 @@ test_that("split-parts arrays with several chunks keep their values", {
   expect_identical(zarr_write_read(complex_value), complex_value)
 })
 
+test_that("a large int64 matrix with big values writes and reads in seconds", {
+  # Rarr warned once per value beyond the integer range, so reading 2^19 x 3
+  # int64 values took minutes (it looked like a hang)
+  value <- set_dtype(matrix(2^40 + seq_len(2^19 * 3), 2^19, 3), "int64")
+  elapsed <- system.time(result <- zarr_write_read(value))[["elapsed"]]
+  expect_identical(result, value)
+  expect_lt(elapsed, 30)
+})
+
 test_that("writing to a zarr v2 store is not supported", {
   # Writing v2 is zarr-io/11, so a v2 store must not be written as v3
   store <- zarr_open(zarr_fixture_path("v2/scalar_int32.zarr"))

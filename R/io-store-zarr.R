@@ -347,23 +347,14 @@ zarr_numeric_read <- function(array, selection, call) {
       call = call
     )
   }
+  if (dtype %in% c("int64", "uint64", "uint32")) {
+    # Always from 16-bit parts (read as double like HDF5), because Rarr warns
+    # once per value beyond the integer range, which takes minutes when big
+    return(record_dtype(zarr_wide_read(array, selection, path, call), dtype))
+  }
   dir <- zarr_dir(array$node)
-  lossy <- FALSE
-  values <- withCallingHandlers(
-    zarr_rarr_read(dir, array$shape, selection),
-    warning = function(w) {
-      if (grepl("Integer (over|under)flow", conditionMessage(w))) {
-        lossy <<- TRUE
-        rlang::cnd_muffle(w)
-      }
-    }
-  )
-  if (lossy) {
-    values <- zarr_wide_read(array, selection, path, call)
-  } else if (dtype %in% c("int64", "uint64", "uint32")) {
-    # Read as double like HDF5, whatever the values
-    values <- structure(as.double(values), dim = dim(values))
-  } else if (identical(dtype, "int32") && anyNA(values)) {
+  values <- zarr_rarr_read(dir, array$shape, selection)
+  if (identical(dtype, "int32") && anyNA(values)) {
     # R reads -2^31 as NA
     missing <- is.na(values)
     values <- structure(as.double(values), dim = dim(values))
