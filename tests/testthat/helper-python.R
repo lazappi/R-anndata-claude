@@ -79,7 +79,10 @@ h5_tree <- function(file) {
 }
 
 # Lists every path and property that differs between two h5_tree() results
-h5_tree_differences <- function(a, b) {
+#
+# `rec_array_paths` are datasets whose field dtypes are exempt (ADR 0005), so
+# their `dtype` and `digest` are not compared, and nothing else is relaxed
+h5_tree_differences <- function(a, b, rec_array_paths = character()) {
   diffs <- character()
   note <- function(...) diffs <<- c(diffs, paste0(...))
   show <- function(x) jsonlite::toJSON(x, auto_unbox = TRUE, null = "null")
@@ -93,7 +96,11 @@ h5_tree_differences <- function(a, b) {
   for (path in intersect(names(a), names(b))) {
     x <- a[[path]]
     y <- b[[path]]
-    for (prop in c("kind", "dtype", "shape", "digest")) {
+    props <- c("kind", "dtype", "shape", "digest")
+    if (path %in% rec_array_paths) {
+      props <- c("kind", "shape")
+    }
+    for (prop in props) {
       if (!identical(x[[prop]], y[[prop]])) {
         note(
           path,
@@ -137,13 +144,56 @@ h5_tree_differences <- function(a, b) {
 
 # Expects two HDF5 files to have the same groups, datasets, attributes, dtypes,
 # shapes and values, listing each difference on failure
-expect_structurally_equivalent <- function(a, b) {
-  diffs <- h5_tree_differences(h5_tree(a), h5_tree(b))
+expect_structurally_equivalent <- function(
+  a,
+  b,
+  rec_array_paths = character()
+) {
+  diffs <- h5_tree_differences(h5_tree(a), h5_tree(b), rec_array_paths)
   testthat::expect(
     length(diffs) == 0L,
     paste0(
       "Files are not structurally equivalent:\n",
       paste0("* ", diffs, collapse = "\n")
+    )
+  )
+  invisible(a)
+}
+
+# The field names, order and values of a rec-array dataset, as Python sees them
+rec_array_values <- function(file, name) {
+  jsonlite::fromJSON(
+    paste(run_python("rec_array_values.py", file, name), collapse = ""),
+    simplifyVector = FALSE
+  )
+}
+
+# Expects the rec-arrays at `name` in two files to have the same field names,
+# order and values, which is all ADR 0005 promises
+expect_rec_array_values_equal <- function(a, b, name = "/x") {
+  x <- rec_array_values(a, name)
+  y <- rec_array_values(b, name)
+  same_values <- identical(names(x$fields), names(y$fields)) &&
+    all(mapply(
+      function(p, q) {
+        p <- unlist(p)
+        q <- unlist(q)
+        if (is.character(p) || is.character(q)) {
+          identical(as.character(p), as.character(q))
+        } else {
+          isTRUE(all.equal(as.double(p), as.double(q), tolerance = 0))
+        }
+      },
+      x$fields,
+      y$fields
+    ))
+  testthat::expect(
+    identical(x$names, y$names) && same_values,
+    paste0(
+      "Rec-arrays differ:\n",
+      jsonlite::toJSON(x, auto_unbox = TRUE),
+      "\nvs\n",
+      jsonlite::toJSON(y, auto_unbox = TRUE)
     )
   )
   invisible(a)

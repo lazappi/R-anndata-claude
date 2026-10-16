@@ -196,7 +196,10 @@ def _rec_arrays():
         dtype=[("0", "U2"), ("1", "U2")],
     )
     objects = np.array([("a", 1.0), ("bé", 2.0)], dtype=[("o", str_dt), ("f", "<f8")])
+    # 2^60 is not exact as a double, so R must refuse to read it
+    big = np.array([(2**60,)], dtype=[("big", "<i8")])
     return {
+        "rec_array_int64_big": big,
         "rec_array_basic": basic,
         "rec_array_widths": widths,
         "rec_array_rank_genes_groups": rank,

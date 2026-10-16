@@ -252,6 +252,7 @@ Both are in the table's last rows, and are recorded in the fixtures manifest und
 | `nullable_str_pdna` | StringArray | nullable-string-array 0.1.0 | {mask: array 0.2.0: bool (enum int8: FALSE=0, TRUE=1) [3] = [False, True, False]; values: string-array 0.2.0: string(variable, utf-8) [3] = ['a', '', '日本']} | na-value='NA' (str) |
 | `nullable_uint16` | IntegerArray | nullable-integer 0.1.0 | {mask: array 0.2.0: bool (enum int8: FALSE=0, TRUE=1) [3] = [False, True, False]; values: array 0.2.0: uint16 [3] = [1, 0, 3]} |  |
 | `rec_array_basic` | structured ndarray [i:int32, f:float64, fixed:\|S3, uni:<U3] | rec-array 0.2.0 | rec-array 0.2.0: compound(i:int32, f:float64, fixed:S3-ascii, uni:vlen-utf-8) [2] |  |
+| `rec_array_int64_big` | structured ndarray [big:int64] | rec-array 0.2.0 | rec-array 0.2.0: compound(big:int64) [1] |  |
 | `rec_array_object_field` | structured ndarray [o:object, f:float64] | rec-array 0.2.0 | rec-array 0.2.0: compound(o:vlen-utf-8, f:float64) [2] |  |
 | `rec_array_rank_genes_groups` | structured ndarray [0:<U2, 1:<U2] | rec-array 0.2.0 | rec-array 0.2.0: compound(0:vlen-utf-8, 1:vlen-utf-8) [2] |  |
 | `rec_array_widths` | structured ndarray [u1:uint8, i2:int16, u4:uint32, i8:int64, f4:float32, b:bool] | rec-array 0.2.0 | rec-array 0.2.0: compound(u1:uint8, i2:int16, u4:uint32, i8:int64, f4:float32, b:bool) [2] |  |

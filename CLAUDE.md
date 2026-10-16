@@ -75,4 +75,8 @@ Kept brief and current by the loop.
 - Test helpers shared between files (`read_fixture_elem()`, `write_fixture_like()`, `read_written()`) live in `helper-io.R`
 - Sparse `data`, `indices` and `indptr` are plain datasets with no Encoding attributes, so `R/io-sparse.R` uses `write_dataset()` and `read_values()` and not `write_elem()`/`read_elem()` (which reject unencoded Elements)
 - Open files that are only read with `H5Fopen(path, flags = "H5F_ACC_RDONLY")`, because the default takes a write lock and breaks parallel tests that read the same fixture from h5py
+- Rec-arrays (`R/io-values-rec-array.R`): `H5Dread(bit64conversion = "double")` keeps `u4`/`i8` values, bool fields read as factors, `h5writeDataset(<data.frame>, store, key, level = 0L, chunk = nrow)` writes the compound, and anndata cannot read non-ASCII fixed-length strings so writing them raises
+- `h5ls` lists a dict's members alphabetically, so a dict reads back in that order, and `result[i] <- list(NULL)` is how to keep `NULL` members
+- Text in `abort_unwritable(path, what)` is plain, the braces of `what` are not interpolated by cli
+- `expect_structurally_equivalent(a, b, rec_array_paths =)` exempts only the dtype and digest of those datasets, and `expect_rec_array_values_equal()` compares field names, order and values through Python
 - Python is only used through `uv run --project tests/python ...`, in tests via `run_python()` which sets a private `TMPDIR` (uv lock files left in the check temp dir cause a NOTE)

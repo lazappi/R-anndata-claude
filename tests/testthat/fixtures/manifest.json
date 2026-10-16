@@ -544,6 +544,10 @@
       "file": "h5ad/rec_array_basic.h5",
       "python": "structured ndarray [i:int32, f:float64, fixed:|S3, uni:<U3]"
     },
+    "rec_array_int64_big": {
+      "file": "h5ad/rec_array_int64_big.h5",
+      "python": "structured ndarray [big:int64]"
+    },
     "rec_array_object_field": {
       "file": "h5ad/rec_array_object_field.h5",
       "python": "structured ndarray [o:object, f:float64]"
