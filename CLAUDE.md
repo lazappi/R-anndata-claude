@@ -32,7 +32,8 @@ Single-context: one `CONTEXT.md` plus `docs/adr/` at the repo root. See `docs/ag
 - Project subagents are defined in `.claude/agents/`: `searcher` and `checker` (Haiku), and `python-oracle` and `reviewer` (Sonnet)
 - Create a `STOP` file at the root to stop the loop after the current run
 - `scripts/ralph.sh --resume "<message>" <runs>` resumes the last run's session with a message (such as decisions), then continues the loop
-- Versions use tidyverse-style development numbers (`0.0.0.9000`), bumped by one and tagged `v<version>` only when a ticket is done
+- Versions use tidyverse-style development numbers (`0.0.1.9000`), bumped by one in the fourth component and tagged `v<version>` only when a ticket is done
+- Releases (such as `v0.0.1`, the MVP) are set by the human, and `NEWS.md` collects user-visible changes under the development version heading
 
 ## Build, test and learnings
 

@@ -74,9 +74,11 @@ No human is watching, so never wait for input.
 
 - Commit everything from this run (`git add -A`) as one atomic gitmoji commit with a clear, brief message (see `CLAUDE.md`)
 - When a ticket becomes `done`, also release it:
-  - bump the development version in `DESCRIPTION` by one in the fourth component (`0.0.0.9000` becomes `0.0.0.9001`), except for the ticket that first creates `DESCRIPTION` at `0.0.0.9000`
+  - bump the development version in `DESCRIPTION` by one in the fourth component (`0.0.1.9000` becomes `0.0.1.9001`).
+    Never change the first three components, because releases are the human's decision.
+  - add a bullet for any user-visible change under `# anndata.claude (development version)` in `NEWS.md`
   - include the bump in the commit
-  - tag the commit `v<version>` (e.g. `v0.0.0.9001`) as an annotated tag whose message names the ticket
+  - tag the commit `v<version>` (e.g. `v0.0.1.9001`) as an annotated tag whose message names the ticket
 - Never tag a commit for a ticket that is not done
 
 ## 8. When you are stuck

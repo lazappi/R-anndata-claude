@@ -1,3 +1,5 @@
+# anndata.claude (development version)
+
 # anndata.claude 0.0.1
 
 First milestone: the MVP of an R port of Python anndata 0.13.4, with h5ad files that round trip between R and Python.
