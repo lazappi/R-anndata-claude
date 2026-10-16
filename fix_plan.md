@@ -45,6 +45,7 @@ The human owns the order of the Queue.
 - [x] h5ad-io/05: dense arrays, string arrays, scalars, null and bytes (`.scratch/h5ad-io/issues/05-dense-scalar-null.md`)
 - [x] h5ad-io/06: nullable and categorical arrays (`.scratch/h5ad-io/issues/06-nullable-categorical.md`)
 - [x] h5ad-io/07: sparse matrices (`.scratch/h5ad-io/issues/07-sparse-matrices.md`)
+- [ ] foundations/09: faster test suite (`.scratch/foundations/issues/09-test-speed.md`)
 - [ ] h5ad-io/08: dict and rec-array (`.scratch/h5ad-io/issues/08-dict-rec-array.md`), implemented but blocked, see Blocked
 - [x] h5ad-io/09: dataframe (`.scratch/h5ad-io/issues/09-dataframe.md`)
 - [ ] h5ad-io/10: AnnData and Raw, read_h5ad and write_h5ad basics (`.scratch/h5ad-io/issues/10-anndata-raw-roundtrip.md`)
