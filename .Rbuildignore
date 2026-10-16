@@ -18,6 +18,7 @@
 ^\.air$
 ^tests/python/\.venv$
 ^tests/python/__pycache__$
+^tests/testthat/fixtures/zarr$
 ^\.venv$
 ^\.Rproj\.user$
 ^.*\.Rproj$

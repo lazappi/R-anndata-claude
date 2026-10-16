@@ -45,7 +45,11 @@ def to_json(value):
 
 def digest(dataset):
     """Hash the values of a dataset so large datasets compare cheaply."""
-    values = dataset[()]
+    return digest_values(dataset[()])
+
+
+def digest_values(values):
+    """Hash values read from an HDF5 dataset or a zarr array (see zarr_tree.py)."""
     sha = hashlib.sha256()
     if isinstance(values, np.ndarray) and values.dtype.kind in "OSU":
         for item in values.ravel().tolist():

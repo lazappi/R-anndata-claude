@@ -58,7 +58,7 @@ The human owns the order of the Queue.
 - [x] zarr-io/01: zarr library spike (`.scratch/zarr-io/issues/01-zarr-library-spike.md`), re-run against Rarr devel and zarr main (see Decisions)
 - [x] 🛑 Human checkpoint: review `.scratch/zarr-io/zarr-spike.md`, then grill the rest of the zarr-io spec and write its tickets
 - [x] zarr-io/02: backend-neutral store layer (`.scratch/zarr-io/issues/02-store-abstraction.md`)
-- [ ] zarr-io/03: zarr fixtures and encoding table (`.scratch/zarr-io/issues/03-zarr-fixtures-and-encoding-table.md`)
+- [x] zarr-io/03: zarr fixtures and encoding table (`.scratch/zarr-io/issues/03-zarr-fixtures-and-encoding-table.md`)
 - [ ] zarr-io/04: reading zarr stores (`.scratch/zarr-io/issues/04-zarr-read-backend.md`)
 - [ ] zarr-io/05: writing zarr stores (`.scratch/zarr-io/issues/05-zarr-write-backend.md`)
 - [ ] zarr-io/06: zarr v3 dense, string, scalar, null and sparse Elements (`.scratch/zarr-io/issues/06-zarr-v3-basic-elements.md`)
@@ -84,6 +84,11 @@ The human owns the order of the Queue.
 - [ ] The cellxgene PBMC 3k file (the real-world test download) is in a legacy format that `read_h5ad()` rejects (`anndata_legacy_format_error`, unencoded root Element), so the test reads a Python rewrite of it, reading the original needs the `legacy-formats` sub-project
 
 - [x] Coverage was understated because the registry held uninstrumented function copies under covr, fixed with `late_bound()`, now 96.42%
+
+- [ ] Python writes a missing `raw` as a `null` Element in zarr (not in h5ad), and zarr keeps rec-array field dtypes (see zarr-io/03 comments).
+  zarr-io/05 must write the `null` raw, and the human should decide on rec-array dtype fidelity in zarr (ADR 0005, zarr-io/07)
+
+- [ ] Delete the stale unpacked `tests/testthat/fixtures/zarr/` (ignored by git and the build, but unused), the shell denied `rm`
 
 ## Blocked
 

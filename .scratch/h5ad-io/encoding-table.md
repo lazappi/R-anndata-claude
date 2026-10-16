@@ -120,6 +120,9 @@ Both are in the table's last rows, and are recorded in the fixtures manifest und
 | `anndata_full` |  | anndata 0.1.0 | {X: array 0.2.0: float32 [4x3]; layers: dict 0.1.0; obs: dataframe 0.2.0; obsm: dict 0.1.0; obsp: dict 0.1.0; raw: raw 0.1.0; uns: dict 0.1.0; var: dataframe 0.2.0; varm: dict 0.1.0; varp: dict 0.1.0} |  |
 | `anndata_no_raw` |  | anndata 0.1.0 | {X: array 0.2.0: float32 [4x3]; layers: dict 0.1.0; obs: dataframe 0.2.0; obsm: dict 0.1.0; obsp: dict 0.1.0; uns: dict 0.1.0; var: dataframe 0.2.0; varm: dict 0.1.0; varp: dict 0.1.0} |  |
 | `anndata_no_x` |  | anndata 0.1.0 | {layers: dict 0.1.0; obs: dataframe 0.2.0; obsm: dict 0.1.0; obsp: dict 0.1.0; uns: dict 0.1.0; var: dataframe 0.2.0; varm: dict 0.1.0; varp: dict 0.1.0} |  |
+| `anndata_raw_0_obs` |  | anndata 0.1.0 | {X: array 0.2.0: float32 [0x3] = []; layers: dict 0.1.0; obs: dataframe 0.2.0; obsm: dict 0.1.0; obsp: dict 0.1.0; raw: raw 0.1.0; uns: dict 0.1.0; var: dataframe 0.2.0; varm: dict 0.1.0; varp: dict 0.1.0} |  |
+| `anndata_raw_0_vars` |  | anndata 0.1.0 | {X: array 0.2.0: float32 [2x0] = []; layers: dict 0.1.0; obs: dataframe 0.2.0; obsm: dict 0.1.0; obsp: dict 0.1.0; raw: raw 0.1.0; uns: dict 0.1.0; var: dataframe 0.2.0; varm: dict 0.1.0; varp: dict 0.1.0} |  |
+| `anndata_raw_own_var` |  | anndata 0.1.0 | {X: array 0.2.0: float32 [4x2]; layers: dict 0.1.0; obs: dataframe 0.2.0; obsm: dict 0.1.0; obsp: dict 0.1.0; raw: raw 0.1.0; uns: dict 0.1.0; var: dataframe 0.2.0; varm: dict 0.1.0; varp: dict 0.1.0} |  |
 | `anndata_sparse_x` |  | anndata 0.1.0 | {X: csr_matrix 0.1.0; layers: dict 0.1.0; obs: dataframe 0.2.0; obsm: dict 0.1.0; obsp: dict 0.1.0; uns: dict 0.1.0; var: dataframe 0.2.0; varm: dict 0.1.0; varp: dict 0.1.0} |  |
 | `array_bool` | ndarray bool (3,) | array 0.2.0 | array 0.2.0: bool (enum int8: FALSE=0, TRUE=1) [3] = [True, False, True] |  |
 | `array_bool_2d` | ndarray bool (2, 3) | array 0.2.0 | array 0.2.0: bool (enum int8: FALSE=0, TRUE=1) [2x3] = [True, False, True, False, False, True] |  |
@@ -251,6 +254,10 @@ Both are in the table's last rows, and are recorded in the fixtures manifest und
 | `nullable_str_nomissing` | StringArray | nullable-string-array 0.1.0 | {mask: array 0.2.0: bool (enum int8: FALSE=0, TRUE=1) [3] = [False, False, False]; values: string-array 0.2.0: string(variable, utf-8) [3] = ['a', 'bé', '']} | na-value='NaN' (str) |
 | `nullable_str_pdna` | StringArray | nullable-string-array 0.1.0 | {mask: array 0.2.0: bool (enum int8: FALSE=0, TRUE=1) [3] = [False, True, False]; values: string-array 0.2.0: string(variable, utf-8) [3] = ['a', '', '日本']} | na-value='NA' (str) |
 | `nullable_uint16` | IntegerArray | nullable-integer 0.1.0 | {mask: array 0.2.0: bool (enum int8: FALSE=0, TRUE=1) [3] = [False, True, False]; values: array 0.2.0: uint16 [3] = [1, 0, 3]} |  |
+| `realistic` |  | anndata 0.1.0 | {X: csr_matrix 0.1.0; layers: dict 0.1.0; obs: dataframe 0.2.0; obsm: dict 0.1.0; obsp: dict 0.1.0; uns: dict 0.1.0; var: dataframe 0.2.0; varm: dict 0.1.0; varp: dict 0.1.0} |  |
+| `realistic_csc` |  | anndata 0.1.0 | {X: csc_matrix 0.1.0; layers: dict 0.1.0; obs: dataframe 0.2.0; obsm: dict 0.1.0; obsp: dict 0.1.0; uns: dict 0.1.0; var: dataframe 0.2.0; varm: dict 0.1.0; varp: dict 0.1.0} |  |
+| `realistic_gzip` |  | anndata 0.1.0 | {X: csr_matrix 0.1.0; layers: dict 0.1.0; obs: dataframe 0.2.0; obsm: dict 0.1.0; obsp: dict 0.1.0; uns: dict 0.1.0; var: dataframe 0.2.0; varm: dict 0.1.0; varp: dict 0.1.0} |  |
+| `realistic_lzf` |  | anndata 0.1.0 | {X: csr_matrix 0.1.0; layers: dict 0.1.0; obs: dataframe 0.2.0; obsm: dict 0.1.0; obsp: dict 0.1.0; uns: dict 0.1.0; var: dataframe 0.2.0; varm: dict 0.1.0; varp: dict 0.1.0} |  |
 | `rec_array_basic` | structured ndarray [i:int32, f:float64, fixed:\|S3, uni:<U3] | rec-array 0.2.0 | rec-array 0.2.0: compound(i:int32, f:float64, fixed:S3-ascii, uni:vlen-utf-8) [2] |  |
 | `rec_array_int64_big` | structured ndarray [big:int64] | rec-array 0.2.0 | rec-array 0.2.0: compound(big:int64) [1] |  |
 | `rec_array_object_field` | structured ndarray [o:object, f:float64] | rec-array 0.2.0 | rec-array 0.2.0: compound(o:vlen-utf-8, f:float64) [2] |  |

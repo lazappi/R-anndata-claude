@@ -96,6 +96,25 @@ fixture_path <- function(name) {
   testthat::test_path("fixtures", name)
 }
 
+# The zarr fixture stores are committed as one archive (R CMD check notes the
+# hidden files and long paths of a zarr directory tree), unpacked once per test
+# process into a temporary directory that is removed at the end
+zarr_fixture_dir <- local({
+  dir <- NULL
+  function() {
+    if (is.null(dir)) {
+      dir <<- withr::local_tempdir(.local_envir = testthat::teardown_env())
+      utils::untar(fixture_path("zarr-fixtures.tar.gz"), exdir = dir)
+    }
+    dir
+  }
+})
+
+# Path to a zarr fixture (a manifest or a store) in the unpacked archive
+zarr_fixture_path <- function(name) {
+  file.path(zarr_fixture_dir(), name)
+}
+
 name_h5_nodes <- function(nodes) {
   stats::setNames(nodes, vapply(nodes, function(node) node$path, character(1)))
 }
@@ -110,19 +129,25 @@ h5_tree_cache <- new.env(parent = emptyenv())
 # files must not change in between
 prefetch_h5_trees <- function(files) {
   files <- unique(as.character(files))
-  if (length(files) == 0L) {
-    return(invisible())
-  }
-  # One file prints its own list of nodes and several print one list per file
-  trees <- jsonlite::fromJSON(
-    paste(run_python("h5_tree.py", files), collapse = ""),
-    simplifyVector = FALSE
-  )
-  if (length(files) == 1L) {
-    trees <- list(trees)
-  }
-  for (i in seq_along(files)) {
-    assign(files[[i]], name_h5_nodes(trees[[i]]), envir = h5_tree_cache)
+  # A zarr store is a directory and is described by zarr_tree.py in the same
+  # shape, so HDF5 files and zarr stores can be compared with each other
+  is_store <- dir.exists(files)
+  for (script in c("h5_tree.py", "zarr_tree.py")) {
+    group <- files[is_store == (script == "zarr_tree.py")]
+    if (length(group) == 0L) {
+      next
+    }
+    # One file prints its own list of nodes and several print one list per file
+    trees <- jsonlite::fromJSON(
+      paste(run_python(script, group), collapse = ""),
+      simplifyVector = FALSE
+    )
+    if (length(group) == 1L) {
+      trees <- list(trees)
+    }
+    for (i in seq_along(group)) {
+      assign(group[[i]], name_h5_nodes(trees[[i]]), envir = h5_tree_cache)
+    }
   }
   invisible()
 }
@@ -155,11 +180,15 @@ python_rewrite <- function(files, .local_envir = parent.frame()) {
 #
 # `sorted_paths` are sparse `data` and `indices` datasets that may be stored
 # unsorted in the second file (ADR 0006), so only their `digest` is skipped
+#
+# `attr_types = FALSE` skips the attribute `type`, which an HDF5 file and a zarr
+# store describe differently (zarr only stores JSON)
 h5_tree_differences <- function(
   a,
   b,
   rec_array_paths = character(),
-  sorted_paths = character()
+  sorted_paths = character(),
+  attr_types = TRUE
 ) {
   diffs <- character()
   note <- function(...) diffs <<- c(diffs, paste0(...))
@@ -202,7 +231,7 @@ h5_tree_differences <- function(
       note(path, ": attribute `", attr, "` only in the second file")
     }
     for (attr in intersect(names(x$attrs), names(y$attrs))) {
-      for (prop in c("value", "type")) {
+      for (prop in c("value", if (attr_types) "type")) {
         if (!identical(x$attrs[[attr]][[prop]], y$attrs[[attr]][[prop]])) {
           note(
             path,
@@ -223,8 +252,11 @@ h5_tree_differences <- function(
   diffs
 }
 
-# Expects two HDF5 files to have the same groups, datasets, attributes, dtypes,
-# shapes and values, listing each difference on failure
+# Expects two HDF5 files or zarr stores (or one of each) to have the same
+# groups, datasets, attributes, dtypes, shapes and values, listing each
+# difference on failure
+#
+# Chunk shape, codecs and shard layout are never compared
 expect_structurally_equivalent <- function(
   a,
   b,
@@ -235,7 +267,8 @@ expect_structurally_equivalent <- function(
     h5_tree(a),
     h5_tree(b),
     rec_array_paths,
-    sorted_paths
+    sorted_paths,
+    attr_types = dir.exists(a) == dir.exists(b)
   )
   testthat::expect(
     length(diffs) == 0L,
