@@ -351,13 +351,175 @@ zarr_codecs <- function(dtype, compressor = zarr_default_compressor) {
   if (is.null(codec)) list(array_bytes) else list(array_bytes, codec)
 }
 
+# The shard layout of an array of shape `dims` (no shards for a 0-d array).
+# `shards` is `NULL` (unsharded), `"auto"` or the shard shape, and the chunk
+# shape is reduced where needed so that it divides an explicit shard shape.
+# The shard shape is the whole array, or the largest block of chunks below the
+# target of 1 GB uncompressed (Python's `array.target_shard_size_bytes`).
+zarr_layout <- function(dims, chunk, shards, dtype) {
+  if (is.null(shards) || length(dims) == 0L) {
+    return(list(chunk = chunk, shard = NULL))
+  }
+  if (identical(shards, "auto")) {
+    shard <- ceiling(pmax(dims, 1) / chunk) * chunk
+    # Strings are counted as 8 bytes, as for a Python object array
+    target <- 1e9 /
+      (if (identical(dtype, "string")) {
+        8
+      } else {
+        zarr_value_sizes[[dtype]]
+      })
+    for (i in seq_along(shard)) {
+      if (prod(shard) > target) {
+        room <- floor(target / prod(shard[-i]))
+        shard[[i]] <- max(chunk[[i]], floor(room / chunk[[i]]) * chunk[[i]])
+      }
+    }
+    return(list(chunk = chunk, shard = shard))
+  }
+  for (i in seq_along(chunk)) {
+    candidates <- seq_len(min(chunk[[i]], shards[[i]]))
+    chunk[[i]] <- max(candidates[shards[[i]] %% candidates == 0])
+  }
+  list(chunk = chunk, shard = shards)
+}
+
+# The `shards` dataset argument as `NULL`, `"auto"` or a shard shape.
+# Python shards by default (`auto_shard_zarr_v3`), and `shards = NULL` given
+# explicitly switches that off.
+zarr_shard_arg <- function(dataset_kwargs, dims, call) {
+  if (length(dims) == 0L) {
+    return(NULL)
+  }
+  if (!"shards" %in% names(dataset_kwargs)) {
+    return(if (isTRUE(anndata_settings$auto_shard_zarr_v3)) "auto")
+  }
+  shards <- dataset_kwargs[["shards"]]
+  if (is.null(shards)) {
+    return(NULL)
+  }
+  valid <- is.numeric(shards) &&
+    length(shards) == length(dims) &&
+    !anyNA(shards) &&
+    all(shards >= 1) &&
+    all(shards == round(shards))
+  if (!valid) {
+    abort_invalid_argument(
+      "{.arg shards} must be {.code NULL} or have one positive whole number
+       for each of the {length(dims)} dimension{?s} of the array.",
+      call
+    )
+  }
+  as.numeric(shards)
+}
+
+# The CRC-32C (Castagnoli) of `bytes` as four little-endian bytes. The CRC is
+# held in two 16-bit halves, because R integers cannot hold 2^32.
+zarr_crc32c <- function(bytes) {
+  table_hi <- integer(256)
+  table_lo <- integer(256)
+  for (n in 0:255) {
+    hi <- 0L
+    lo <- n
+    for (bit in 1:8) {
+      carry <- bitwAnd(lo, 1L)
+      lo <- bitwOr(lo %/% 2L, (hi %% 2L) * 32768L)
+      hi <- hi %/% 2L
+      if (carry == 1L) {
+        hi <- bitwXor(hi, 0x82F6L)
+        lo <- bitwXor(lo, 0x3B78L)
+      }
+    }
+    table_hi[[n + 1L]] <- hi
+    table_lo[[n + 1L]] <- lo
+  }
+  hi <- 0xFFFFL
+  lo <- 0xFFFFL
+  for (byte in as.integer(bytes)) {
+    index <- bitwXor(bitwAnd(lo, 255L), byte) + 1L
+    lo <- bitwXor(lo %/% 256L + (hi %% 256L) * 256L, table_lo[[index]])
+    hi <- bitwXor(hi %/% 256L, table_hi[[index]])
+  }
+  lo <- bitwXor(lo, 0xFFFFL)
+  hi <- bitwXor(hi, 0xFFFFL)
+  as.raw(c(lo %% 256L, lo %/% 256L, hi %% 256L, hi %/% 256L))
+}
+
+# Packs the chunk files of an array into shard files (the `sharding_indexed`
+# codec with the index at the end): the chunks one after another, then for each
+# chunk of the shard its offset and size (both 2^64 - 1 for a missing chunk) as
+# 8-byte little-endian integers, and the CRC-32C of that index. A shard with no
+# chunks is not written.
+zarr_shard_files <- function(dir, chunk, shard) {
+  files <- list.files(file.path(dir, "c"), recursive = TRUE)
+  if (length(files) == 0L) {
+    return(invisible(NULL))
+  }
+  per_shard <- shard / chunk
+  coords <- do.call(
+    rbind,
+    lapply(strsplit(files, "/", fixed = TRUE), as.numeric)
+  )
+  shard_coords <- sweep(coords, 2L, per_shard, function(x, y) x %/% y)
+  inner <- sweep(coords, 2L, per_shard, function(x, y) x %% y)
+  # C-order position of each chunk in its shard
+  strides <- rev(cumprod(c(1, rev(per_shard)[-length(per_shard)])))
+  position <- as.vector(inner %*% strides)
+  keys <- apply(shard_coords, 1L, paste, collapse = "/")
+  uint64 <- function(x) zarr_encode_values(x, "uint64")
+  missing <- as.raw(rep(255L, 16L))
+  shards <- list()
+  for (key in unique(keys)) {
+    members <- which(keys == key)
+    members <- members[order(position[members])]
+    blobs <- lapply(file.path(dir, "c", files[members]), function(file) {
+      readBin(file, "raw", file.size(file))
+    })
+    sizes <- vapply(blobs, length, numeric(1))
+    offsets <- c(0, cumsum(sizes))[seq_along(sizes)]
+    index <- rep(list(missing), prod(per_shard))
+    for (j in seq_along(members)) {
+      index[[position[members[[j]]] + 1L]] <- c(
+        uint64(offsets[[j]]),
+        uint64(sizes[[j]])
+      )
+    }
+    index <- unlist(index)
+    shards[[key]] <- c(unlist(blobs), index, zarr_crc32c(index))
+  }
+  unlink(file.path(dir, "c"), recursive = TRUE)
+  for (key in names(shards)) {
+    target <- file.path(dir, "c", key)
+    dir.create(dirname(target), recursive = TRUE, showWarnings = FALSE)
+    writeBin(shards[[key]], target)
+  }
+  invisible(NULL)
+}
+
 zarr_write_array_meta <- function(
   dir,
   dtype,
   dims,
   chunk,
-  compressor = zarr_default_compressor
+  compressor = zarr_default_compressor,
+  shard = NULL
 ) {
+  codecs <- zarr_codecs(dtype, compressor)
+  if (!is.null(shard)) {
+    codecs <- list(list(
+      name = "sharding_indexed",
+      configuration = list(
+        chunk_shape = as.list(chunk),
+        codecs = codecs,
+        index_codecs = list(
+          list(name = "bytes", configuration = list(endian = "little")),
+          list(name = "crc32c")
+        ),
+        index_location = "end"
+      )
+    ))
+    chunk <- shard
+  }
   meta <- list(
     shape = as.list(dims),
     data_type = dtype,
@@ -370,7 +532,7 @@ zarr_write_array_meta <- function(
       configuration = list(separator = "/")
     ),
     fill_value = zarr_fill_value(dtype),
-    codecs = zarr_codecs(dtype, compressor),
+    codecs = codecs,
     attributes = empty_object(),
     zarr_format = 3L,
     node_type = "array",
@@ -489,10 +651,25 @@ zarr_write_single <- function(
   dims,
   payload,
   write_chunk = TRUE,
-  compressor = zarr_default_compressor
+  compressor = zarr_default_compressor,
+  shards = NULL
 ) {
   dir.create(dir, recursive = TRUE, showWarnings = FALSE)
-  zarr_write_array_meta(dir, dtype, dims, pmax(dims, 1), compressor)
+  chunk <- pmax(dims, 1)
+  layout <- if (is.numeric(shards)) {
+    # The array is one chunk, so a shard is a multiple of it
+    list(chunk = chunk, shard = ceiling(shards / chunk) * chunk)
+  } else {
+    zarr_layout(dims, chunk, shards, dtype)
+  }
+  zarr_write_array_meta(
+    dir,
+    dtype,
+    dims,
+    layout$chunk,
+    compressor,
+    layout$shard
+  )
   if (!write_chunk || (length(dims) > 0L && prod(dims) == 0)) {
     return(invisible(NULL))
   }
@@ -503,6 +680,9 @@ zarr_write_single <- function(
     zarr_compress(payload, compressor, dtype),
     file.path(chunk_dir, key[[length(key)]])
   )
+  if (!is.null(layout$shard)) {
+    zarr_shard_files(dir, layout$chunk, layout$shard)
+  }
   invisible(NULL)
 }
 
@@ -532,17 +712,19 @@ zarr_write_numeric <- function(
   dtype,
   dims,
   chunk = NULL,
-  compressor = zarr_default_compressor
+  compressor = zarr_default_compressor,
+  shards = NULL
 ) {
-  chunk <- chunk %||% zarr_chunk_shape(dims)
+  layout <- zarr_layout(dims, chunk %||% zarr_chunk_shape(dims), shards, dtype)
+  chunk <- layout$chunk
   dir.create(dir, recursive = TRUE, showWarnings = FALSE)
   if (length(values) == 0L) {
-    zarr_write_array_meta(dir, dtype, dims, chunk, compressor)
+    zarr_write_array_meta(dir, dtype, dims, chunk, compressor, layout$shard)
     return(invisible(NULL))
   }
   held <- zarr_rarr_values(values, dtype)
   if (is.null(held)) {
-    zarr_write_parts(dir, values, dtype, dims, chunk, compressor)
+    zarr_write_parts(dir, values, dtype, dims, chunk, compressor, shards)
     return(invisible(NULL))
   }
   suppressMessages(Rarr::write_zarr_array(
@@ -558,7 +740,10 @@ zarr_write_numeric <- function(
   if (identical(compressor$name, "gzip")) {
     zarr_gzip_chunks(dir, compressor$level)
   }
-  zarr_write_array_meta(dir, dtype, dims, chunk, compressor)
+  zarr_write_array_meta(dir, dtype, dims, chunk, compressor, layout$shard)
+  if (!is.null(layout$shard)) {
+    zarr_shard_files(dir, chunk, layout$shard)
+  }
   invisible(NULL)
 }
 
@@ -571,8 +756,10 @@ zarr_write_parts <- function(
   dtype,
   dims,
   chunk,
-  compressor = zarr_default_compressor
+  compressor = zarr_default_compressor,
+  shards = NULL
 ) {
+  layout <- zarr_layout(dims, chunk, shards, dtype)
   bytes <- zarr_encode_values(as.vector(values), dtype)
   if (identical(dtype, "complex128")) {
     count <- 2L
@@ -611,7 +798,11 @@ zarr_write_parts <- function(
   if (identical(compressor$name, "gzip")) {
     zarr_gzip_chunks(dir, compressor$level)
   }
-  zarr_write_array_meta(dir, dtype, dims, chunk, compressor)
+  zarr_write_array_meta(dir, dtype, dims, chunk, compressor, layout$shard)
+  if (!is.null(layout$shard)) {
+    zarr_shard_files(dir, chunk, layout$shard)
+  }
+  invisible(NULL)
 }
 
 # The on-disk shape of `x`, empty for a scalar
@@ -667,7 +858,8 @@ zarr_dataset_write <- function(loc, name, x, scalar, dataset_kwargs, call) {
       dtype,
       dims,
       zarr_chunk_arg(dataset_kwargs, dims, call),
-      compressor
+      compressor,
+      zarr_shard_arg(dataset_kwargs, dims, call)
     )
   }
   invisible(NULL)
@@ -693,7 +885,8 @@ zarr_bool_write <- function(loc, name, x, scalar, call, dataset_kwargs) {
       "bool",
       dims,
       zarr_chunk_arg(dataset_kwargs, dims, call),
-      compressor
+      compressor,
+      zarr_shard_arg(dataset_kwargs, dims, call)
     )
   }
   invisible(NULL)
@@ -714,12 +907,19 @@ zarr_complex_write <- function(loc, name, x, scalar, call, dataset_kwargs) {
     )
   } else if (length(values) == 0L) {
     dir.create(dir, recursive = TRUE, showWarnings = FALSE)
+    layout <- zarr_layout(
+      dims,
+      zarr_chunk_shape(dims),
+      zarr_shard_arg(dataset_kwargs, dims, call),
+      "complex128"
+    )
     zarr_write_array_meta(
       dir,
       "complex128",
       dims,
-      zarr_chunk_shape(dims),
-      compressor
+      layout$chunk,
+      compressor,
+      layout$shard
     )
   } else {
     dir.create(dir, recursive = TRUE, showWarnings = FALSE)
@@ -729,7 +929,8 @@ zarr_complex_write <- function(loc, name, x, scalar, call, dataset_kwargs) {
       "complex128",
       dims,
       zarr_chunk_shape(dims),
-      compressor
+      compressor,
+      zarr_shard_arg(dataset_kwargs, dims, call)
     )
   }
   invisible(NULL)
@@ -744,7 +945,8 @@ zarr_string_write <- function(loc, name, x, scalar, call, dataset_kwargs) {
     "string",
     dims,
     payload,
-    compressor = zarr_compressor_arg(dataset_kwargs, call, scalar)
+    compressor = zarr_compressor_arg(dataset_kwargs, call, scalar),
+    shards = zarr_shard_arg(dataset_kwargs, dims, call)
   )
   invisible(NULL)
 }

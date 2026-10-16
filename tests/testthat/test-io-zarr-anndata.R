@@ -18,6 +18,30 @@ h5ad_adata_cases <- function(names) {
   )
 }
 
+# The codec names of an array in a store R wrote
+zarr_codec_names <- function(path, array) {
+  meta <- jsonlite::fromJSON(
+    file.path(path, array, "zarr.json"),
+    simplifyVector = FALSE
+  )
+  codecs <- meta$codecs
+  # A sharded array holds its codecs inside the sharding codec
+  if (identical(codecs[[1]]$name, "sharding_indexed")) {
+    codecs <- codecs[[1]]$configuration$codecs
+  }
+  vapply(codecs, function(codec) codec$name, character(1))
+}
+
+# The chunk shape of an array in a store R wrote (inside the shards if sharded)
+zarr_inner_chunk_shape <- function(path, array) {
+  meta <- jsonlite::fromJSON(file.path(path, array, "zarr.json"))
+  sharding <- meta$codecs$configuration$chunk_shape
+  if (is.null(sharding)) {
+    return(meta$chunk_grid$configuration$chunk_shape)
+  }
+  sharding[[1]]
+}
+
 test_that("the whole-AnnData zarr fixtures are found", {
   # Guards the case filter, so the loops below cannot silently run on nothing
   expect_gt(length(zarr_adata_cases()), 10L)
@@ -179,10 +203,7 @@ test_that("chunks sets the chunk shape of a dense X only", {
   )
   path <- withr::local_tempfile(fileext = ".zarr")
   write_zarr(adata, path, chunks = c(2, 3))
-  chunk_shape <- function(array) {
-    meta <- jsonlite::fromJSON(file.path(path, array, "zarr.json"))
-    meta$chunk_grid$configuration$chunk_shape
-  }
+  chunk_shape <- function(array) zarr_inner_chunk_shape(path, array)
   expect_identical(chunk_shape("X"), c(2L, 3L))
   expect_false(identical(chunk_shape("layers/a"), c(2L, 3L)))
   expect_identical(adata_parts(read_zarr(path)), adata_parts(adata))
@@ -197,8 +218,7 @@ test_that("a chunk larger than the array is cut to its shape", {
   adata <- AnnData(matrix(as.numeric(1:6), nrow = 3))
   path <- withr::local_tempfile(fileext = ".zarr")
   write_zarr(adata, path, chunks = c(100, 100))
-  meta <- jsonlite::fromJSON(file.path(path, "X", "zarr.json"))
-  expect_identical(meta$chunk_grid$configuration$chunk_shape, c(3L, 2L))
+  expect_identical(zarr_inner_chunk_shape(path, "X"), c(3L, 2L))
   expect_identical(adata_parts(read_zarr(path)), adata_parts(adata))
 })
 
@@ -258,21 +278,12 @@ test_that("write_zarr checks its arguments", {
     "anndata_invalid_argument_error"
   )
   big <- AnnData(matrix(1, 2, 2))
-  big$X <- array(1, c(2, 2, 2))
+  suppressWarnings(big$X <- array(1, c(2, 2, 2)))
   expect_error(
     suppressWarnings(write_zarr(big, path)),
     class = "anndata_non_2d_error"
   )
 })
-
-# The codec names of an array in a store R wrote
-zarr_codec_names <- function(path, array) {
-  meta <- jsonlite::fromJSON(
-    file.path(path, array, "zarr.json"),
-    simplifyVector = FALSE
-  )
-  vapply(meta$codecs, function(codec) codec$name, character(1))
-}
 
 test_that("compressors sets the codec of every array and round trips", {
   # Python's compressors dataset argument (zstd, gzip, blosc, none), applied to
@@ -335,11 +346,15 @@ test_that("compressed arrays with several chunks are read by R and Python", {
   )
   for (name in c("gzip", "blosc")) {
     path <- withr::local_tempfile(fileext = ".zarr")
-    write_zarr(adata, path, compressors = name)
+    # Unsharded, so that every chunk is a file of its own
+    write_zarr(adata, path, compressors = name, shards = NULL)
     expect_gt(
       length(list.files(file.path(path, "X", "c"), recursive = TRUE)),
       1
     )
+    expect_identical(read_zarr(path)$X, adata$X)
+    # Sharded, the chunks are compressed inside the shard files
+    write_zarr(adata, path, compressors = name)
     back <- read_zarr(path)
     expect_identical(back$X, adata$X, info = name)
     expect_identical(
@@ -395,16 +410,36 @@ test_that("invalid dataset arguments raise classed errors", {
   }
 })
 
-test_that("shards is not yet supported unless NULL", {
-  # Sharded writing is ticket zarr-io/09, NULL means unsharded as in Python
+test_that("shards = NULL writes unsharded arrays and a shape shards them", {
+  # NULL switches off the automatic sharding as in Python, and an explicit
+  # shape must round trip through R
+  adata <- AnnData(matrix(as.numeric(1:12), 4, 3))
+  path <- withr::local_tempfile(fileext = ".zarr")
+  has_sharding <- function() {
+    meta <- jsonlite::fromJSON(file.path(path, "X", "zarr.json"))
+    "sharding_indexed" %in% meta$codecs$name
+  }
+  write_zarr(adata, path, shards = NULL)
+  expect_false(has_sharding())
+  expect_identical(adata_parts(read_zarr(path)), adata_parts(adata))
+  write_zarr(adata, path)
+  expect_true(has_sharding())
+  expect_identical(adata_parts(read_zarr(path)), adata_parts(adata))
+  local_anndata_settings(list(auto_shard_zarr_v3 = FALSE))
+  write_zarr(adata, path)
+  expect_false(has_sharding())
+})
+
+test_that("an invalid shards argument is rejected", {
+  # The shard shape needs one whole number per dimension
   adata <- AnnData(matrix(1, 2, 2))
   path <- withr::local_tempfile(fileext = ".zarr")
-  expect_anndata_condition(
-    write_zarr(adata, path, shards = c(2, 2)),
-    "anndata_not_supported_error"
-  )
-  write_zarr(adata, path, shards = NULL)
-  expect_identical(adata_parts(read_zarr(path)), adata_parts(adata))
+  for (shards in list(c(2, 2, 2), c(0, 2), c(1.5, 2), "auto")) {
+    expect_anndata_condition(
+      write_zarr(adata, path, shards = shards),
+      "anndata_invalid_argument_error"
+    )
+  }
 })
 
 test_that("write_zarr refuses a directory that is not a zarr store", {

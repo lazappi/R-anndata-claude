@@ -368,6 +368,89 @@ test_that("consolidated metadata is written inline and Python opens it", {
   expect_identical(array_read(store, "/g/x"), c(1, 2, 3))
 })
 
+test_that("crc32c matches the standard check value and zarr's index", {
+  # Vectors from zarr 3.4.1: the CRC-32C check string, and the index of a shard
+  # with one chunk of 65 bytes at offset 0
+  expect_identical(
+    zarr_crc32c(charToRaw("123456789")),
+    as.raw(c(0x83, 0x92, 0x06, 0xe3))
+  )
+  index <- as.raw(c(rep(0, 8), 0x41, rep(0, 7)))
+  expect_identical(zarr_crc32c(index), as.raw(c(0xff, 0x2c, 0x4c, 0x11)))
+})
+
+test_that("the shard layout is the whole array, or chunks within 1 GB", {
+  # Auto shards cover the array (rounded up to whole chunks), explicit shards
+  # reduce the chunk shape to a divisor, and 0-d arrays are never sharded
+  expect_null(zarr_layout(numeric(), numeric(), "auto", "float64")$shard)
+  expect_null(zarr_layout(c(3, 4), c(3, 4), NULL, "float64")$shard)
+  expect_identical(
+    zarr_layout(c(3, 4), c(3, 4), "auto", "float64")$shard,
+    c(3, 4)
+  )
+  expect_identical(
+    zarr_layout(2^22, 2^20, "auto", "float64")$shard,
+    2^22
+  )
+  big <- zarr_layout(c(2^20, 2^10), c(1, 2^10), "auto", "float64")
+  expect_lte(prod(big$shard) * 8, 1e9)
+  expect_identical(big$shard[[2]], 2^10)
+  explicit <- zarr_layout(c(10, 6), c(4, 6), c(6, 6), "float64")
+  expect_identical(explicit$chunk, c(3, 6))
+  expect_identical(explicit$shard, c(6, 6))
+})
+
+test_that("a shard file holds its chunks, a padded index and the index crc", {
+  # Layout of `sharding_indexed` with the index at the end: a shard with a
+  # missing chunk has 2^64 - 1 for its offset and size
+  dir <- withr::local_tempdir()
+  zarr_write_numeric(dir, c(1, 2, 0, 0), "int32", 4, 2, shards = 4)
+  bytes <- readBin(file.path(dir, "c", "0"), "raw", 1000)
+  n <- length(bytes)
+  index <- bytes[(n - 35):(n - 4)]
+  expect_identical(index[1:8], as.raw(rep(0, 8)))
+  expect_identical(index[17:32], as.raw(rep(255, 16)))
+  expect_identical(bytes[(n - 3):n], zarr_crc32c(index))
+  size <- as.integer(index[9])
+  expect_identical(n, size + 36L)
+})
+
+test_that("sharded arrays of every kind read back in R and in Python", {
+  # Several shards, several chunks per shard and chunks missing from a shard
+  # (all zero), for the Rarr writer, the split-parts writer and strings
+  skip_if_no_python()
+  withr::local_options(anndata.zarr_chunk_limit = 6)
+  store <- local_zarr_store()
+  dense <- matrix(c(rep(0, 20), as.double(1:40)), 12, 5)
+  big <- set_dtype(matrix(c(rep(0, 20), 2^40 + 1:40), 12, 5), "int64")
+  kwargs <- list(shards = c(6, 5))
+  write_dataset(store, "dense", dense, dataset_kwargs = kwargs)
+  write_dataset(store, "big", big, dataset_kwargs = kwargs)
+  write_bool_dataset(store, "bool", dense > 10, FALSE, NULL, kwargs)
+  write_complex_dataset(store, "complex", dense * 1i, FALSE, NULL, kwargs)
+  write_string_dataset(
+    store,
+    "strings",
+    c("a", "", non_ascii),
+    FALSE,
+    NULL,
+    list(shards = 6)
+  )
+  write_dataset(store, "auto", dense)
+  expect_identical(array_read(store, "/dense"), dense)
+  expect_identical(array_read(store, "/big"), big)
+  expect_identical(array_read(store, "/bool"), dense > 10)
+  expect_identical(array_read(store, "/complex"), dense * 1i)
+  expect_identical(array_read(store, "/strings"), c("a", "", non_ascii))
+  expect_identical(array_read(store, "/auto"), dense)
+  seen <- python_describe(store)
+  expect_equal(unlist(seen[["/dense"]]$value), c(t(dense)))
+  expect_equal(unlist(seen[["/big"]]$value), c(t(drop_dtype(big))))
+  expect_equal(unlist(seen[["/bool"]]$value), c(t(dense > 10)))
+  expect_equal(unlist(seen[["/strings"]]$value), c("a", "", non_ascii))
+  expect_equal(unlist(seen[["/auto"]]$value), c(t(dense)))
+})
+
 test_that("the chunk bytes of strings and scalars are the Python layout", {
   # The vlen-utf8 format is a count, then a length and the bytes of each value
   expect_identical(

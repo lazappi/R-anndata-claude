@@ -73,8 +73,7 @@ Writing version 2 is not yet supported and raises
 automatically, with a target of 1 GB uncompressed per shard.
 An explicit \code{shards} dataset argument overrides it and it is ignored for
 version 2.
-Shards are not yet written, so for now this setting has no effect and R
-writes unsharded arrays.
+Shard shapes can differ from Python's, and rec-arrays are not sharded.
 }
 }
 

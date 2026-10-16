@@ -12,7 +12,8 @@
 #' Stores in a legacy layout (such as one with `raw.X`) raise
 #' `anndata_legacy_format_error`.
 #'
-#' `write_zarr()` writes zarr version 3 and replaces an existing store.
+#' `write_zarr()` writes zarr version 3 (sharded by default) and replaces an
+#' existing store.
 #' To protect other data it refuses a directory that is neither empty nor a
 #' zarr group.
 #' The version is the `zarr_write_format` setting ([anndata_settings]), and
@@ -43,9 +44,12 @@
 #'   as in Python.
 #'   `compressor` is accepted as Python's older name for `compressors`, but
 #'   scalars ignore it, as in Python.
-#'   `shards` must be `NULL` until sharded writing is supported (any other
-#'   value raises `anndata_not_supported_error`), and other arguments raise
-#'   `anndata_invalid_argument_error`.
+#'   `shards` is the shard shape, one whole number for each dimension (it
+#'   applies to arrays of one or more dimensions, and chunks are reduced to
+#'   divide it), or `NULL` for no sharding.
+#'   Without it, arrays are sharded when the `auto_shard_zarr_v3` setting is
+#'   `TRUE` ([anndata_settings]).
+#'   Other arguments raise `anndata_invalid_argument_error`.
 #'
 #' @return `read_zarr()` returns an [AnnData()] and `write_zarr()` returns
 #'   `NULL` invisibly.
@@ -183,16 +187,6 @@ check_zarr_dataset_args <- function(args, call) {
     args <- args[names(args) != "compressors"]
     names(args)[names(args) == "compressor"] <- "compressors"
     args[["legacy_compressor"]] <- TRUE
-  }
-  if ("shards" %in% names(args)) {
-    if (!is.null(args[["shards"]])) {
-      abort_not_supported(
-        "Writing sharded zarr arrays is not yet supported, use
-         {.code shards = NULL}.",
-        call = call
-      )
-    }
-    args[["shards"]] <- NULL
   }
   args
 }

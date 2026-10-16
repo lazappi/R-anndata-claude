@@ -43,9 +43,12 @@ Scalars take the same compressor and the \code{null} Element is always zstd,
 as in Python.
 \code{compressor} is accepted as Python's older name for \code{compressors}, but
 scalars ignore it, as in Python.
-\code{shards} must be \code{NULL} until sharded writing is supported (any other
-value raises \code{anndata_not_supported_error}), and other arguments raise
-\code{anndata_invalid_argument_error}.}
+\code{shards} is the shard shape, one whole number for each dimension (it
+applies to arrays of one or more dimensions, and chunks are reduced to
+divide it), or \code{NULL} for no sharding.
+Without it, arrays are sharded when the \code{auto_shard_zarr_v3} setting is
+\code{TRUE} (\link{anndata_settings}).
+Other arguments raise \code{anndata_invalid_argument_error}.}
 }
 \value{
 \code{read_zarr()} returns an \code{\link[=AnnData]{AnnData()}} and \code{write_zarr()} returns
@@ -65,7 +68,8 @@ Zip stores are not supported, unzip them first.
 Stores in a legacy layout (such as one with \code{raw.X}) raise
 \code{anndata_legacy_format_error}.
 
-\code{write_zarr()} writes zarr version 3 and replaces an existing store.
+\code{write_zarr()} writes zarr version 3 (sharded by default) and replaces an
+existing store.
 To protect other data it refuses a directory that is neither empty nor a
 zarr group.
 The version is the \code{zarr_write_format} setting (\link{anndata_settings}), and
