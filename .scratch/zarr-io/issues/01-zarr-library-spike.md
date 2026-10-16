@@ -1,6 +1,6 @@
 # zarr library spike
 
-Status: needs-info
+Status: ready-for-agent
 Type: research
 Blocked by: none
 
@@ -36,6 +36,18 @@ Also recommend:
 - A findings document is committed at `.scratch/zarr-io/zarr-spike.md` with a verdict for every item above for every candidate, and the recommendations
 - Each verdict for the recommended library is backed by a package test that reads a Python-written fixture or writes a file that Python reads back
 - `scripts/check.sh` passes
+
+## Decisions (human, 2026-10-16)
+
+- Re-run the spike against the **development versions**, which count as the CRAN and Bioconductor packages, and update `.scratch/zarr-io/zarr-spike.md` (keep the release results as a short note, the verdict tables and recommendation are for the development versions):
+  - Rarr from Bioconductor devel (2.1.48 or later), which adds v3 read and write, reading sharded arrays, `write_zarr_group()`, `zarr_consolidate_metadata()` and scalar reads: `Rscript -e 'remotes::install_github("Huber-group-EMBL/Rarr", ref = "devel")'`
+  - pizzarr from GitHub main: `remotes::install_github("zarr-developers/pizzarr")`
+  - zarr from GitHub main: `remotes::install_github("R-CF/zarr")`
+- Declare the chosen library in `DESCRIPTION` (Imports, plus a `Remotes:` entry while the needed version is unreleased) and replace `pizzarr` if it is not chosen.
+- The `R CMD check` failure was not blosc itself: under `--as-cran` the tests only see packages declared in `DESCRIPTION`, and `blosc` was not declared.
+  Declare any codec package the chosen library needs (`blosc` in Suggests, with a classed error naming the package when a blosc chunk is read without it).
+- Restore the verdict tests with `git stash pop` (stash "zarr-io/01: pizzarr verdict tests") and adapt them to the chosen library
+- Note in the findings which gaps remain for v3 strings, 0-d arrays, writing shards and zip stores, since those decide how much of our own code is needed
 
 ## Comments
 

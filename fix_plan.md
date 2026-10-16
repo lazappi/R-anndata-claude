@@ -55,7 +55,7 @@ The human owns the order of the Queue.
 - [x] h5ad-io/12: realistic and compressed fixtures (`.scratch/h5ad-io/issues/12-realistic-fixtures.md`)
 - [x] h5ad-io/13: real-world file test (`.scratch/h5ad-io/issues/13-real-world-file.md`)
 - [x] h5ad-io/14: package vignette (`.scratch/h5ad-io/issues/14-vignette.md`)
-- [ ] zarr-io/01: zarr library spike (`.scratch/zarr-io/issues/01-zarr-library-spike.md`), findings written but blocked (see Blocked)
+- [ ] zarr-io/01: zarr library spike (`.scratch/zarr-io/issues/01-zarr-library-spike.md`), re-run against development versions (see Decisions)
 - [ ] 🛑 Human checkpoint: review `.scratch/zarr-io/zarr-spike.md`, then grill the rest of the zarr-io spec and write its tickets
 
 ## Discovered
@@ -76,7 +76,6 @@ The human owns the order of the Queue.
 
 ## Blocked
 
-- zarr-io/01: the findings (`.scratch/zarr-io/zarr-spike.md`) recommend pizzarr, but its package tests fail under `R CMD check` because pizzarr does not see the `blosc` package there, and `blosc` is GPL-3 (see the ticket's Comments for the questions). The tests are in the git stash `zarr-io/01: pizzarr verdict tests (fail under R CMD check, blosc)`.
 
 ## Follow-up
 
