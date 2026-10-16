@@ -56,7 +56,18 @@ The human owns the order of the Queue.
 - [x] h5ad-io/13: real-world file test (`.scratch/h5ad-io/issues/13-real-world-file.md`)
 - [x] h5ad-io/14: package vignette (`.scratch/h5ad-io/issues/14-vignette.md`)
 - [x] zarr-io/01: zarr library spike (`.scratch/zarr-io/issues/01-zarr-library-spike.md`), re-run against Rarr devel and zarr main (see Decisions)
-- [ ] 🛑 Human checkpoint: review `.scratch/zarr-io/zarr-spike.md`, then grill the rest of the zarr-io spec and write its tickets
+- [x] 🛑 Human checkpoint: review `.scratch/zarr-io/zarr-spike.md`, then grill the rest of the zarr-io spec and write its tickets
+- [ ] zarr-io/02: backend-neutral store layer (`.scratch/zarr-io/issues/02-store-abstraction.md`)
+- [ ] zarr-io/03: zarr fixtures and encoding table (`.scratch/zarr-io/issues/03-zarr-fixtures-and-encoding-table.md`)
+- [ ] zarr-io/04: reading zarr stores (`.scratch/zarr-io/issues/04-zarr-read-backend.md`)
+- [ ] zarr-io/05: writing zarr stores (`.scratch/zarr-io/issues/05-zarr-write-backend.md`)
+- [ ] zarr-io/06: zarr v3 dense, string, scalar, null and sparse Elements (`.scratch/zarr-io/issues/06-zarr-v3-basic-elements.md`)
+- [ ] zarr-io/07: zarr v3 nullable, categorical, dataframe, dict and rec-array Elements (`.scratch/zarr-io/issues/07-zarr-v3-compound-elements.md`)
+- [ ] zarr-io/08: read_zarr, write_zarr and settings (`.scratch/zarr-io/issues/08-read-write-zarr.md`)
+- [ ] zarr-io/09: writing sharded zarr v3 (`.scratch/zarr-io/issues/09-zarr-shard-writing.md`)
+- [ ] zarr-io/10: reading zarr v2 (`.scratch/zarr-io/issues/10-zarr-v2-read.md`)
+- [ ] zarr-io/11: writing zarr v2 (`.scratch/zarr-io/issues/11-zarr-v2-write.md`)
+- [ ] zarr-io/12: zarr documentation (`.scratch/zarr-io/issues/12-zarr-docs.md`)
 
 ## Discovered
 
@@ -80,4 +91,5 @@ The human owns the order of the Queue.
 
 Tickets that need triage before they can be queued.
 
+- zarr-io/13: zip stores (`.scratch/zarr-io/issues/13-zarr-zip-stores.md`)
 - h5ad-io/15: rec-array field dtype fidelity (`.scratch/h5ad-io/issues/15-rec-array-dtype-fidelity.md`), after the MVP

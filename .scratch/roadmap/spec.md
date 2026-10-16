@@ -47,7 +47,7 @@ A stub spec must be grilled into a full spec before tickets are written for it.
 | 3 | `h5ad-io` | done (MVP) | Element registry and h5ad read/write for all current encodings except awkward-array | foundations, core-object |
 | 4 | `views` | stub | Lazy views with copy-on-write | core-object |
 | 5 | `concat` | stub | `concat()` | core-object, views |
-| 6 | `zarr-io` | stub, spike first | `read_zarr()` / `write_zarr()` for zarr v2 and v3 | h5ad-io |
+| 6 | `zarr-io` | full | `read_zarr()` / `write_zarr()` for zarr v2 and v3 | h5ad-io |
 | 7 | `backed` | stub | Backed mode for h5ad | h5ad-io, views |
 | 8 | `lazy` | stub | Lazy arrays and lazy reading | h5ad-io, backed |
 | 9 | `legacy-formats` | stub | Reading files from before the current encodings | h5ad-io |

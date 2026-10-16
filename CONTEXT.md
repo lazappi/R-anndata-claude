@@ -58,8 +58,19 @@ Reading a file and writing it back (R to R, Python to R to Python or R to Python
 _Avoid_: conversion, export
 
 **Structural equivalence**:
-Two files with the same tree of groups and datasets, attributes, Encoding types and versions, On-disk dtypes, shapes and values, regardless of byte layout.
+Two Stores (of the same or different formats) with the same tree of groups and arrays, attributes, Encoding types and versions, On-disk dtypes, shapes and values, regardless of byte layout.
 _Avoid_: identical files
+
+**Store**:
+A file or directory holding an AnnData on disk: an h5ad file or a zarr store (v2 or v3).
+_Avoid_: container
+
+**Shard**:
+A zarr v3 file holding many chunks of one array with an index, written by default by Python (`auto_shard_zarr_v3`).
+Shard and chunk layout are not part of Structural equivalence.
+
+**Consolidated metadata**:
+All of a zarr store's group and array metadata collected in one place (`.zmetadata` in v2, the root `zarr.json` in v3) so it can be read at once.
 
 **Reference implementation**:
 Python anndata at the pinned release, the only source of truth for behaviour.
