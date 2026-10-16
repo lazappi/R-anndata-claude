@@ -1,0 +1,6 @@
+x <- jsonlite::fromJSON('{"a": {}, "b": [], "c": {"d": {}}, "e": [{"name": "x", "configuration": {}}]}', simplifyVector = FALSE)
+str(x)
+cat(jsonlite::toJSON(x, auto_unbox = TRUE), "\n")
+y <- list()
+y[["a"]] <- list()
+str(y)

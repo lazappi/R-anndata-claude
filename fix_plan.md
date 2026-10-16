@@ -90,6 +90,8 @@ The human owns the order of the Queue.
 
 - [ ] Delete the stale unpacked `tests/testthat/fixtures/zarr/` (ignored by git and the build, but unused), the shell denied `rm`
 
+- [ ] Writing a large int64 (or complex) array to zarr through the split-parts writer hangs: a 2^19 x 3 int64 matrix never finished in `zarr_write_read()` (zarr-io/05 shrank the test with the `anndata.zarr_chunk_limit` option instead of finding the cause). Find and fix the slow path, then add a test that writes a 2^19 x 3 int64 matrix in seconds.
+
 ## Blocked
 
 ## Follow-up
