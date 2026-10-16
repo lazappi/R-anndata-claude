@@ -91,7 +91,10 @@ To mark it blocked:
 1. Set the ticket's `Status:` to `needs-info`
 2. Under `## Comments`, write the precise question or problem, what you tried and your recommended answer
 3. Move the item to **Blocked** in `fix_plan.md`
-4. Commit the bookkeeping and exit.
+4. Keep only work that passes the checks.
+   Commit a finished, tested part (such as a bug fix with its unit test) with the bookkeeping, and set the rest aside with `git stash push --include-untracked -m "<ticket>: <what it is>" -- <paths>`, naming the stash in the ticket comment.
+   The tree must be clean when you exit.
+5. Commit the bookkeeping and exit.
    The next run picks a different item.
 
 ## Tools and permissions
@@ -106,6 +109,9 @@ To mark it blocked:
 - A permission denial is not a reason to stop or ask.
   Retry with a dedicated tool or an allowlisted command.
   If an essential command is genuinely denied, mark the item blocked (step 8), naming the exact command and why it is needed.
+- Never end your turn while a background task or subagent is still running, because in a loop run that ends the run and leaves the work uncommitted.
+  Run commands and subagents in the foreground, and never poll task output files (`until`, `sleep`, `tail -f`, `ps`).
+  If a command would take longer than 10 minutes, record that in the ticket instead of running it.
 - Delegating builds and tests to the `checker` subagent is the intended workflow, not a way round a denial
 - Never end a run by asking a question, because nobody will answer.
   Every run ends with a commit or with `.ralph/halt`.
