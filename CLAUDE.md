@@ -40,6 +40,7 @@ Kept brief and current by the loop.
 
 - `scripts/fetch-reference.sh` fetches the Python reference to `.reference/anndata/`
 - `scripts/check.sh` is the full check that must pass before every commit, and `scripts/check.sh --quick <test files>` is for use during development (`--quick` takes test file paths and lints only changed R files)
+- The registry binds named functions late (`late_bound()`), otherwise covr reports registered encodings as uncovered
 - Coverage is not part of the full check, run `scripts/check.sh --coverage` for the report (target at least 90%)
 - The full check fails on any NOTE (`error_on = "note"`) and sets `_R_CHECK_SYSTEM_CLOCK_=false` itself
 - `LICENSE` needs `ORGANIZATION` as well as `COPYRIGHT HOLDER`, otherwise check gives a note

@@ -54,7 +54,7 @@ The human owns the order of the Queue.
 - [x] h5ad-io/11: read_h5ad and write_h5ad options (`.scratch/h5ad-io/issues/11-read-write-options.md`)
 - [x] h5ad-io/12: realistic and compressed fixtures (`.scratch/h5ad-io/issues/12-realistic-fixtures.md`)
 - [x] h5ad-io/13: real-world file test (`.scratch/h5ad-io/issues/13-real-world-file.md`)
-- [ ] h5ad-io/14: package vignette (`.scratch/h5ad-io/issues/14-vignette.md`), pandoc now installed, restore the stash "h5ad-io/14: vignette"
+- [x] h5ad-io/14: package vignette (`.scratch/h5ad-io/issues/14-vignette.md`)
 
 ## Discovered
 
@@ -70,7 +70,7 @@ The human owns the order of the Queue.
 
 - [ ] The cellxgene PBMC 3k file (the real-world test download) is in a legacy format that `read_h5ad()` rejects (`anndata_legacy_format_error`, unencoded root Element), so the test reads a Python rewrite of it, reading the original needs the `legacy-formats` sub-project
 
-- [ ] Coverage is 83.11% (target 90%) and likely understated: `R/io-values-mapping.R` shows 0% and `R/io-sparse.R` 11.8% despite passing tests, probably because the element registry holds uninstrumented function copies under covr. Confirm, fix the measurement or add tests, then finish h5ad-io/14 (vignette itself is done and passes check)
+- [x] Coverage was understated because the registry held uninstrumented function copies under covr, fixed with `late_bound()`, now 96.42%
 
 ## Blocked
 

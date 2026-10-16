@@ -38,14 +38,33 @@ io_registry$write <- list()
 
 spec_key <- function(type, version) paste0(type, "\r", version)
 
+# Looks a named package function up at call time, so replacing it (as covr does
+# to instrument it) takes effect. Anonymous functions are kept as they are.
+late_bound <- function(fn_expr, fn) {
+  if (!is.symbol(fn_expr)) {
+    return(fn)
+  }
+  name <- as.character(fn_expr)
+  ns <- environment(fn)
+  if (
+    !is.environment(ns) ||
+      !identical(ns, topenv(ns)) ||
+      !exists(name, envir = ns, inherits = FALSE)
+  ) {
+    return(fn)
+  }
+  function(...) get(name, envir = ns, inherits = FALSE)(...)
+}
+
 #' @rdname io-registry
 register_reader <- function(type, version, fn) {
-  io_registry$read[[spec_key(type, version)]] <- fn
+  io_registry$read[[spec_key(type, version)]] <- late_bound(substitute(fn), fn)
   invisible(NULL)
 }
 
 #' @rdname io-registry
 register_writer <- function(class, type, version, fn) {
+  fn <- late_bound(substitute(fn), fn)
   current <- io_registry$write[[class]]
   changed <- !is.null(current) &&
     (current$type != type || current$version != version)

@@ -1,6 +1,6 @@
 # Package vignette
 
-Status: in-progress
+Status: done
 Type: task
 Blocked by: 12, core-object/16
 
@@ -36,5 +36,9 @@ Coverage is 83.11% (target 90%), so the ticket stays `in-progress`.
 Lowest: `R/io-values-mapping.R` 0%, `R/io-sparse.R` 11.8%, `R/io-values-categorical.R` 19%, though their tests run (no skips).
 Suspected cause: encodings register their functions in the registry at top level, and covr instruments the namespace copies, so the registry calls uninstrumented originals.
 Next run: confirm that, then fix the measurement (e.g. look functions up by name at call time) or add tests, and re-measure before setting `done` and bumping the version.
+2026-10-16 (coverage run): confirmed the cause.
+`register_reader()`/`register_writer()` now bind named functions late via `late_bound()` (`R/io-registry.R`), so covr's instrumented copies are used.
+Coverage is 96.42% (lowest `R/settings.R` 71%), full check passes with no NOTE.
+All acceptance criteria met, ticket `done`.
 
 (Earlier note) Not done yet: coverage check (`scripts/check.sh --coverage`, target 90%) and the exported-function documentation audit.

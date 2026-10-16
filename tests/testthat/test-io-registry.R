@@ -253,3 +253,19 @@ test_that("registering a writer with a different encoding is an error", {
     register_writer("test_elem", "test-elem", "0.1.0", function(...) NULL)
   )
 })
+
+# Named package functions are looked up at call time so covr can instrument
+# them, while anonymous, test-local and primitive functions are kept as given
+test_that("late_bound looks named package functions up at call time", {
+  local_io_registry()
+  fn <- late_bound(quote(spec_key), spec_key)
+  expect_equal(fn("a", "b"), spec_key("a", "b"))
+  local_mocked_bindings(spec_key = function(...) "mocked")
+  expect_equal(fn("a", "b"), "mocked")
+
+  anon <- function(...) NULL
+  expect_identical(late_bound(quote(function(...) NULL), anon), anon)
+  expect_identical(late_bound(quote(anon), anon), anon)
+  expect_identical(late_bound(quote(sum), sum), sum)
+  expect_identical(late_bound(quote(not_a_function), spec_key), spec_key)
+})
