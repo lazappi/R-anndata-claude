@@ -549,6 +549,18 @@
       "file": "h5ad/nullable_uint16.h5",
       "python": "IntegerArray"
     },
+    "realistic": {
+      "file": "h5ad/realistic.h5ad"
+    },
+    "realistic_csc": {
+      "file": "h5ad/realistic_csc.h5ad"
+    },
+    "realistic_gzip": {
+      "file": "h5ad/realistic_gzip.h5ad"
+    },
+    "realistic_lzf": {
+      "file": "h5ad/realistic_lzf.h5ad"
+    },
     "rec_array_basic": {
       "file": "h5ad/rec_array_basic.h5",
       "python": "structured ndarray [i:int32, f:float64, fixed:|S3, uni:<U3]"

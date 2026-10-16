@@ -90,4 +90,5 @@ Kept brief and current by the loop.
 - `expect_python_equal()`, `python_rewrite_h5ad()` and `compare.py` take many files per Python process, use them for whole h5ad files
 - Compression (`R/io-compression.R`) rides in `dataset_kwargs` (with an internal `as_dense` key), rhdf5 type handles are digit strings (tell predefined types by the `H5T_` prefix), `H5Pset_lzf()` segfaults on variable-length strings and `H5Pset_chunk()`/`H5Pget_chunk()` use HDF5 (row-major) order
 - `as(<dense>, "CsparseMatrix")` gives a symmetric class for symmetric input, so go through `"generalMatrix"` first
+- `gen_adata` needs `awkward`, which the uv environment lacks, so `_realistic_adata()` stubs `helpers.gen_awkward` and seeds the global `np.random` too
 - Each Python start costs 0.3s (`h5_tree.py`) to 1.8s (anything importing anndata), so never call it per case: write all files first, then use `prefetch_h5_trees()`, `python_rewrite()` and `expect_all_equivalent()` (testthat's per-test times do not show this cost)

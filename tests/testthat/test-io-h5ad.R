@@ -8,7 +8,11 @@ adata_fixture_names <- c(
   "anndata_0_vars",
   "anndata_raw_own_var",
   "anndata_raw_0_obs",
-  "anndata_raw_0_vars"
+  "anndata_raw_0_vars",
+  "realistic",
+  "realistic_csc",
+  "realistic_gzip",
+  "realistic_lzf"
 )
 
 adata_fixture_files <- function() {
@@ -122,6 +126,81 @@ test_that("Python-written h5ad files read as the expected AnnData", {
   )
 })
 
+# Python -> R for the gen_adata objects: every variant, plain or compressed,
+# must read as the same object with all Slots and column types
+test_that("the realistic fixtures read with every Slot and column type", {
+  reference <- adata_parts(read_adata_fixture("realistic"))
+  for (name in c(
+    "realistic",
+    "realistic_csc",
+    "realistic_gzip",
+    "realistic_lzf"
+  )) {
+    adata <- read_adata_fixture(name)
+    expect_identical(adata$shape, c(20L, 10L), info = name)
+    expect_identical(adata$obs_names, paste0("cell", 0:19), info = name)
+    expect_identical(adata$var_names, paste0("gene", 0:9), info = name)
+    expect_true(is_sparse(adata$X), info = name)
+    expect_identical(unname(get_dtype(adata$X)), "float32", info = name)
+    # gen_adata only keeps the csr_matrix entries when the format is csr
+    csr <- name != "realistic_csc"
+    expect_setequal(
+      names(adata$layers),
+      c(NA, "array", if (csr) "sparse")
+    )
+    expect_identical(
+      names(adata$obsm),
+      c("array", "df", if (csr) "sparse"),
+      info = name
+    )
+    expect_identical(
+      names(adata$varm),
+      c("array", "df", if (csr) "sparse"),
+      info = name
+    )
+    expect_identical(names(adata$obsp), c("array", "sparse"), info = name)
+    expect_identical(names(adata$varp), c("array", "sparse"), info = name)
+    expect_setequal(
+      names(adata$uns),
+      c("O_recarray", "nested", "df", "df_int_index")
+    )
+    expect_identical(
+      colnames(adata$obs),
+      c(
+        "cat_unordered",
+        "obs_cat",
+        "int64",
+        "float64",
+        "uint8",
+        "bool",
+        "nullable-bool",
+        "nullable-int32",
+        "nullable-uint8"
+      ),
+      info = name
+    )
+    expect_true(is.factor(adata$obs[["cat_unordered"]]), info = name)
+    expect_type(adata$obs[["bool"]], "logical")
+    expect_true(anyNA(adata$obs[["nullable-int32"]]), info = name)
+    expect_true(anyNA(adata$obs[["nullable-bool"]]), info = name)
+    # An int64 scalar reads as a double
+    expect_identical(drop_dtype(adata$uns$nested$scalar_int), 42, info = name)
+    expect_identical(
+      as.integer(adata$uns$nested$nested_further$array),
+      0:4,
+      info = name
+    )
+    # Compression and the index format must not change any value
+    if (name != "realistic_csc") {
+      expect_identical(
+        adata_parts(adata)[c("obs", "var", "X")],
+        reference[c("obs", "var", "X")],
+        info = name
+      )
+    }
+  }
+})
+
 # R -> R: writing and reading must keep every Slot of objects built in R,
 # including the `NA` layer (X), which is stored at /X
 test_that("AnnData objects built in R round trip through R", {
@@ -147,8 +226,21 @@ test_that("R rewrites every h5ad fixture equivalent to Python", {
     write_h5ad(read_adata_fixture(name), written[[name]])
   }
   originals <- adata_fixture_files()
-  expect_all_equivalent(unname(written), originals)
+  # The realistic objects hold a rec-array whose field dtypes are exempt
+  # (ADR 0005), so its values are compared separately
+  expect_all_equivalent(
+    unname(written),
+    originals,
+    rec_array_paths = "/uns/O_recarray"
+  )
   expect_python_equal(unname(written), originals)
+  for (name in grep("^realistic", adata_fixture_names, value = TRUE)) {
+    expect_rec_array_values_equal(
+      written[[name]],
+      fixture_path(file.path("h5ad", paste0(name, ".h5ad"))),
+      "/uns/O_recarray"
+    )
+  }
 })
 
 # R -> Python -> R: Python reads and rewrites what R writes, and R reads that
@@ -167,6 +259,27 @@ test_that("Python reads and rewrites the AnnData objects R writes", {
       adata_parts(read_h5ad(rewritten[[i]])),
       adata_parts(built[[i]]),
       info = names(built)[[i]]
+    )
+  }
+})
+
+# R -> Python -> R for the realistic object written plain, gzip and lzf, so the
+# compression options are tied to a Python rewrite of a full object
+test_that("Python rewrites the realistic object R writes with compression", {
+  skip_if_no_python()
+  built <- read_adata_fixture("realistic")
+  settings <- list(NULL, "gzip", "lzf")
+  written <- character()
+  for (i in seq_along(settings)) {
+    written[[i]] <- withr::local_tempfile(fileext = ".h5ad")
+    write_h5ad(built, written[[i]], compression = settings[[i]])
+  }
+  rewritten <- python_rewrite_h5ad(written)
+  for (i in seq_along(settings)) {
+    expect_identical(
+      adata_parts(read_h5ad(rewritten[[i]])),
+      adata_parts(built),
+      info = format(settings[[i]])
     )
   }
 })
@@ -301,6 +414,134 @@ test_that("write_h5ad names the path of an unencodable value", {
     class = "anndata_io_registry_error"
   )
   expect_identical(cnd$path, "/uns/f")
+})
+
+# Every class the spec lists as unencodable must be refused with its path and
+# class, at the top level of uns and nested inside a dict
+test_that("write_h5ad refuses every unencodable value class by path", {
+  unencodable_s4 <- methods::setClass(
+    "UnencodableS4",
+    representation(a = "numeric")
+  )
+  withr::defer(methods::removeClass("UnencodableS4"))
+  values <- list(
+    fn = length,
+    env = new.env(),
+    unnamed = list(1, 2),
+    partly_named = list(a = 1, 2),
+    date = Sys.Date(),
+    posixct = as.POSIXct("2020-01-01", tz = "UTC"),
+    s4 = unencodable_s4(a = 1),
+    s3 = structure(list(a = 1), class = "made_up")
+  )
+  classes <- list(
+    fn = "function",
+    env = "environment",
+    unnamed = "list",
+    partly_named = "list",
+    date = "Date",
+    posixct = "POSIXct",
+    s4 = "UnencodableS4",
+    s3 = "made_up"
+  )
+  for (label in names(values)) {
+    for (nested in c(FALSE, TRUE)) {
+      path <- withr::local_tempfile(fileext = ".h5ad")
+      uns <- if (nested) {
+        list(outer = stats::setNames(list(values[[label]]), "inner"))
+      } else {
+        stats::setNames(list(values[[label]]), "item")
+      }
+      adata <- AnnData(matrix(0, 2, 3))
+      adata$uns <- uns
+      cnd <- expect_error(
+        write_h5ad(adata, path),
+        class = "anndata_io_registry_error",
+        info = label
+      )
+      expected <- if (nested) "/uns/outer/inner" else "/uns/item"
+      expect_identical(cnd$path, expected, info = label)
+      # Lists are refused for their names, which the message gives instead
+      if (!label %in% c("unnamed", "partly_named")) {
+        expect_true(classes[[label]] %in% cnd$r_class, info = label)
+      }
+    }
+  }
+})
+
+# Every supported R value class written into uns must come back unchanged
+test_that("uns values of every supported R class round trip through R", {
+  uns <- list(
+    dbl = c(1.5, NaN, Inf),
+    int = c(1L, 2L, 3L),
+    lgl = c(TRUE, FALSE),
+    chr = c("a", "b"),
+    cplx = complex(real = c(1, 2), imaginary = c(0, -1)),
+    scalar_dbl = 2.5,
+    scalar_int = 3L,
+    scalar_lgl = TRUE,
+    scalar_chr = "text",
+    mat = matrix(c(1, 2, 3, 4), 2),
+    arr3 = array(as.numeric(1:8), c(2, 2, 2)),
+    sparse = methods::as(
+      methods::as(Matrix::Matrix(diag(3), sparse = TRUE), "generalMatrix"),
+      "CsparseMatrix"
+    ),
+    fct = factor(c("x", "y", "x")),
+    ord = factor(c("lo", "hi"), levels = c("lo", "hi"), ordered = TRUE),
+    nullable_int = c(1L, NA, 3L),
+    nullable_lgl = c(TRUE, NA),
+    nullable_chr = c("a", NA),
+    frame = data.frame(a = 1:2, b = c("u", "v"), row.names = c("r1", "r2")),
+    nested = list(inner = list(k = 1, l = "m")),
+    empty = stats::setNames(list(), character())
+  )
+  adata <- AnnData(matrix(0, 2, 3))
+  adata$uns <- uns
+  path <- withr::local_tempfile(fileext = ".h5ad")
+  write_h5ad(adata, path)
+  back <- read_h5ad(path)
+  # Data frames read back as DataFrame, so they are compared as data frames
+  plain <- function(x) {
+    if (methods::is(x, "DataFrame")) as.data.frame(x) else drop_dtype(x)
+  }
+  for (key in names(uns)) {
+    expect_equal(
+      plain(back$uns[[key]]),
+      plain(uns[[key]]),
+      ignore_attr = TRUE,
+      info = key
+    )
+  }
+})
+
+# Unencodable values in the other Slots must name those Slots in the path
+test_that("unencodable values name their Slot in the path", {
+  path <- withr::local_tempfile(fileext = ".h5ad")
+  expect_path <- function(adata, expected) {
+    cnd <- expect_error(
+      write_h5ad(adata, path),
+      class = "anndata_io_registry_error"
+    )
+    expect_identical(cnd$path, expected)
+  }
+
+  obs <- AnnData(matrix(0, 2, 3))
+  obs$obs[["when"]] <- Sys.Date() + 0:1
+  expect_path(obs, "/obs/when")
+
+  var <- AnnData(matrix(0, 2, 3))
+  var$var[["when"]] <- Sys.Date() + 0:2
+  expect_path(var, "/var/when")
+
+  raw <- AnnData(matrix(0, 2, 3))
+  raw$raw <- raw
+  raw$raw$var[["when"]] <- Sys.Date() + 0:2
+  expect_path(raw, "/raw/var/when")
+
+  frame <- AnnData(matrix(0, 2, 3))
+  frame$uns <- list(df = data.frame(when = Sys.Date() + 0:1))
+  expect_path(frame, "/uns/df/when")
 })
 
 test_that("write_h5ad and read_h5ad check their arguments", {

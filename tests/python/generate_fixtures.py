@@ -538,6 +538,59 @@ def _adata_cases():
     }
 
 
+def _realistic_adata(sparse_fmt="csr"):
+    """`gen_adata` restricted to the encodings the R port supports."""
+    import pandas as pd
+    import scipy.sparse as sp
+    from anndata.tests import helpers
+
+    types = (sp.csr_matrix, np.ndarray, pd.DataFrame)
+    # gen_adata always builds awkward arrays, which are out of scope and need
+    # the awkward package, so they are stubbed and dropped afterwards
+    original = helpers.gen_awkward
+    helpers.gen_awkward = lambda *args, **kwargs: None
+    try:
+        # Columns and rec-arrays draw from the global generator
+        np.random.seed(0)
+        adata = helpers.gen_adata(
+            (20, 10),
+            X_type=sp.csr_matrix if sparse_fmt == "csr" else sp.csc_matrix,
+            obs_dtypes=helpers.DEFAULT_COL_TYPES,
+            var_dtypes=helpers.DEFAULT_COL_TYPES,
+            obsm_types=types,
+            varm_types=types,
+            layers_types=(sp.csr_matrix, np.ndarray),
+            sparse_fmt=sparse_fmt,
+            random_state=np.random.default_rng(0),
+        )
+    finally:
+        helpers.gen_awkward = original
+    for mapping in (adata.obsm, adata.varm):
+        for key in ("awk_2d_ragged", "da", "sparse_array"):
+            mapping.pop(key, None)
+    for mapping in (adata.obsp, adata.varp):
+        mapping.pop("sparse_array", None)
+    for key in ("awkward_regular", "awkward_ragged"):
+        adata.uns.pop(key, None)
+    return adata
+
+
+def _register_realistic_cases():
+    variants = {
+        "realistic": ("csr", None),
+        "realistic_csc": ("csc", None),
+        "realistic_gzip": ("csr", "gzip"),
+        "realistic_lzf": ("csr", "lzf"),
+    }
+    for name, (fmt, compression) in variants.items():
+        CASES[name] = {
+            "file": f"{ENCODING_DIR}/{name}.h5ad",
+            "write": lambda path, fmt=fmt, compression=compression: _realistic_adata(
+                fmt
+            ).write_h5ad(path, compression=compression),
+        }
+
+
 def _register_encoding_cases():
     elements = _element_cases()
     for name, factory in elements.items():
@@ -563,6 +616,7 @@ def _register_encoding_cases():
 
 
 _register_encoding_cases()
+_register_realistic_cases()
 
 
 def main(outdir):
