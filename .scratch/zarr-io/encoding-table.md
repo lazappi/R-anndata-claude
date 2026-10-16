@@ -24,6 +24,10 @@ How to read the **On disk** column:
 Whole objects are written with `write_zarr` (consolidated metadata) and Elements with `write_elem` to the key `x` (not consolidated).
 The variants (`v3_unsharded`, `v3_unconsolidated`, `v3_zstd`, `v3_blosc`, `v3_gzip` and `v3_none`) hold a few of the cases and are listed in `tests/testthat/fixtures/zarr/manifest.json`.
 
+Python widens numeric scalars on a rewrite, for zarr and h5ad alike: `read_scalar` returns a plain `int`, `float` or `bool` (`methods.py:1362-1367`), so writing it back gives int64 or float64 (`np.array(value).dtype`, `methods.py:1404`).
+A scalar read from a store keeps its dtype only when R reads it, so R -> Python -> R tests compare the value, not the dtype, of numeric scalars (bool survives).
+A Python `complex` scalar has no writer, so Python cannot rewrite a complex scalar.
+
 ## Observed
 
 <!-- observed:start -->

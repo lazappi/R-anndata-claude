@@ -142,9 +142,19 @@ zarr_abs_path <- function(store, name) {
   paste0("/", paste(parts[nzchar(parts)], collapse = "/"))
 }
 
+# Whether the node holds metadata, matching the case of every name (a
+# case-insensitive file system would otherwise find `x` as `X`)
+zarr_node_exists <- function(node) {
+  dir <- zarr_dir(node)
+  if (node$path != "/" && !(basename(dir) %in% list.files(dirname(dir)))) {
+    return(FALSE)
+  }
+  !is.null(zarr_meta(dir, node$version))
+}
+
 zarr_node_open <- function(store, path) {
   node <- zarr_node(store$root, zarr_abs_path(store, path), store$version)
-  if (is.null(zarr_meta(zarr_dir(node), node$version))) {
+  if (!zarr_node_exists(node)) {
     anndata_abort(
       "There is no zarr group or array at {.path {node$path}}.",
       "anndata_invalid_value_error",
@@ -155,8 +165,9 @@ zarr_node_open <- function(store, path) {
 }
 
 zarr_member_exists <- function(store, key) {
-  node <- zarr_node(store$root, zarr_abs_path(store, key), store$version)
-  !is.null(zarr_meta(zarr_dir(node), node$version))
+  zarr_node_exists(
+    zarr_node(store$root, zarr_abs_path(store, key), store$version)
+  )
 }
 
 # Alphabetical, as `h5ls()` lists a group

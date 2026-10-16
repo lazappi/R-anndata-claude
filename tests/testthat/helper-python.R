@@ -123,6 +123,16 @@ zarr_fixture_manifest <- function() {
   )
 }
 
+# The fixture store paths of a variant, keyed by case name
+zarr_variant_paths <- function(variant) {
+  cases <- zarr_fixture_manifest()$variants[[variant]]$cases
+  vapply(
+    cases,
+    function(case) zarr_fixture_path(case$file),
+    character(1)
+  )
+}
+
 name_h5_nodes <- function(nodes) {
   stats::setNames(nodes, vapply(nodes, function(node) node$path, character(1)))
 }
@@ -174,9 +184,9 @@ h5_tree <- function(file) {
 # Python's rewrite (read then write with `anndata.io`) of many files in one
 # Python process, returning the paths of the rewritten files (in the temporary
 # directory of the calling test)
-python_rewrite <- function(files, .local_envir = parent.frame()) {
+python_rewrite <- function(files, ext = ".h5", .local_envir = parent.frame()) {
   out_dir <- withr::local_tempdir(.local_envir = .local_envir)
-  rewritten <- file.path(out_dir, paste0(seq_along(files), ".h5"))
+  rewritten <- file.path(out_dir, paste0(seq_along(files), ext))
   run_python("rewrite.py", as.vector(rbind(files, rewritten)))
   rewritten
 }

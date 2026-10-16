@@ -109,7 +109,7 @@ zarr_group_create <- function(store, key) {
   zarr_require_v3(store)
   path <- zarr_abs_path(store, key)
   node <- zarr_node(store$root, path, store$version)
-  if (!is.null(zarr_meta(zarr_dir(node), 3L))) {
+  if (zarr_node_exists(node)) {
     anndata_abort(
       "There is already a zarr group or array at {.path {path}}.",
       "anndata_invalid_value_error",

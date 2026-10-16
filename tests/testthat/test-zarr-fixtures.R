@@ -1,16 +1,6 @@
 # Guards the zarr fixtures, the zarr encoding table and the structural
 # comparison of zarr stores (ticket zarr-io/03)
 
-# The fixture store paths of a variant, keyed by case name
-zarr_variant_paths <- function(variant) {
-  cases <- zarr_fixture_manifest()$variants[[variant]]$cases
-  vapply(
-    cases,
-    function(case) zarr_fixture_path(case$file),
-    character(1)
-  )
-}
-
 # Offline guard: every case in the zarr manifest has its store, so the suite
 # works without Python
 test_that("every zarr fixture listed in the manifest exists", {

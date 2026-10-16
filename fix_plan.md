@@ -61,7 +61,7 @@ The human owns the order of the Queue.
 - [x] zarr-io/03: zarr fixtures and encoding table (`.scratch/zarr-io/issues/03-zarr-fixtures-and-encoding-table.md`)
 - [x] zarr-io/04: reading zarr stores (`.scratch/zarr-io/issues/04-zarr-read-backend.md`)
 - [x] zarr-io/05: writing zarr stores (`.scratch/zarr-io/issues/05-zarr-write-backend.md`)
-- [ ] zarr-io/06: zarr v3 dense, string, scalar, null and sparse Elements (`.scratch/zarr-io/issues/06-zarr-v3-basic-elements.md`)
+- [x] zarr-io/06: zarr v3 dense, string, scalar, null and sparse Elements (`.scratch/zarr-io/issues/06-zarr-v3-basic-elements.md`)
 - [ ] zarr-io/07: zarr v3 nullable, categorical, dataframe, dict and rec-array Elements (`.scratch/zarr-io/issues/07-zarr-v3-compound-elements.md`)
 - [ ] zarr-io/08: read_zarr, write_zarr and settings (`.scratch/zarr-io/issues/08-read-write-zarr.md`)
 - [ ] zarr-io/09: writing sharded zarr v3 (`.scratch/zarr-io/issues/09-zarr-shard-writing.md`)
