@@ -167,6 +167,8 @@ Each method matches the referenced Python method's behaviour, errors and warning
 | `strings_to_categoricals(df = NULL)` | `anndata.py:1170` | Converts character columns with fewer unique values than rows to factors, in place on obs and var (or on `df`), with Python's messages |
 | `rename_categories(key, categories)` | `anndata.py:1118` | Renames levels of an obs/var factor, also renaming entries in `uns` that Python renames |
 
+Methods that Python 0.13.4 marks deprecated (`obs_vector`, `var_vector` and the `*_keys()` methods, among others) are implemented, warn when called with Python's message and the class mapped from Python's warning category, and carry a lifecycle `deprecated` badge.
+
 Python's `__eq__` raises `NotImplementedError` (`anndata.py:581-588`).
 `==` and other comparison operators on `AnnData` raise an equivalent classed error.
 
@@ -189,6 +191,7 @@ AnnData object with n_obs × n_vars = 100 × 50
   Read it from the reference and confirm it with a Python-generated expected output.
 - `layers` lists the X entry as `None (.X)`, exactly as Python does, in Python's key order
 - Empty Slots are omitted
+- Keys are quoted as Python's `repr` quotes them, including escapes for control characters (`\n`, `\t`) and the choice of quote character
 - The `View of ` prefix and ` backed at '<file>'` suffix are added by later sub-projects
 
 ## Errors and warnings

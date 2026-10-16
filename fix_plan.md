@@ -46,7 +46,9 @@ The human owns the order of the Queue.
 - [x] h5ad-io/06: nullable and categorical arrays (`.scratch/h5ad-io/issues/06-nullable-categorical.md`)
 - [x] h5ad-io/07: sparse matrices (`.scratch/h5ad-io/issues/07-sparse-matrices.md`)
 - [ ] foundations/09: faster test suite (`.scratch/foundations/issues/09-test-speed.md`)
-- [ ] h5ad-io/08: dict and rec-array (`.scratch/h5ad-io/issues/08-dict-rec-array.md`), implemented but blocked, see Blocked
+- [ ] core-object/17: deprecation warnings (`.scratch/core-object/issues/17-deprecation-warnings.md`)
+- [ ] core-object/18: escape keys in printing like Python's repr (`.scratch/core-object/issues/18-repr-key-escaping.md`)
+- [ ] h5ad-io/08: dict and rec-array (`.scratch/h5ad-io/issues/08-dict-rec-array.md`), implemented, finish with the 2026-10-16 decisions
 - [x] h5ad-io/09: dataframe (`.scratch/h5ad-io/issues/09-dataframe.md`)
 - [ ] h5ad-io/10: AnnData and Raw, read_h5ad and write_h5ad basics (`.scratch/h5ad-io/issues/10-anndata-raw-roundtrip.md`)
 - [ ] h5ad-io/11: read_h5ad and write_h5ad options (`.scratch/h5ad-io/issues/11-read-write-options.md`)
@@ -60,18 +62,13 @@ The human owns the order of the Queue.
 
 - [x] Deadlock: core-object/06 has `Blocked by: 04`, but 04's last sub-item (`layers[[NA]]` assignment) needs 06. The human should remove 04 from 06's `Blocked by:` (06 can then finish 04's sub-item).
 
-- [ ] Python 0.13.4 marks `obs_vector`, `var_vector` and the `*_keys()` methods deprecated (they warn). core-object/13 does not warn, because the spec is silent. The human should decide whether to add an `anndata_deprecated_warning`.
+- [x] Python 0.13.4 marks `obs_vector`, `var_vector` and the `*_keys()` methods deprecated (they warn). core-object/13 does not warn, because the spec is silent. The human should decide whether to add an `anndata_deprecated_warning`.
 
-- [ ] rec-arrays ignore `dataset_kwargs` (compression, ticket h5ad-io/11) and a rec-array with no rows cannot be written, because rhdf5's compound writer needs a non-empty chunk (h5ad-io/15 would fix both)
+- [x] rec-arrays ignore `dataset_kwargs` (compression, ticket h5ad-io/11) and a rec-array with no rows cannot be written, because rhdf5's compound writer needs a non-empty chunk (h5ad-io/15 would fix both)
 
-- [ ] `format.AnnData` does not escape control characters in keys as Python's `repr` does (`\n`, `\t`), see `quote_key()` in `R/printing.R`
+- [x] `format.AnnData` does not escape control characters in keys as Python's `repr` does (`\n`, `\t`), see `quote_key()` in `R/printing.R`
 
 ## Blocked
-
-- h5ad-io/08: anndata cannot read non-ASCII text in a fixed-length string field, so R-written rec-arrays with such text break `read_elem` in Python, against the ticket's decision.
-  R raises on write for now and the rest is done.
-  The human decides between keeping the error until h5ad-io/15 and writing the file anyway (question and recommendation in the ticket).
-  Once decided, the `rec_array_basic` and `rec_array_object_field` fixtures still need their write directions tested.
 
 ## Follow-up
 

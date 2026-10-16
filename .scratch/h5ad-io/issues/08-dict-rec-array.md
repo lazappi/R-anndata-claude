@@ -1,6 +1,6 @@
 # Dict and rec-array
 
-Status: needs-info
+Status: ready-for-agent
 Type: task
 Blocked by: 05, 06
 
@@ -24,6 +24,13 @@ Register `dict` 0.1.0 and `rec-array` 0.2.0.
   Write with rhdf5's compound writer, sizing fixed-length string fields to the longest value in bytes.
 - Round-trip tests compare field values in every direction (Python → R → Python with Python's own comparison of the field values), with an explicit, narrowly scoped relaxation of Structural equivalence for rec-array field types
 - Document the deviation in the help pages
+
+## Decisions (human, 2026-10-16)
+
+- Keep the error on write for string fields with non-ASCII text, because Python cannot read them back (ADR 0005 promises that Python reads every R-written `rec-array`).
+  h5ad-io/15 lifts it.
+- For `rec_array_basic` and `rec_array_object_field`, the R write direction tests that writing raises `anndata_io_registry_error`, and the Python to R direction is tested as before
+- `dataset_kwargs` for rec-arrays and rec-arrays with no rows move to h5ad-io/15
 
 ## Comments
 
