@@ -1,0 +1,89 @@
+---
+title: "Getting started with anndata.claude"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Getting started with anndata.claude}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+```
+
+anndata.claude is an R port of Python anndata.
+Its first priority is that `.h5ad` files round trip between R and Python.
+
+```{r library}
+library(anndata.claude)
+```
+
+## Create an AnnData
+
+An `AnnData` holds a matrix `X` with observations (`obs`) as rows and variables (`var`) as columns.
+
+```{r create}
+X <- matrix(as.numeric(1:12), nrow = 3)
+obs <- data.frame(
+  cell_type = c("T", "B", "T"),
+  row.names = c("cell1", "cell2", "cell3")
+)
+var <- data.frame(
+  highly_variable = c(TRUE, FALSE, TRUE, FALSE),
+  row.names = c("gene1", "gene2", "gene3", "gene4")
+)
+adata <- AnnData(X, obs = obs, var = var)
+adata
+```
+
+## Assign Slots
+
+Annotations are aligned to `obs` or `var` and are kept in `obsm`, `varm`, `obsp`, `varp` and `layers`.
+Unstructured data goes in `uns`.
+
+```{r slots}
+adata$obsm[["pca"]] <- matrix(c(0.1, 0.2, 0.3, 1, 2, 3), nrow = 3)
+adata$layers[["counts"]] <- X * 2
+adata$uns[["note"]] <- "example"
+adata$obs[["batch"]] <- c("a", "a", "b")
+adata
+```
+
+## Subset
+
+Indexing is 1-based, and negative indices exclude.
+
+```{r subset}
+adata[1:2, ]
+adata[-1, c("gene1", "gene3")]$shape
+```
+
+## Write and read h5ad
+
+```{r h5ad}
+path <- tempfile(fileext = ".h5ad")
+write_h5ad(adata, path)
+roundtrip <- read_h5ad(path)
+roundtrip
+identical(roundtrip$obs_names, adata$obs_names)
+```
+
+Use `compression = "gzip"` to compress datasets, and `as_sparse` in `read_h5ad()` to read a dense `X` as a sparse matrix.
+
+## Move a file to Python and back
+
+The file written above can be read by Python anndata directly.
+These chunks need Python so they are shown but not run.
+
+```{python python-read, eval = FALSE, python.reticulate = FALSE}
+import anndata as ad
+
+adata = ad.read_h5ad("example.h5ad")
+adata.obs["from_python"] = True
+adata.write_h5ad("from-python.h5ad")
+```
+
+```{r read-back, eval = FALSE}
+back <- read_h5ad("from-python.h5ad")
+back$obs[["from_python"]]
+```

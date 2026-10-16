@@ -70,6 +70,8 @@ The human owns the order of the Queue.
 
 - [ ] The cellxgene PBMC 3k file (the real-world test download) is in a legacy format that `read_h5ad()` rejects (`anndata_legacy_format_error`, unencoded root Element), so the test reads a Python rewrite of it, reading the original needs the `legacy-formats` sub-project
 
+- [ ] Coverage is 83.11% (target 90%) and likely understated: `R/io-values-mapping.R` shows 0% and `R/io-sparse.R` 11.8% despite passing tests, probably because the element registry holds uninstrumented function copies under covr. Confirm, fix the measurement or add tests, then finish h5ad-io/14 (vignette itself is done and passes check)
+
 ## Blocked
 
 ## Follow-up

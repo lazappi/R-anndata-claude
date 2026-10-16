@@ -1,6 +1,6 @@
 # Package vignette
 
-Status: ready-for-agent
+Status: in-progress
 Type: task
 Blocked by: 12, core-object/16
 
@@ -29,4 +29,12 @@ Also needed: `VignetteBuilder: knitr` in `DESCRIPTION` (knitr and rmarkdown are 
 Question: install pandoc (e.g. `brew install pandoc`), or switch to a pandoc-free engine such as `litedown` (a new dependency, not covered by the spec)?
 Recommended: install pandoc.
 The work is in `git stash` named "h5ad-io/14: vignette" (the vignette file and the `DESCRIPTION` change).
-Not done yet: coverage check (`scripts/check.sh --coverage`, target 90%) and the exported-function documentation audit.
+2026-10-16 (later run): popped the stash, added `python.reticulate = FALSE` to the Python chunk (knitr otherwise needs reticulate even with `eval = FALSE`).
+Full `scripts/check.sh` passes with no NOTE, and reviewer passed the vignette, `DESCRIPTION` and docs parts.
+All 7 exports are documented.
+Coverage is 83.11% (target 90%), so the ticket stays `in-progress`.
+Lowest: `R/io-values-mapping.R` 0%, `R/io-sparse.R` 11.8%, `R/io-values-categorical.R` 19%, though their tests run (no skips).
+Suspected cause: encodings register their functions in the registry at top level, and covr instruments the namespace copies, so the registry calls uninstrumented originals.
+Next run: confirm that, then fix the measurement (e.g. look functions up by name at call time) or add tests, and re-measure before setting `done` and bumping the version.
+
+(Earlier note) Not done yet: coverage check (`scripts/check.sh --coverage`, target 90%) and the exported-function documentation audit.
