@@ -115,6 +115,7 @@ The governing rule is that R writes what the reference environment writes for th
   `bit64` is not a dependency, and the On-disk dtype record restores int64 or uint64 on write (decided in the encoding table).
 - R's `NA_integer_` shares its bit pattern with the int32 value -2147483648.
   An int32 dataset containing that value is read as double (keeping the int32 record so it writes back unchanged), never as `NA`.
+- Unsorted sparse indices are sorted on read and so written back sorted (ADR 0006)
 - `write_csr_csc_indices_with_min_possible_dtype` is honoured (`methods.py:867-968`)
 - The mechanism (attributes, a wrapper class or similar) is an implementation choice.
   It must survive the operations in `core-object` (subset, copy, transpose) and must be invisible to normal use: arithmetic and printing behave as with an ordinary R vector or matrix.
