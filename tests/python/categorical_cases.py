@@ -121,8 +121,59 @@ def rename_case():
     return out
 
 
+def rename_uns_case():
+    """Scanpy-style uns entries whose rec-array fields are named by category."""
+    handler = Capture()
+    handler.setLevel(logging.WARNING)
+    anndata_logger.addHandler(handler)
+
+    def rec(names):
+        return np.rec.fromarrays(
+            [np.array([i + 1.0, i + 2.0]) for i in range(len(names))],
+            names=names,
+        )
+
+    obs = pd.DataFrame(
+        {"s": pd.Categorical(["a", "b", "c", "a", "b", "c"])},
+        index=[f"o{i}" for i in range(6)],
+    )
+    adata = ad.AnnData(np.zeros((6, 3)), obs=obs)
+    adata.uns["match"] = {
+        "params": {"groupby": "s"},
+        "names": rec(["a", "b", "c"]),
+        "scores": rec(["a", "b", "c"]),
+        "stale": rec(["x", "y", "z"]),
+        "plain": np.array([1.0, 2.0]),
+    }
+    adata.uns["other_group"] = {
+        "params": {"groupby": "t"},
+        "names": rec(["a", "b", "c"]),
+    }
+    adata.uns["bad_params"] = {"params": "x", "names": rec(["a", "b", "c"])}
+    adata.uns["no_params"] = {"names": rec(["a", "b", "c"])}
+    adata.uns["not_dict"] = rec(["a", "b", "c"])
+    adata.rename_categories("s", ["X", "Y", "Z"])
+    anndata_logger.removeHandler(handler)
+
+    def names(v):
+        return list(v.dtype.names)
+
+    return {
+        "match": {k: names(v) for k, v in adata.uns["match"].items() if k != "params" and v.dtype.names},
+        "other_group": names(adata.uns["other_group"]["names"]),
+        "no_params": names(adata.uns["no_params"]["names"]),
+        "bad_params": names(adata.uns["bad_params"]["names"]),
+        "not_dict": names(adata.uns["not_dict"]),
+        "warnings": list(handler.messages),
+    }
+
+
 if __name__ == "__main__":
-    result = {"convert": convert_case(), "rename": rename_case()}
+    result = {
+        "convert": convert_case(),
+        "rename": rename_case(),
+        "rename_uns": rename_uns_case(),
+    }
     with open(sys.argv[1], "w") as f:
         json.dump(result, f, indent=2)
         f.write("\n")

@@ -480,5 +480,47 @@
       "error": "ValueError",
       "message": "Only list-like `categories` is supported."
     }
+  },
+  "rename_uns": {
+    "match": {
+      "names": [
+        "X",
+        "Y",
+        "Z"
+      ],
+      "scores": [
+        "X",
+        "Y",
+        "Z"
+      ],
+      "stale": [
+        "x",
+        "y",
+        "z"
+      ]
+    },
+    "other_group": [
+      "a",
+      "b",
+      "c"
+    ],
+    "no_params": [
+      "a",
+      "b",
+      "c"
+    ],
+    "bad_params": [
+      "a",
+      "b",
+      "c"
+    ],
+    "not_dict": [
+      "a",
+      "b",
+      "c"
+    ],
+    "warnings": [
+      "Omitting match/stale as old categories do not match."
+    ]
   }
 }

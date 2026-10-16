@@ -1,6 +1,6 @@
 # strings_to_categoricals and rename_categories
 
-Status: in-progress
+Status: done
 Type: task
 Blocked by: 07
 
@@ -26,3 +26,8 @@ Blocked by: 07
 - Python's `rename_categories` does NOT touch `uns[key + "_colors"]`, despite the docstring
 - Remaining: the scanpy `uns[k]$params$groupby == key` rec-array field renaming, plus the `Omitting {k1}/{k2} as old categories do not match.` log warning at WARNING level. Needs the rec-array R structure from h5ad-io/08, so the ticket stays `in-progress`.
 - Views do not exist yet, so Python's view behaviour (implicit modification warning, backed view `RuntimeError`) is not covered
+
+2026-10-16: Done the scanpy `uns` rec-array renaming (`rename_uns_rec_arrays()` in `R/categoricals.R`, Python expectations `rename_uns` in `categorical_cases.py`).
+- A rec-array under an entry with `params$groupby == key` has its field names replaced when they equal the old levels, otherwise it warns with class `anndata_rec_array_categories_mismatch_warning` (Python `logger.warning`)
+- A non-list `params` is ignored, as in Python
+- All acceptance criteria are met, so `Status: done`

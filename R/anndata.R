@@ -524,6 +524,13 @@ AnnDataClass <- R6Class(
         rlang::caller_env()
       )
       private[[paste0(".", renamed$attr)]] <- renamed$frame
+      private$.uns <- rename_uns_rec_arrays(
+        private$.uns,
+        key,
+        renamed$old,
+        renamed$new,
+        rlang::caller_env()
+      )
       invisible(self)
     },
     #' @description The data matrix X, or a layer, as a dense `data.frame`

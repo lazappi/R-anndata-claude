@@ -185,6 +185,64 @@ test_that("rename_categories errors by class", {
   expect_equal(levels(adata$obs$s), c("a", "b", "c"))
 })
 
+# Python renames the rec-array fields of scanpy-style uns entries (where
+# params$groupby is the key) if they match the old categories, else warns
+test_that("rename_categories renames scanpy uns rec-arrays like Python", {
+  case <- cases()$rename_uns
+  rec <- function(names) {
+    fields <- lapply(seq_along(names), function(i) c(i + 1, i + 2))
+    new_rec_array(as.data.frame(stats::setNames(fields, names)))
+  }
+  abc <- c("a", "b", "c")
+  adata <- AnnData(
+    matrix(0, 6, 3),
+    obs = data.frame(
+      s = factor(rep(abc, 2)),
+      row.names = paste0("o", 1:6)
+    ),
+    uns = list(
+      match = list(
+        params = list(groupby = "s"),
+        names = rec(abc),
+        scores = rec(abc),
+        stale = rec(c("x", "y", "z")),
+        plain = c(1, 2)
+      ),
+      other_group = list(params = list(groupby = "t"), names = rec(abc)),
+      bad_params = list(params = "x", names = rec(abc)),
+      no_params = list(names = rec(abc)),
+      not_dict = rec(abc)
+    )
+  )
+  warnings <- list()
+  withCallingHandlers(
+    adata$rename_categories("s", c("X", "Y", "Z")),
+    anndata_rec_array_categories_mismatch_warning = function(w) {
+      warnings[[length(warnings) + 1L]] <<- conditionMessage(w)
+      rlang::cnd_muffle(w)
+    }
+  )
+  uns <- adata$uns
+  expect_equal(names(uns$match$names), unlist(case$match$names))
+  expect_equal(names(uns$match$scores), unlist(case$match$scores))
+  expect_equal(names(uns$match$stale), unlist(case$match$stale))
+  expect_equal(names(uns$other_group$names), unlist(case$other_group))
+  expect_equal(names(uns$no_params$names), unlist(case$no_params))
+  expect_equal(names(uns$bad_params$names), unlist(case$bad_params))
+  expect_equal(names(uns$not_dict), unlist(case$not_dict))
+  expect_equal(uns$match$names$X, c(2, 3))
+  expect_equal(unlist(warnings), unlist(case$warnings))
+
+  # Python looks in var too when the key is not in obs
+  var_adata <- AnnData(
+    matrix(0, 1, 3),
+    var = data.frame(g = factor(abc), row.names = abc),
+    uns = list(res = list(params = list(groupby = "g"), names = rec(abc)))
+  )
+  var_adata$rename_categories("g", c("X", "Y", "Z"))
+  expect_equal(names(var_adata$uns$res$names), c("X", "Y", "Z"))
+})
+
 # Python's natsort puts digit runs in numeric order and uppercase first
 test_that("natural_order sorts like natsort", {
   x <- c("c10", "c2", "c1", "10a", "2a", "a", "B", "A", "b", "a1", "a1b")

@@ -35,9 +35,9 @@ The human owns the order of the Queue.
 - [x] core-object/11: copy and transpose (`.scratch/core-object/issues/11-copy-and-transpose.md`)
 - [x] core-object/12: obs_names_make_unique and var_names_make_unique (`.scratch/core-object/issues/12-make-unique.md`)
 - [x] core-object/13: to_df, obs_vector, var_vector and key methods (`.scratch/core-object/issues/13-data-access-methods.md`)
-- [ ] core-object/14: strings_to_categoricals and rename_categories (`.scratch/core-object/issues/14-categorical-methods.md`)
+- [x] core-object/14: strings_to_categoricals and rename_categories (`.scratch/core-object/issues/14-categorical-methods.md`)
   - [x] `strings_to_categoricals` and `rename_categories` on obs and var
-  - [ ] `rename_categories` renaming of scanpy `uns` rec-array fields (needs rec-array structure from h5ad-io/08)
+  - [x] `rename_categories` renaming of scanpy `uns` rec-array fields (needs rec-array structure from h5ad-io/08)
 - [x] core-object/15: printing (`.scratch/core-object/issues/15-printing.md`)
 - [x] core-object/16: R generics and comparison error (`.scratch/core-object/issues/16-generics-and-comparison.md`)
 - [x] h5ad-io/03: element registry and error classes (`.scratch/h5ad-io/issues/03-element-registry.md`)

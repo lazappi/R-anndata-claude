@@ -102,7 +102,40 @@ rename_frame_categories <- function(obs, var, key, categories, call) {
   if (anyDuplicated(categories)) {
     abort_invalid_argument("Categories must be unique.", call)
   }
+  old <- levels(column)
   levels(column) <- categories
   frame[[key]] <- column
-  list(attr = attr, frame = frame)
+  list(attr = attr, frame = frame, old = old, new = categories)
+}
+
+# Scanpy stores per-group results (e.g. `rank_genes_groups`) as rec-arrays named
+# by category in a `uns` entry whose `params$groupby` is the renamed key. Like
+# Python, a rec-array whose fields are not the old categories is left alone with
+# a warning
+rename_uns_rec_arrays <- function(uns, key, old, new, call) {
+  for (k1 in names(uns)) {
+    entry <- uns[[k1]]
+    params <- if (is.list(entry) && !is.object(entry)) entry[["params"]]
+    groupby <- if (is.list(params) && !is.object(params)) params[["groupby"]]
+    if (!rlang::is_string(groupby) || groupby != key) {
+      next
+    }
+    for (k2 in names(entry)) {
+      value <- entry[[k2]]
+      if (!inherits(value, rec_array_class)) {
+        next
+      }
+      if (identical(names(value), old)) {
+        names(value) <- new
+        uns[[k1]][[k2]] <- value
+      } else {
+        anndata_warn(
+          "Omitting {k1}/{k2} as old categories do not match.",
+          "anndata_rec_array_categories_mismatch_warning",
+          call = call
+        )
+      }
+    }
+  }
+  uns
 }

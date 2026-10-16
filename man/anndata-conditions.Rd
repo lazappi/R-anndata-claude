@@ -38,6 +38,9 @@ Python's categories map to these classes:\tabular{ll}{
 }
 
 
+A Python \code{logger.warning} call becomes an \code{anndata_warning} subclass named
+for the situation too, and \code{logger.info} is signalled as the (silent unless
+handled) condition \code{anndata_info_message}.
 A Python \code{UserWarning} becomes an \code{anndata_warning} subclass named for the
 situation (e.g. \code{anndata_names_not_unique_warning}), and any other Python
 error becomes an \code{anndata_error} subclass named likewise.

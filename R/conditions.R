@@ -21,6 +21,9 @@
 #' | values do not fit an On-disk dtype | `anndata_dtype_overflow_error` |
 #' | dataset is not an integer or float | `anndata_dtype_error` |
 #'
+#' A Python `logger.warning` call becomes an `anndata_warning` subclass named
+#' for the situation too, and `logger.info` is signalled as the (silent unless
+#' handled) condition `anndata_info_message`.
 #' A Python `UserWarning` becomes an `anndata_warning` subclass named for the
 #' situation (e.g. `anndata_names_not_unique_warning`), and any other Python
 #' error becomes an `anndata_error` subclass named likewise.
