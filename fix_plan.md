@@ -54,7 +54,6 @@ The human owns the order of the Queue.
 - [x] h5ad-io/11: read_h5ad and write_h5ad options (`.scratch/h5ad-io/issues/11-read-write-options.md`)
 - [x] h5ad-io/12: realistic and compressed fixtures (`.scratch/h5ad-io/issues/12-realistic-fixtures.md`)
 - [x] h5ad-io/13: real-world file test (`.scratch/h5ad-io/issues/13-real-world-file.md`)
-- [ ] h5ad-io/14: package vignette (`.scratch/h5ad-io/issues/14-vignette.md`)
 
 ## Discovered
 
@@ -71,6 +70,8 @@ The human owns the order of the Queue.
 - [ ] The cellxgene PBMC 3k file (the real-world test download) is in a legacy format that `read_h5ad()` rejects (`anndata_legacy_format_error`, unencoded root Element), so the test reads a Python rewrite of it, reading the original needs the `legacy-formats` sub-project
 
 ## Blocked
+
+- [ ] h5ad-io/14: package vignette (`.scratch/h5ad-io/issues/14-vignette.md`), `pandoc` is not installed so the vignette cannot build, work is in the stash "h5ad-io/14: vignette"
 
 ## Follow-up
 
