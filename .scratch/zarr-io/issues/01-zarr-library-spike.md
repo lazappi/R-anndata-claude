@@ -1,6 +1,6 @@
 # zarr library spike
 
-Status: needs-info
+Status: ready-for-agent
 Type: research
 Blocked by: none
 
@@ -48,6 +48,9 @@ Also recommend:
   Declare any codec package the chosen library needs (`blosc` in Suggests, with a classed error naming the package when a blosc chunk is read without it).
 - Restore the verdict tests with `git stash pop` (stash "zarr-io/01: pizzarr verdict tests") and adapt them to the chosen library
 - Note in the findings which gaps remain for v3 strings, 0-d arrays, writing shards and zip stores, since those decide how much of our own code is needed
+- Skip pizzarr main (it needs a Rust toolchain, too heavy a requirement for source installs).
+  Compare Rarr devel and zarr main, and keep the pizzarr 0.2.1 results for comparison, noting that pizzarr main was not tested and why.
+  If a candidate cannot be installed or run, record that as its verdict and carry on with the others rather than blocking the ticket.
 
 ## Comments
 
