@@ -1,7 +1,11 @@
 #!/usr/bin/env bash
 # Run the Ralph loop: one fresh Claude Code run per item in fix_plan.md.
 #
-# Usage: scripts/ralph.sh [max_runs]
+# Usage: scripts/ralph.sh [--resume [message]] [max_runs]
+#
+# --resume first resumes the session of the most recent run (for example one that
+# stopped with uncommitted changes or a question), passing it the optional message
+# (such as the human's decisions), then starts up to max_runs new runs.
 #
 # Stops when:
 #   - a STOP file exists at the repository root (create it to stop after the current run)
@@ -34,6 +38,17 @@ cd "$ROOT" || exit 1
 # Keep the Mac awake (idle sleep, and system sleep on power) until this script exits.
 # Closing a laptop lid still sleeps it unless it is on power with an external display.
 caffeinate -i -s -w $$ &
+
+RESUME=""
+RESUME_MESSAGE=""
+if [ "${1:-}" = "--resume" ]; then
+    RESUME=1
+    shift
+    if [ -n "${1:-}" ] && ! [[ "$1" =~ ^[0-9]+$ ]]; then
+        RESUME_MESSAGE="$1"
+        shift
+    fi
+fi
 
 MAX_RUNS="${1:-${RALPH_MAX_RUNS:-20}}"
 MAX_IDLE="${RALPH_MAX_IDLE:-3}"
@@ -95,6 +110,35 @@ resume_after_limit() {
     done
     return 0
 }
+
+# Resume the most recent run's session on request
+if [ -n "$RESUME" ]; then
+    last="$(/bin/ls -t "$LOG_DIR"/*.jsonl 2>/dev/null | head -n 1)"
+    session="$(grep -a -o '"session_id":"[^"]*"' "$last" 2>/dev/null | tail -n 1 | cut -d'"' -f4)"
+    if [ -z "$session" ]; then
+        echo "No session found to resume in ${last:-$LOG_DIR}"
+        exit 1
+    fi
+    log="${last%.jsonl}-resume-$(date +%H%M%S).jsonl"
+    echo "=== Resuming session $session ($(date '+%F %T')) log: $log"
+    prompt="Your previous run stopped before the item was finished. Continue the same item following PROMPT.md: check git status and the ticket, finish the work, pass the checks and review, then do the bookkeeping and commit."
+    [ -n "$RESUME_MESSAGE" ] && prompt="$prompt
+
+Message from the human: $RESUME_MESSAGE"
+    run_claude "$log" --resume "$session" <<<"$prompt"
+    python3 scripts/ralph-log.py summary "$log"
+    python3 scripts/ralph-log.py denials "$log"
+    resume_after_limit "$log" || exit 1
+    if [ -n "$(git status --porcelain)" ]; then
+        echo "The resumed run left uncommitted changes, stopping. Inspect and commit or discard."
+        git status --short
+        exit 1
+    fi
+    if [ -f .ralph/halt ]; then
+        echo "Loop halted: $(cat .ralph/halt)"
+        exit 0
+    fi
+fi
 
 # Recover from a previous invocation that stopped on a usage limit mid-run
 if [ -n "$(git status --porcelain)" ]; then

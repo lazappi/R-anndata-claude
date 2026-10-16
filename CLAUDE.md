@@ -31,6 +31,7 @@ Single-context: one `CONTEXT.md` plus `docs/adr/` at the repo root. See `docs/ag
 - Loop runs use `ralph/settings.json` (Sonnet, no plugins, project subagents only, no edits to specs, ADRs or loop config)
 - Project subagents are defined in `.claude/agents/`: `searcher` and `checker` (Haiku), and `python-oracle` and `reviewer` (Sonnet)
 - Create a `STOP` file at the root to stop the loop after the current run
+- `scripts/ralph.sh --resume "<message>" <runs>` resumes the last run's session with a message (such as decisions), then continues the loop
 - Versions use tidyverse-style development numbers (`0.0.0.9000`), bumped by one and tagged `v<version>` only when a ticket is done
 
 ## Build, test and learnings
