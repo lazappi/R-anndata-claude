@@ -66,6 +66,11 @@ The human owns the order of the Queue.
   - [x] nullable arrays, categorical, dataframe and dict
   - [x] rec-array: zarr `table_read`/`table_write` for the v3 `struct` data type (own chunk packing, zstd via Rarr), three round-trip directions on the `rec_array_*` fixtures
 - [ ] zarr-io/08: read_zarr, write_zarr and settings (`.scratch/zarr-io/issues/08-read-write-zarr.md`)
+  - [x] `read_zarr()`, `write_zarr()`, `adata$write_zarr()`, `chunks`, settings, whole-AnnData round trips and cross-format checks
+  - [ ] dataset arguments: compression (`compressor`/`compressors` with zstd, gzip, blosc) and `shards` (the sharding itself is ticket 09), dropped for scalars and nulls
+  - [ ] Python's warning for `zarr_write_format = 2` (writing v2 is ticket 11) and the zarr `unwriteable` details
+  - [ ] vignette-independent NEWS entry for zarr, and the settings help text once sharding is written
+  - [ ] `read_elem()`/`write_elem()` tests on zarr groups with a path and error parity with h5ad (forward slashes, bad keys)
 - [ ] zarr-io/09: writing sharded zarr v3 (`.scratch/zarr-io/issues/09-zarr-shard-writing.md`)
 - [ ] zarr-io/10: reading zarr v2 (`.scratch/zarr-io/issues/10-zarr-v2-read.md`)
 - [ ] zarr-io/11: writing zarr v2 (`.scratch/zarr-io/issues/11-zarr-v2-write.md`)

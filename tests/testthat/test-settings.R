@@ -4,7 +4,9 @@ defaults <- list(
   allow_write_nullable_strings = NULL,
   disallow_forward_slash_in_h5ad = TRUE,
   write_csr_csc_indices_with_min_possible_dtype = FALSE,
-  restrict_index_types = TRUE
+  restrict_index_types = TRUE,
+  zarr_write_format = 3L,
+  auto_shard_zarr_v3 = TRUE
 )
 
 # Defaults must match Python's anndata.settings

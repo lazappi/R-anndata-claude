@@ -661,6 +661,12 @@ AnnDataClass <- R6Class(
     write_h5ad = function(filename, ...) {
       write_h5ad(self, filename, ...)
     },
+    #' @description Writes the object to a zarr store, see [write_zarr()].
+    #' @param store Path of the zarr directory store.
+    #' @param ... Further arguments of [write_zarr()].
+    write_zarr = function(store, ...) {
+      write_zarr(self, store, ...)
+    },
     #' @description Whether the object holds a value that cannot be written to
     #'   disk, see [write_h5ad()].
     #' @param store_type `NULL`, `"h5"` or `"zarr"`.

@@ -2,20 +2,28 @@
 
 Usage: compare.py <a.h5ad> <b.h5ad> [<a.h5ad> <b.h5ad> ...]
 
-Several pairs share one process because importing anndata is slow. Every pair
+A path that is a directory is read as a zarr store. Several pairs share one process because importing anndata is slow. Every pair
 is compared, the differences are printed on stderr and make the exit status
 non-zero.
 """
 
+import os
 import sys
 
 import anndata
 from anndata.tests.helpers import assert_equal
 
 
+def read(path):
+    # A directory is a zarr store
+    if os.path.isdir(path):
+        return anndata.read_zarr(path)
+    return anndata.read_h5ad(path)
+
+
 def compare(a_path, b_path):
-    a = anndata.read_h5ad(a_path)
-    b = anndata.read_h5ad(b_path)
+    a = read(a_path)
+    b = read(b_path)
     try:
         assert_equal(a, b)
     except AssertionError as err:

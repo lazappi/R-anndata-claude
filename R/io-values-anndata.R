@@ -86,6 +86,10 @@ write_x_elem <- function(group, x, name, dataset_kwargs, call) {
   if (name %in% dataset_kwargs$as_dense && methods::is(x, "sparseMatrix")) {
     x <- densify(x)
   }
+  # `chunks` applies to a dense X only, as in Python's `write_zarr`
+  if (!identical(name, "X") || methods::is(x, "sparseMatrix")) {
+    dataset_kwargs$chunks <- NULL
+  }
   write_elem(group, "X", x, dataset_kwargs, call)
 }
 
@@ -105,6 +109,8 @@ write_anndata <- function(store, key, value, dataset_kwargs, path) {
   if (!is.null(value$X)) {
     write_x_elem(group, value$X, "X", dataset_kwargs, call)
   }
+  # Only X takes the `chunks` argument
+  dataset_kwargs$chunks <- NULL
   slots <- list(
     obs = value$obs,
     var = value$var,
@@ -120,6 +126,9 @@ write_anndata <- function(store, key, value, dataset_kwargs, path) {
   }
   if (!is.null(value$raw)) {
     write_elem(group, "raw", value$raw, dataset_kwargs, call)
+  } else if (inherits(group, "zarr_node")) {
+    # Python writes a missing raw as a null Element in zarr, not in h5ad
+    write_elem(group, "raw", NULL, dataset_kwargs, call)
   }
   invisible(NULL)
 }

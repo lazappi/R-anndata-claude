@@ -141,7 +141,9 @@ zarr_abs_path <- function(store, name) {
     paste(store$path, name, sep = "/")
   }
   parts <- strsplit(parts, "/", fixed = TRUE)[[1L]]
-  paste0("/", paste(parts[nzchar(parts)], collapse = "/"))
+  # `.` is the node itself
+  parts <- parts[nzchar(parts) & parts != "."]
+  paste0("/", paste(parts, collapse = "/"))
 }
 
 # Whether the node holds metadata, matching the case of every name (a

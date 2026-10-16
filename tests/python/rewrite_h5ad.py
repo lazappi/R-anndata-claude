@@ -2,11 +2,15 @@
 
 Usage: rewrite_h5ad.py <in.h5ad> <out.h5ad> [<in.h5ad> <out.h5ad> ...]
 
+Zarr stores work too, a directory is read as one and an output ending in .zarr
+is written as one, so this also converts between the formats.
+
 Several pairs share one process because importing anndata is slow. Every pair
 is attempted, failures are reported on stderr and make the exit status
 non-zero.
 """
 
+import os
 import sys
 import traceback
 
@@ -14,7 +18,15 @@ import anndata
 
 
 def rewrite(in_path, out_path):
-    anndata.read_h5ad(in_path).write_h5ad(out_path)
+    # A directory is a zarr store, and an output ending in .zarr is written as one
+    if os.path.isdir(in_path):
+        adata = anndata.read_zarr(in_path)
+    else:
+        adata = anndata.read_h5ad(in_path)
+    if out_path.endswith(".zarr"):
+        adata.write_zarr(out_path)
+    else:
+        adata.write_h5ad(out_path)
 
 
 def main(paths):

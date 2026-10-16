@@ -372,9 +372,13 @@ expect_python_equal <- function(a, b) {
 
 # Python's read and write of many h5ad files in one Python process, returning
 # the paths of the rewritten files (in the temporary directory of the caller)
-python_rewrite_h5ad <- function(files, .local_envir = parent.frame()) {
+python_rewrite_h5ad <- function(
+  files,
+  ext = ".h5ad",
+  .local_envir = parent.frame()
+) {
   out_dir <- withr::local_tempdir(.local_envir = .local_envir)
-  rewritten <- file.path(out_dir, paste0(seq_along(files), ".h5ad"))
+  rewritten <- file.path(out_dir, paste0(seq_along(files), ext))
   run_python("rewrite_h5ad.py", as.vector(rbind(files, rewritten)))
   rewritten
 }

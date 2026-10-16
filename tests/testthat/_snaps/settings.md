@@ -10,6 +10,8 @@
         disallow_forward_slash_in_h5ad                 TRUE   Disallow `/` in keys for h5ad files
         write_csr_csc_indices_with_min_possible_dtype  FALSE  Write sparse indices with the minimum unsigned dtype
         restrict_index_types                           TRUE   Force string indices on creation and when setting obs/var
+        zarr_write_format                              3      Zarr format version written (2 is not yet supported)
+        auto_shard_zarr_v3                             TRUE   Shard zarr v3 arrays automatically (not yet written)
 
 ---
 
@@ -23,4 +25,6 @@
         disallow_forward_slash_in_h5ad                 TRUE   Disallow `/` in keys for h5ad files
         write_csr_csc_indices_with_min_possible_dtype  FALSE  Write sparse indices with the minimum unsigned dtype
         restrict_index_types                           TRUE   Force string indices on creation and when setting obs/var
+        zarr_write_format                              3      Zarr format version written (2 is not yet supported)
+        auto_shard_zarr_v3                             TRUE   Shard zarr v3 arrays automatically (not yet written)
 

@@ -34,14 +34,22 @@
 #'   string index upon creation of an `AnnData` or setting `obs`/`var`.
 #'   Setting this to `FALSE` allows other index types, but integer indices are
 #'   always converted to strings.
+#' * `zarr_write_format` (default `3`): The zarr format version that
+#'   [write_zarr()] writes.
+#'   Writing version 2 is not yet supported and raises
+#'   `anndata_not_supported_error`.
+#' * `auto_shard_zarr_v3` (default `TRUE`): Whether zarr v3 arrays are sharded
+#'   automatically, with a target of 1 GB uncompressed per shard.
+#'   An explicit `shards` dataset argument overrides it and it is ignored for
+#'   version 2.
+#'   Shards are not yet written, so for now this setting has no effect and R
+#'   writes unsharded arrays.
 #'
 #' @section Omitted settings:
 #' Python's `copy_on_write_X` is deprecated and always on upstream, so it is
 #' omitted (copy-on-write is the only behaviour).
 #' `use_sparse_array_on_read` is omitted because R has no distinction between
 #' scipy sparse matrices and sparse arrays.
-#' Settings for later sub-projects (such as `zarr_write_format`) are added by
-#' those sub-projects.
 #'
 #' @param new A named list of settings to override.
 #' @param code Code to run with the overridden settings.
@@ -102,6 +110,20 @@ setting_specs <- list(
     valid = setting_flag,
     expected = "`TRUE` or `FALSE`",
     description = "Force string indices on creation and when setting obs/var"
+  ),
+  zarr_write_format = list(
+    default = 3L,
+    valid = function(x) {
+      is.numeric(x) && length(x) == 1L && !is.na(x) && x %in% c(2, 3)
+    },
+    expected = "`2` or `3`",
+    description = "Zarr format version written (2 is not yet supported)"
+  ),
+  auto_shard_zarr_v3 = list(
+    default = TRUE,
+    valid = setting_flag,
+    expected = "`TRUE` or `FALSE`",
+    description = "Shard zarr v3 arrays automatically (not yet written)"
   )
 )
 

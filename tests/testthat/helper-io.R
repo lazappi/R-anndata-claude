@@ -134,3 +134,81 @@ h5_case_elem <- function(case, env = parent.frame()) {
   withr::defer(rhdf5::h5closeAll(), envir = env)
   read_elem(store, "x")
 }
+
+# The whole-AnnData fixture cases, shared by the h5ad and zarr tests
+adata_fixture_names <- c(
+  "anndata_full",
+  "anndata_no_raw",
+  "anndata_empty_slots",
+  "anndata_sparse_x",
+  "anndata_no_x",
+  "anndata_0_obs",
+  "anndata_0_vars",
+  "anndata_raw_own_var",
+  "anndata_raw_0_obs",
+  "anndata_raw_0_vars",
+  "realistic",
+  "realistic_csc",
+  "realistic_gzip",
+  "realistic_lzf"
+)
+
+adata_fixture_files <- function() {
+  fixture_path(file.path("h5ad", paste0(adata_fixture_names, ".h5ad")))
+}
+
+# AnnData objects built in R that cover the Slots, with alphabetical keys
+# because h5py lists the members of a dict that way
+r_built_adatas <- function() {
+  obs <- data.frame(
+    group = factor(c("a", "b", "a", "b")),
+    n = c(1, 2, 3, 4),
+    row.names = paste0("cell", 0:3)
+  )
+  var <- data.frame(
+    score = c(0.5, 1.5, 2.5),
+    row.names = paste0("gene", 0:2)
+  )
+  x <- matrix(as.numeric(1:12), 4)
+  sparse <- methods::as(
+    Matrix::sparseMatrix(
+      i = c(1, 3, 4),
+      j = c(1, 2, 3),
+      x = c(1, 2, 3),
+      dims = c(4, 3)
+    ),
+    "CsparseMatrix"
+  )
+  full <- AnnData(
+    X = x,
+    obs = obs,
+    var = var,
+    obsm = list(pca = matrix(as.numeric(1:8), 4)),
+    varm = list(load = matrix(as.numeric(1:6), 3)),
+    obsp = list(conn = matrix(as.numeric(1:16), 4)),
+    varp = list(corr = matrix(as.numeric(1:9), 3)),
+    layers = list(counts = sparse),
+    uns = list(note = "text", sub = list(k = c(1, 2, 3)))
+  )
+  with_raw <- full$copy()
+  with_raw$raw <- full
+  # Raw has a variable and a varm key that the object lacks
+  own_var <- AnnData(matrix(as.numeric(1:8), 4), obs = obs)
+  own_var$raw <- full
+  raw_zero_obs <- AnnData(matrix(0, 0, 3))
+  raw_zero_obs$raw <- raw_zero_obs
+  raw_zero_vars <- AnnData(matrix(0, 2, 0))
+  raw_zero_vars$raw <- raw_zero_vars
+  list(
+    full = full,
+    with_raw = with_raw,
+    raw_own_var = own_var,
+    raw_zero_obs = raw_zero_obs,
+    raw_zero_vars = raw_zero_vars,
+    sparse_x = AnnData(sparse),
+    no_x = AnnData(shape = c(2L, 3L)),
+    empty_slots = AnnData(matrix(0, 2, 3)),
+    zero_obs = AnnData(matrix(0, 0, 3)),
+    zero_vars = AnnData(matrix(0, 2, 0))
+  )
+}

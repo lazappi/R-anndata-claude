@@ -339,8 +339,8 @@ zarr_rarr_values <- function(values, dtype) {
   as.integer(values)
 }
 
-zarr_write_numeric <- function(dir, values, dtype, dims) {
-  chunk <- zarr_chunk_shape(dims)
+zarr_write_numeric <- function(dir, values, dtype, dims, chunk = NULL) {
+  chunk <- chunk %||% zarr_chunk_shape(dims)
   dir.create(dir, recursive = TRUE, showWarnings = FALSE)
   if (length(values) == 0L) {
     zarr_write_array_meta(dir, dtype, dims, chunk)
@@ -410,6 +410,28 @@ zarr_dims <- function(x, scalar) {
   if (scalar) numeric() else dim(x) %||% length(x)
 }
 
+# The chunk shape of the `chunks` dataset argument (Python's `chunks`), or
+# `NULL` for the default. A chunk larger than the array is cut to its shape.
+zarr_chunk_arg <- function(dataset_kwargs, dims, call) {
+  chunks <- dataset_kwargs$chunks
+  if (is.null(chunks) || length(dims) == 0L) {
+    return(NULL)
+  }
+  valid <- is.numeric(chunks) &&
+    length(chunks) == length(dims) &&
+    !anyNA(chunks) &&
+    all(chunks >= 1) &&
+    all(chunks == round(chunks))
+  if (!valid) {
+    abort_invalid_argument(
+      "{.arg chunks} must have one positive whole number for each of the
+       {length(dims)} dimension{?s} of the array.",
+      call
+    )
+  }
+  pmax(pmin(chunks, dims), 1)
+}
+
 zarr_array_dir <- function(loc, name) {
   zarr_require_v3(loc)
   zarr_key_dir(loc, name)
@@ -428,7 +450,13 @@ zarr_dataset_write <- function(loc, name, x, scalar, dataset_kwargs, call) {
       zarr_encode_values(values, dtype)
     )
   } else {
-    zarr_write_numeric(dir, values, dtype, dims)
+    zarr_write_numeric(
+      dir,
+      values,
+      dtype,
+      dims,
+      zarr_chunk_arg(dataset_kwargs, dims, call)
+    )
   }
   invisible(NULL)
 }
@@ -440,7 +468,13 @@ zarr_bool_write <- function(loc, name, x, scalar, call, dataset_kwargs) {
   if (scalar) {
     zarr_write_single(dir, "bool", dims, zarr_encode_values(values, "bool"))
   } else {
-    zarr_write_numeric(dir, values, "bool", dims)
+    zarr_write_numeric(
+      dir,
+      values,
+      "bool",
+      dims,
+      zarr_chunk_arg(dataset_kwargs, dims, call)
+    )
   }
   invisible(NULL)
 }

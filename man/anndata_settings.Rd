@@ -65,6 +65,16 @@ unsigned integer.
 string index upon creation of an \code{AnnData} or setting \code{obs}/\code{var}.
 Setting this to \code{FALSE} allows other index types, but integer indices are
 always converted to strings.
+\item \code{zarr_write_format} (default \code{3}): The zarr format version that
+\code{\link[=write_zarr]{write_zarr()}} writes.
+Writing version 2 is not yet supported and raises
+\code{anndata_not_supported_error}.
+\item \code{auto_shard_zarr_v3} (default \code{TRUE}): Whether zarr v3 arrays are sharded
+automatically, with a target of 1 GB uncompressed per shard.
+An explicit \code{shards} dataset argument overrides it and it is ignored for
+version 2.
+Shards are not yet written, so for now this setting has no effect and R
+writes unsharded arrays.
 }
 }
 
@@ -74,8 +84,6 @@ Python's \code{copy_on_write_X} is deprecated and always on upstream, so it is
 omitted (copy-on-write is the only behaviour).
 \code{use_sparse_array_on_read} is omitted because R has no distinction between
 scipy sparse matrices and sparse arrays.
-Settings for later sub-projects (such as \code{zarr_write_format}) are added by
-those sub-projects.
 }
 
 \examples{
