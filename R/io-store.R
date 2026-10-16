@@ -4,8 +4,8 @@
 #' Encodings (`R/io-*.R`) never call rhdf5 directly, they call the functions
 #' here, which dispatch on the class of the handle they are given to a backend
 #' (`store_backend()`).
-#' HDF5 (`h5_backend()`) and zarr (`zarr_backend()`, reading only so far) each
-#' have a list of the same operations.
+#' HDF5 (`h5_backend()`) and zarr (`zarr_backend()`, which writes v3 only so
+#' far) each have a list of the same operations.
 #'
 #' A `store` is an open file or group, and a `node` is an open group or array.
 #' Both are handles of the backend, and paths are absolute within the store.

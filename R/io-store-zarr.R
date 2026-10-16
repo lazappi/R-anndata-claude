@@ -2,6 +2,7 @@
 #'
 #' The read operations of [io-store] for a local zarr directory store, version 2
 #' or 3, sharded or not, consolidated or not, through Rarr.
+#' The write operations are in [io-store-zarr-write].
 #'
 #' A handle is a `zarr_node`: the store directory, the absolute path of the
 #' node within the store and the zarr format.
@@ -27,15 +28,23 @@ zarr_backend <- function() {
     is_file = function(store) identical(store$path, "/"),
     node_open = zarr_node_open,
     node_close = function(node) invisible(NULL),
+    group_create = zarr_group_create,
     group_root = function(store) zarr_node(store$root, "/", store$version),
     group_members = zarr_group_members,
     member_exists = zarr_member_exists,
+    member_delete = zarr_member_delete,
     attr_exists = function(node, name) name %in% names(zarr_attrs(node)),
     attr_read = zarr_attr_read,
+    attr_write = zarr_attr_write,
     array_info = zarr_info,
     array_read = zarr_array_read,
     dataset_read = zarr_dataset_read,
-    string_read = zarr_string_read
+    dataset_write = zarr_dataset_write,
+    bool_write = zarr_bool_write,
+    complex_write = zarr_complex_write,
+    string_write = zarr_string_write,
+    string_read = zarr_string_read,
+    null_write = zarr_null_write
   )
 }
 
@@ -180,7 +189,7 @@ zarr_attr_read <- function(node, name) {
     function(item) is.atomic(item) && length(item) == 1L,
     logical(1)
   )
-  if (all(scalar)) unlist(value) else value
+  if (all(scalar) && is.null(names(value))) unlist(value) else value
 }
 
 # The numpy-style dtype of a v2 array as the name v3 uses

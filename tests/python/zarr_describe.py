@@ -28,6 +28,8 @@ def to_json(value):
         return [to_json(v) for v in value]
     if isinstance(value, dict):
         return {k: to_json(v) for k, v in value.items()}
+    if isinstance(value, complex):
+        return [to_json(value.real), to_json(value.imag)]
     if isinstance(value, float) and not np.isfinite(value):
         return repr(value)
     return value

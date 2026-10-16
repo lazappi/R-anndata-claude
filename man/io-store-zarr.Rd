@@ -15,6 +15,7 @@ zarr_open(path, call = rlang::caller_env())
 \description{
 The read operations of \link{io-store} for a local zarr directory store, version 2
 or 3, sharded or not, consolidated or not, through Rarr.
+The write operations are in \link{io-store-zarr-write}.
 }
 \details{
 A handle is a \code{zarr_node}: the store directory, the absolute path of the
