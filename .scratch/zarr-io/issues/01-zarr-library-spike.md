@@ -1,6 +1,6 @@
 # zarr library spike
 
-Status: ready-for-agent
+Status: needs-info
 Type: research
 Blocked by: none
 
@@ -68,4 +68,20 @@ Questions for the human:
 2. Why does pizzarr not see `blosc` under `R CMD check`? Recommended next step: run the failing test under `R CMD check` with `loadNamespace("blosc")` printed (the output was not captured above) before deciding.
 3. Given the gaps (v3 strings, v3 scalars, sharding, empty v2 strings, consolidated writing), is pizzarr plus wrappers acceptable or should zarr-io go to fallback step 2 (own R implementation of the zarr subset, reusing pizzarr's codecs)? Recommended: pizzarr for metadata, groups, attributes and numeric chunks, and our own string and sharding codecs.
 
-Recommended answer to 1: accept `blosc` in Suggests only (v2 blosc reading and tests then skip when it is absent), pending the human's call.
+2026-10-16 (loop run, development versions)
+
+Blocked before any re-run work.
+Installed into the user library: Rarr 2.1.48 (Bioconductor devel, GitHub `devel`) and zarr 0.5.1.9000 (GitHub main).
+`remotes::install_github("zarr-developers/pizzarr")` (0.2.2) fails at configure: `rustc` not found on the PATH (needs rustc >= 1.91 and OpenSSL).
+The newest pizzarr therefore has a compiled Rust dependency, which is a new system requirement not covered by the spec or decisions.
+I did not install a Rust toolchain (it is a system-level change, and `which cargo rustup brew` was denied here).
+Questions for the human:
+
+1. Install Rust >= 1.91 (for example `brew install rust` or rustup) so the pizzarr main spike can run?
+2. Or is a pizzarr that needs a Rust toolchain unacceptable for the package (source installs for every user), in which case compare Rarr devel and zarr main only, or use pizzarr 0.2.1?
+
+Recommended: install Rust to test pizzarr main, but treat its Rust requirement as a verdict item (dependencies) in the findings.
+Nothing was changed in the repository besides this note.
+The stash `zarr-io/01: pizzarr verdict tests` is untouched.
+
+Recommended answer to 1 (earlier note): accept `blosc` in Suggests only (v2 blosc reading and tests then skip when it is absent), pending the human's call.
