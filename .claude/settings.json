@@ -88,7 +88,9 @@
       "Bash(_R_CHECK_SYSTEM_CLOCK_=false Rscript:*)",
       "Bash(/Users/luke/Documents/Code/lazappi/R-anndata-claude/scripts/check.sh:*)",
       "Bash(git stash push:*)",
-      "Bash(git stash pop)"
+      "Bash(git stash pop)",
+      "Bash(tar -tzf tests/testthat/fixtures/:*)",
+      "Bash(tar -xzf tests/testthat/fixtures/:*)"
     ]
   }
 }
