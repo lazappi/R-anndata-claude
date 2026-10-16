@@ -39,7 +39,8 @@ nullable_kind <- function(value, plain) {
   }
   switch(
     typeof(plain),
-    character = if (anyNA(plain) || !is.null(record)) {
+    # A `FALSE` record marks a string read from a plain `string-array`
+    character = if (anyNA(plain) || !is.null(record) && !isFALSE(record)) {
       "nullable-string-array"
     },
     logical = if (anyNA(plain) || !is.null(record)) "nullable-boolean",
@@ -89,8 +90,7 @@ write_nullable <- function(
       write_elem(store, key, as_array(plain), dataset_kwargs, call)
       return(invisible(NULL))
     }
-    record <- get_nullable(value)
-    if (identical(record, "NA")) {
+    if (identical(get_nullable(value), "NA")) {
       na_value <- "NA"
     }
   }

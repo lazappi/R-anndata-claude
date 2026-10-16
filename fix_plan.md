@@ -46,7 +46,7 @@ The human owns the order of the Queue.
 - [x] h5ad-io/06: nullable and categorical arrays (`.scratch/h5ad-io/issues/06-nullable-categorical.md`)
 - [x] h5ad-io/07: sparse matrices (`.scratch/h5ad-io/issues/07-sparse-matrices.md`)
 - [ ] h5ad-io/08: dict and rec-array (`.scratch/h5ad-io/issues/08-dict-rec-array.md`), implemented but blocked, see Blocked
-- [ ] h5ad-io/09: dataframe (`.scratch/h5ad-io/issues/09-dataframe.md`)
+- [x] h5ad-io/09: dataframe (`.scratch/h5ad-io/issues/09-dataframe.md`)
 - [ ] h5ad-io/10: AnnData and Raw, read_h5ad and write_h5ad basics (`.scratch/h5ad-io/issues/10-anndata-raw-roundtrip.md`)
 - [ ] h5ad-io/11: read_h5ad and write_h5ad options (`.scratch/h5ad-io/issues/11-read-write-options.md`)
 - [ ] h5ad-io/12: realistic and compressed fixtures (`.scratch/h5ad-io/issues/12-realistic-fixtures.md`)

@@ -79,4 +79,7 @@ Kept brief and current by the loop.
 - `h5ls` lists a dict's members alphabetically, so a dict reads back in that order, and `result[i] <- list(NULL)` is how to keep `NULL` members
 - Text in `abort_unwritable(path, what)` is plain, the braces of `what` are not interpolated by cli
 - `expect_structurally_equivalent(a, b, rec_array_paths =)` exempts only the dtype and digest of those datasets, and `expect_rec_array_values_equal()` compares field names, order and values through Python
+- Dataframes (`R/io-values-dataframe.R`): a non-string index lives in `metadata(df)$index_source`, and a string read from a plain `string-array` carries the nullable record `FALSE` (written back as `string-array`)
+- `expect_python_equal()` and `rewrite.py` differ in scope: the first compares whole AnnData files, the second rewrites with Python's default settings
+- A `local_anndata_settings()` call inside a test loop leaks to later iterations, so call it from a function run per case
 - Python is only used through `uv run --project tests/python ...`, in tests via `run_python()` which sets a private `TMPDIR` (uv lock files left in the check temp dir cause a NOTE)
