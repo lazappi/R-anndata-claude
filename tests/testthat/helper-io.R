@@ -19,6 +19,28 @@ local_h5_store <- function(env = parent.frame()) {
   fid
 }
 
+read_fixture_elem <- function(name, env = parent.frame()) {
+  store <- rhdf5::H5Fopen(fixture_path(file.path("h5ad", paste0(name, ".h5"))))
+  withr::defer(rhdf5::h5closeAll(), envir = env)
+  read_elem(store, "x")
+}
+
+# Writes `value` as an Element at `x` of a new file and returns the path
+write_fixture_like <- function(value, env = parent.frame()) {
+  path <- withr::local_tempfile(fileext = ".h5", .local_envir = env)
+  rhdf5::h5createFile(path)
+  store <- rhdf5::H5Fopen(path)
+  write_elem(store, "x", value)
+  rhdf5::h5closeAll()
+  path
+}
+
+read_written <- function(path) {
+  store <- rhdf5::H5Fopen(path)
+  on.exit(rhdf5::h5closeAll())
+  read_elem(store, "x")
+}
+
 # A trivial encoding `test-elem` 0.1.0, a group holding the attribute `n`, used
 # to test dispatch without any real encoding
 register_test_encoding <- function() {

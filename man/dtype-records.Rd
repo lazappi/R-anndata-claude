@@ -5,6 +5,8 @@
 \alias{get_dtype}
 \alias{set_dtype}
 \alias{drop_dtype}
+\alias{get_nullable}
+\alias{set_nullable}
 \alias{check_dtype_fits}
 \alias{write_dtype}
 \alias{sparse_write_dtypes}
@@ -17,6 +19,10 @@ get_dtype(x)
 set_dtype(x, dtype)
 
 drop_dtype(x)
+
+get_nullable(x)
+
+set_nullable(x, na_value = TRUE)
 
 check_dtype_fits(x, dtype, path, call = rlang::caller_env())
 
@@ -66,6 +72,13 @@ Plain vectors and arrays that carry a record also get the S3 class
 \code{anndata_typed}, whose print method hides the attribute, so they print and
 compute like ordinary R values.
 Subsetting, copy and transpose copy the record with \code{copy_dtype()}.
+
+The nullable record is the \code{anndata_nullable} attribute, set by the readers
+of \code{nullable-integer}, \code{nullable-boolean} and \code{nullable-string-array}.
+It makes the value write back as a nullable Element even when it holds no
+\code{NA}, as Python writes any pandas nullable array.
+For strings it holds the \code{na-value} attribute (\code{"NaN"} or \code{"NA"}), and it is
+\code{TRUE} for the other types.
 
 Reading with \code{read_dataset()} records the dtype only where it differs from
 the R type returned, which is \code{float64} for double and \code{int32} for integer.

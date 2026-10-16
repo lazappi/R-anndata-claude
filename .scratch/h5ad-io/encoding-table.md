@@ -144,6 +144,19 @@ Both are in the table's last rows, and are recorded in the fixtures manifest und
 | `array_uint64` | ndarray uint64 (3,) | array 0.2.0 | array 0.2.0: uint64 [3] = [1, 2, 3] |  |
 | `array_uint8` | ndarray uint8 (3,) | array 0.2.0 | array 0.2.0: uint8 [3] = [1, 2, 3] |  |
 | `bytes_scalar` |  | bytes 0.2.0 | bytes 0.2.0: string(fixed 9, ascii) [scalar] = ['raw bytes'] |  |
+| `categorical` | Categorical str | categorical 0.2.0 | {categories: string-array 0.2.0: string(variable, utf-8) [3] = ['c0', 'c1', 'c2']; codes: array 0.2.0: int8 [3] = [0, 1, 2]} | ordered=False (bool) |
+| `categorical_126` | Categorical str | categorical 0.2.0 | {categories: string-array 0.2.0: string(variable, utf-8) [126]; codes: array 0.2.0: int8 [3] = [0, 1, 125]} | ordered=False (bool) |
+| `categorical_127` | Categorical str | categorical 0.2.0 | {categories: string-array 0.2.0: string(variable, utf-8) [127]; codes: array 0.2.0: int16 [3] = [0, 1, 126]} | ordered=False (bool) |
+| `categorical_32767` | Categorical str | categorical 0.2.0 | {categories: string-array 0.2.0: string(variable, utf-8) [32767]; codes: array 0.2.0: int32 [3] = [0, 1, 32766]} | ordered=False (bool) |
+| `categorical_32768` | Categorical str | categorical 0.2.0 | {categories: string-array 0.2.0: string(variable, utf-8) [32768]; codes: array 0.2.0: int32 [3] = [0, 1, 32767]} | ordered=False (bool) |
+| `categorical_bool` | Categorical bool | categorical 0.2.0 | {categories: array 0.2.0: bool (enum int8: FALSE=0, TRUE=1) [2] = [False, True]; codes: array 0.2.0: int8 [3] = [1, 0, 1]} | ordered=False (bool) |
+| `categorical_empty` | Categorical str | categorical 0.2.0 | {categories: string-array 0.2.0: string(variable, utf-8) [2] = ['a', 'b']; codes: array 0.2.0: int8 [0] = []} | ordered=False (bool) |
+| `categorical_missing` | Categorical str | categorical 0.2.0 | {categories: string-array 0.2.0: string(variable, utf-8) [3] = ['c0', 'c1', 'c2']; codes: array 0.2.0: int8 [3] = [0, -1, 2]} | ordered=False (bool) |
+| `categorical_nonascii` | Categorical str | categorical 0.2.0 | {categories: string-array 0.2.0: string(variable, utf-8) [2] = ['é', '日本']; codes: array 0.2.0: int8 [3] = [0, 1, 0]} | ordered=False (bool) |
+| `categorical_numeric` | Categorical int64 | categorical 0.2.0 | {categories: array 0.2.0: int64 [3] = [0, 1, 2]; codes: array 0.2.0: int8 [3] = [0, 1, 2]} | ordered=False (bool) |
+| `categorical_one_level` | Categorical str | categorical 0.2.0 | {categories: string-array 0.2.0: string(variable, utf-8) [1] = ['a']; codes: array 0.2.0: int8 [1] = [0]} | ordered=False (bool) |
+| `categorical_ordered` | Categorical str | categorical 0.2.0 | {categories: string-array 0.2.0: string(variable, utf-8) [3] = ['c0', 'c1', 'c2']; codes: array 0.2.0: int8 [3] = [0, 1, 2]} | ordered=True (bool) |
+| `categorical_unused` | Categorical str | categorical 0.2.0 | {categories: string-array 0.2.0: string(variable, utf-8) [3] = ['a', 'b', 'unused']; codes: array 0.2.0: int8 [3] = [0, 1, 0]} | ordered=False (bool) |
 | `csc_bool` | csc_matrix bool, index int32 | csc_matrix 0.1.0 | {data: (none): bool (enum int8: FALSE=0, TRUE=1) [5] = [True, True, True, True, True]; indices: (none): int32 [5] = [1, 0, 2, 0, 2]; indptr: (none): int32 [5] = [0, 1, 2, 3, 5]} | shape=[3, 4] (int64) |
 | `csc_float32` | csc_matrix float32, index int32 | csc_matrix 0.1.0 | {data: (none): float32 [5] = [3.0, 1.0, 4.0, 2.0, 5.0]; indices: (none): int32 [5] = [1, 0, 2, 0, 2]; indptr: (none): int32 [5] = [0, 1, 2, 3, 5]} | shape=[3, 4] (int64) |
 | `csc_float64` | csc_matrix float64, index int32 | csc_matrix 0.1.0 | {data: (none): float64 [5] = [3.0, 1.0, 4.0, 2.0, 5.0]; indices: (none): int32 [5] = [1, 0, 2, 0, 2]; indptr: (none): int32 [5] = [0, 1, 2, 3, 5]} | shape=[3, 4] (int64) |
@@ -212,6 +225,17 @@ Both are in the table's last rows, and are recorded in the fixtures manifest und
 | `dict_nested` | dict | dict 0.1.0 | {a: array 0.2.0: float64 [2] = [1.0, 2.0]; n: numeric-scalar 0.2.0: int64 [scalar] = [3]; s: string 0.2.0: string(variable, utf-8) [scalar] = ['str']; sub: dict 0.1.0 {flag: numeric-scalar 0.2.0: bool (enum int8: FALSE=0, TRUE=1) [scalar] = [True]; names: string-array 0.2.0: string(variable, utf-8) [2] = ['x', 'y']}} |  |
 | `dict_with_null` | dict | dict 0.1.0 | {nothing: null 0.1.0: float32 [null dataspace]; x: numeric-scalar 0.2.0: float64 [scalar] = [1.0]} |  |
 | `null` | None | null 0.1.0 | null 0.1.0: float32 [null dataspace] |  |
+| `nullable_bool` | BooleanArray | nullable-boolean 0.1.0 | {mask: array 0.2.0: bool (enum int8: FALSE=0, TRUE=1) [3] = [False, True, False]; values: array 0.2.0: bool (enum int8: FALSE=0, TRUE=1) [3] = [True, False, False]} |  |
+| `nullable_bool_nomissing` | BooleanArray | nullable-boolean 0.1.0 | {mask: array 0.2.0: bool (enum int8: FALSE=0, TRUE=1) [2] = [False, False]; values: array 0.2.0: bool (enum int8: FALSE=0, TRUE=1) [2] = [True, False]} |  |
+| `nullable_int32_nomissing` | IntegerArray | nullable-integer 0.1.0 | {mask: array 0.2.0: bool (enum int8: FALSE=0, TRUE=1) [3] = [False, False, False]; values: array 0.2.0: int32 [3] = [1, 2, 3]} |  |
+| `nullable_int64` | IntegerArray | nullable-integer 0.1.0 | {mask: array 0.2.0: bool (enum int8: FALSE=0, TRUE=1) [3] = [False, True, False]; values: array 0.2.0: int64 [3] = [1, 0, 3]} |  |
+| `nullable_int8` | IntegerArray | nullable-integer 0.1.0 | {mask: array 0.2.0: bool (enum int8: FALSE=0, TRUE=1) [3] = [False, True, False]; values: array 0.2.0: int8 [3] = [1, 0, 3]} |  |
+| `nullable_int_empty` | IntegerArray | nullable-integer 0.1.0 | {mask: array 0.2.0: bool (enum int8: FALSE=0, TRUE=1) [0] = []; values: array 0.2.0: int32 [0] = []} |  |
+| `nullable_str` | StringArray | nullable-string-array 0.1.0 | {mask: array 0.2.0: bool (enum int8: FALSE=0, TRUE=1) [4] = [False, True, False, False]; values: string-array 0.2.0: string(variable, utf-8) [4] = ['a', '', 'bé', '']} | na-value='NaN' (str) |
+| `nullable_str_allow_nullable_false` | StringArray | string-array 0.2.0 | string-array 0.2.0: string(variable, utf-8) [3] = ['a', 'bé', ''] |  |
+| `nullable_str_nomissing` | StringArray | nullable-string-array 0.1.0 | {mask: array 0.2.0: bool (enum int8: FALSE=0, TRUE=1) [3] = [False, False, False]; values: string-array 0.2.0: string(variable, utf-8) [3] = ['a', 'bé', '']} | na-value='NaN' (str) |
+| `nullable_str_pdna` | StringArray | nullable-string-array 0.1.0 | {mask: array 0.2.0: bool (enum int8: FALSE=0, TRUE=1) [3] = [False, True, False]; values: string-array 0.2.0: string(variable, utf-8) [3] = ['a', '', '日本']} | na-value='NA' (str) |
+| `nullable_uint16` | IntegerArray | nullable-integer 0.1.0 | {mask: array 0.2.0: bool (enum int8: FALSE=0, TRUE=1) [3] = [False, True, False]; values: array 0.2.0: uint16 [3] = [1, 0, 3]} |  |
 | `rec_array_basic` | structured ndarray [i:int32, f:float64, fixed:\|S3, uni:<U3] | rec-array 0.2.0 | rec-array 0.2.0: compound(i:int32, f:float64, fixed:S3-ascii, uni:vlen-utf-8) [2] |  |
 | `rec_array_object_field` | structured ndarray [o:object, f:float64] | rec-array 0.2.0 | rec-array 0.2.0: compound(o:vlen-utf-8, f:float64) [2] |  |
 | `rec_array_rank_genes_groups` | structured ndarray [0:<U2, 1:<U2] | rec-array 0.2.0 | rec-array 0.2.0: compound(0:vlen-utf-8, 1:vlen-utf-8) [2] |  |
@@ -241,4 +265,5 @@ Both are in the table's last rows, and are recorded in the fixtures manifest und
 | `string_array_object` | ndarray object (4,) | string-array 0.2.0 | string-array 0.2.0: string(variable, utf-8) [4] = ['a', 'bé', '', '日本'] |  |
 | `df_col_nullable_float` |  | Python error | IORegistryError | No method registered for writing <class 'pandas.arrays.FloatingArray'> into <class 'h5py._hl.group.Group'> |
 | `df_col_str_na_allow_nullable_false` |  | Python error | ValueError | Cannot write `pd.arrays.[Arrow]StringArray` with missing values when `anndata.settings.allow_write_nullable_strings` is set to False. Opt-in to writing these arrays by toggling it to True or remove missing values. |
+| `nullable_str_na_allow_nullable_false` |  | Python error | ValueError | Cannot write `pd.arrays.[Arrow]StringArray` with missing values when `anndata.settings.allow_write_nullable_strings` is set to False. Opt-in to writing these arrays by toggling it to True or remove missing values. |
 <!-- observed:end -->

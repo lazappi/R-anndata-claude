@@ -280,6 +280,36 @@ def _element_cases():
     cases["df_col_categorical_empty"] = lambda: _df(
         c=pd.Categorical(["a", "b", "a"], categories=["a", "b", "unused"])
     )
+    # Nullable and categorical Elements on their own (not inside a dataframe)
+    cases["nullable_int64"] = lambda: pd.array([1, None, 3], dtype="Int64")
+    cases["nullable_int8"] = lambda: pd.array([1, None, 3], dtype="Int8")
+    cases["nullable_uint16"] = lambda: pd.array([1, None, 3], dtype="UInt16")
+    cases["nullable_int32_nomissing"] = lambda: pd.array([1, 2, 3], dtype="Int32")
+    cases["nullable_int_empty"] = lambda: pd.array([], dtype="Int32")
+    cases["nullable_bool"] = lambda: pd.array([True, None, False], dtype="boolean")
+    cases["nullable_bool_nomissing"] = lambda: pd.array([True, False], dtype="boolean")
+    cases["nullable_str"] = lambda: pd.array(["a", None, "bé", ""], dtype="str")
+    cases["nullable_str_nomissing"] = lambda: pd.array(["a", "bé", ""], dtype="str")
+    cases["nullable_str_pdna"] = lambda: pd.array(
+        ["a", None, "日本"], dtype=pd.StringDtype(na_value=pd.NA)
+    )
+    cases["categorical"] = lambda: _categorical(3)
+    cases["categorical_ordered"] = lambda: _categorical(3, ordered=True)
+    cases["categorical_missing"] = lambda: _categorical(3, missing=True)
+    cases["categorical_numeric"] = lambda: _categorical(3, numeric=True)
+    cases["categorical_bool"] = lambda: pd.Categorical(
+        [True, False, True], categories=[False, True]
+    )
+    cases["categorical_126"] = lambda: _categorical(126)
+    cases["categorical_127"] = lambda: _categorical(127)
+    cases["categorical_32767"] = lambda: _categorical(32767)
+    cases["categorical_32768"] = lambda: _categorical(32768)
+    cases["categorical_unused"] = lambda: pd.Categorical(
+        ["a", "b", "a"], categories=["a", "b", "unused"]
+    )
+    cases["categorical_one_level"] = lambda: pd.Categorical(["a"])
+    cases["categorical_empty"] = lambda: pd.Categorical([], categories=["a", "b"])
+    cases["categorical_nonascii"] = lambda: pd.Categorical(["é", "日本", "é"])
     cases["df_two_columns"] = lambda: _df(b=np.array([1.0, 2.0, 3.0]), a=np.array([1, 2, 3]))
     cases["df_no_columns"] = lambda: pd.DataFrame(index=pd.Index(["a", "b"]))
     cases["df_no_rows"] = lambda: pd.DataFrame(
@@ -343,6 +373,14 @@ SETTING_CASES = {
         "df_col_string_pdna",
         {"allow_write_nullable_strings": True},
     ),
+    "nullable_str_allow_nullable_false": (
+        "nullable_str_nomissing",
+        {"allow_write_nullable_strings": False},
+    ),
+    "nullable_str_na_allow_nullable_false": (
+        "nullable_str",
+        {"allow_write_nullable_strings": False},
+    ),
     "csr_indices_min_dtype": (
         "csr_float64",
         {"write_csr_csc_indices_with_min_possible_dtype": True},
@@ -355,7 +393,11 @@ SETTING_CASES = {
 
 
 # Cases Python 0.13.4 refuses to write, recorded under "errors" in the manifest
-ERROR_CASES = {"df_col_nullable_float", "df_col_str_na_allow_nullable_false"}
+ERROR_CASES = {
+    "df_col_nullable_float",
+    "df_col_str_na_allow_nullable_false",
+    "nullable_str_na_allow_nullable_false",
+}
 
 
 def _describe_value(value):

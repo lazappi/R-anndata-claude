@@ -52,7 +52,9 @@ without \code{NA} is written as h5py's boolean.
 Only complex128 is written, and reading complex64 raises
 \code{anndata_dtype_error} because rhdf5 reads it incorrectly.
 \code{bytes} is read as a \code{raw} vector.
-Integer, logical and character values with \code{NA} need the nullable
-encodings, so writing them raises \code{anndata_io_registry_error}.
+Integer, logical and character values with \code{NA} are written as the nullable
+Elements, see \link{io-nullable}.
+Complex values with \code{NA} cannot be written and raise
+\code{anndata_io_registry_error}.
 }
 \keyword{internal}

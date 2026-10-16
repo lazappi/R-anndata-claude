@@ -70,28 +70,6 @@ expected_values <- function() {
   )
 }
 
-read_fixture_elem <- function(name, env = parent.frame()) {
-  store <- rhdf5::H5Fopen(fixture_path(file.path("h5ad", paste0(name, ".h5"))))
-  withr::defer(rhdf5::h5closeAll(), envir = env)
-  read_elem(store, "x")
-}
-
-# Writes `value` as an Element at `x` of a new file and returns the path
-write_fixture_like <- function(value, env = parent.frame()) {
-  path <- withr::local_tempfile(fileext = ".h5", .local_envir = env)
-  rhdf5::h5createFile(path)
-  store <- rhdf5::H5Fopen(path)
-  write_elem(store, "x", value)
-  rhdf5::h5closeAll()
-  path
-}
-
-read_written <- function(path) {
-  store <- rhdf5::H5Fopen(path)
-  on.exit(rhdf5::h5closeAll())
-  read_elem(store, "x")
-}
-
 # The Encoding type and whether the dataspace is scalar, as Python sees them
 written_encoding <- function(value) {
   path <- write_fixture_like(value)
@@ -242,16 +220,14 @@ test_that("a value outside its recorded dtype raises", {
   )
 })
 
-# Integer, logical and character NA need nullable encodings (ticket 06), so
-# until then they must raise rather than write a wrong value
-test_that("NA in integer, logical and character values raises", {
-  for (value in list(c(1L, NA), c(TRUE, NA), c("a", NA))) {
-    err <- expect_anndata_condition(
-      write_fixture_like(value),
-      "anndata_io_registry_error"
-    )
-    expect_identical(err$path, "/x")
-  }
+# Complex values have no nullable encoding, so NA must raise rather than write a
+# wrong value
+test_that("NA in complex values raises", {
+  err <- expect_anndata_condition(
+    write_fixture_like(c(1 + 2i, NA)),
+    "anndata_io_registry_error"
+  )
+  expect_identical(err$path, "/x")
 })
 
 # Only encodable values are written, and the error names the path and class
@@ -261,7 +237,6 @@ test_that("unencodable values raise an io registry error", {
     new.env(),
     list(1, 2),
     Sys.Date(),
-    factor("a"),
     as.raw(1:2),
     quote(x)
   )

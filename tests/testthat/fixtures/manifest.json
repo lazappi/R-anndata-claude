@@ -112,6 +112,58 @@
     "bytes_scalar": {
       "file": "h5ad/bytes_scalar.h5"
     },
+    "categorical": {
+      "file": "h5ad/categorical.h5",
+      "python": "Categorical str"
+    },
+    "categorical_126": {
+      "file": "h5ad/categorical_126.h5",
+      "python": "Categorical str"
+    },
+    "categorical_127": {
+      "file": "h5ad/categorical_127.h5",
+      "python": "Categorical str"
+    },
+    "categorical_32767": {
+      "file": "h5ad/categorical_32767.h5",
+      "python": "Categorical str"
+    },
+    "categorical_32768": {
+      "file": "h5ad/categorical_32768.h5",
+      "python": "Categorical str"
+    },
+    "categorical_bool": {
+      "file": "h5ad/categorical_bool.h5",
+      "python": "Categorical bool"
+    },
+    "categorical_empty": {
+      "file": "h5ad/categorical_empty.h5",
+      "python": "Categorical str"
+    },
+    "categorical_missing": {
+      "file": "h5ad/categorical_missing.h5",
+      "python": "Categorical str"
+    },
+    "categorical_nonascii": {
+      "file": "h5ad/categorical_nonascii.h5",
+      "python": "Categorical str"
+    },
+    "categorical_numeric": {
+      "file": "h5ad/categorical_numeric.h5",
+      "python": "Categorical int64"
+    },
+    "categorical_one_level": {
+      "file": "h5ad/categorical_one_level.h5",
+      "python": "Categorical str"
+    },
+    "categorical_ordered": {
+      "file": "h5ad/categorical_ordered.h5",
+      "python": "Categorical str"
+    },
+    "categorical_unused": {
+      "file": "h5ad/categorical_unused.h5",
+      "python": "Categorical str"
+    },
     "csc_bool": {
       "file": "h5ad/csc_bool.h5",
       "python": "csc_matrix bool, index int32"
@@ -384,6 +436,50 @@
       "file": "h5ad/null.h5",
       "python": "None"
     },
+    "nullable_bool": {
+      "file": "h5ad/nullable_bool.h5",
+      "python": "BooleanArray"
+    },
+    "nullable_bool_nomissing": {
+      "file": "h5ad/nullable_bool_nomissing.h5",
+      "python": "BooleanArray"
+    },
+    "nullable_int32_nomissing": {
+      "file": "h5ad/nullable_int32_nomissing.h5",
+      "python": "IntegerArray"
+    },
+    "nullable_int64": {
+      "file": "h5ad/nullable_int64.h5",
+      "python": "IntegerArray"
+    },
+    "nullable_int8": {
+      "file": "h5ad/nullable_int8.h5",
+      "python": "IntegerArray"
+    },
+    "nullable_int_empty": {
+      "file": "h5ad/nullable_int_empty.h5",
+      "python": "IntegerArray"
+    },
+    "nullable_str": {
+      "file": "h5ad/nullable_str.h5",
+      "python": "StringArray"
+    },
+    "nullable_str_allow_nullable_false": {
+      "file": "h5ad/nullable_str_allow_nullable_false.h5",
+      "python": "StringArray"
+    },
+    "nullable_str_nomissing": {
+      "file": "h5ad/nullable_str_nomissing.h5",
+      "python": "StringArray"
+    },
+    "nullable_str_pdna": {
+      "file": "h5ad/nullable_str_pdna.h5",
+      "python": "StringArray"
+    },
+    "nullable_uint16": {
+      "file": "h5ad/nullable_uint16.h5",
+      "python": "IntegerArray"
+    },
     "rec_array_basic": {
       "file": "h5ad/rec_array_basic.h5",
       "python": "structured ndarray [i:int32, f:float64, fixed:|S3, uni:<U3]"
@@ -505,6 +601,10 @@
       "type": "IORegistryError"
     },
     "df_col_str_na_allow_nullable_false": {
+      "message": "Cannot write `pd.arrays.[Arrow]StringArray` with missing values when `anndata.settings.allow_write_nullable_strings` is set to False. Opt-in to writing these arrays by toggling it to True or remove missing values.",
+      "type": "ValueError"
+    },
+    "nullable_str_na_allow_nullable_false": {
       "message": "Cannot write `pd.arrays.[Arrow]StringArray` with missing values when `anndata.settings.allow_write_nullable_strings` is set to False. Opt-in to writing these arrays by toggling it to True or remove missing values.",
       "type": "ValueError"
     }

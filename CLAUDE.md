@@ -70,4 +70,6 @@ Kept brief and current by the loop.
 - rhdf5 gives no dataset sign from a dataset handle, so `read_dataset(loc, name)` takes a group or file handle and uses `h5ls`, and `H5Dread(bit64conversion = "double")` warns exactly when 64-bit values reach 2^53
 - Readers are called `fn(elem, path, store)`, and files calling `register_*()` at top level must collate after `io-registry.R` (e.g. `io-values.R`)
 - A scalar Element has no `dim` and a 1-element array has `dim` 1 (`as_array()`), and complex128 types come from a throwaway `h5createDataset(storage.mode = "complex")`
+- Nullable Elements keep an `anndata_nullable` record and factors with non-string categories keep `anndata_categories`, `drop_dtype()` removes the first, and a write that passes the record on to a nested `write_elem()` recurses forever
+- Test helpers shared between files (`read_fixture_elem()`, `write_fixture_like()`, `read_written()`) live in `helper-io.R`
 - Python is only used through `uv run --project tests/python ...`, in tests via `run_python()` which sets a private `TMPDIR` (uv lock files left in the check temp dir cause a NOTE)

@@ -21,6 +21,7 @@
 NULL
 
 dtype_attr <- "anndata_dtype"
+nullable_attr <- "anndata_nullable"
 
 # Copies the On-disk dtype record (if any) from `from` to `to`
 copy_dtype <- function(to, from) {

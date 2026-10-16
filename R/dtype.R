@@ -13,6 +13,13 @@
 #' compute like ordinary R values.
 #' Subsetting, copy and transpose copy the record with `copy_dtype()`.
 #'
+#' The nullable record is the `anndata_nullable` attribute, set by the readers
+#' of `nullable-integer`, `nullable-boolean` and `nullable-string-array`.
+#' It makes the value write back as a nullable Element even when it holds no
+#' `NA`, as Python writes any pandas nullable array.
+#' For strings it holds the `na-value` attribute (`"NaN"` or `"NA"`), and it is
+#' `TRUE` for the other types.
+#'
 #' Reading with `read_dataset()` records the dtype only where it differs from
 #' the R type returned, which is `float64` for double and `int32` for integer.
 #' Writing with `write_dataset()` restores the recorded dtype, or the R type
@@ -97,8 +104,23 @@ set_dtype <- function(x, dtype) {
 #' @rdname dtype-records
 drop_dtype <- function(x) {
   attr(x, dtype_attr) <- NULL
+  attr(x, nullable_attr) <- NULL
   if (identical(oldClass(x)[1L], typed_class)) {
     oldClass(x) <- NULL
+  }
+  x
+}
+
+#' @rdname dtype-records
+get_nullable <- function(x) {
+  attr(x, nullable_attr, exact = TRUE)
+}
+
+#' @rdname dtype-records
+set_nullable <- function(x, na_value = TRUE) {
+  attr(x, nullable_attr) <- na_value
+  if (is.null(oldClass(x)) && !isS4(x)) {
+    oldClass(x) <- c(typed_class, class(x))
   }
   x
 }

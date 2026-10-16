@@ -19,8 +19,10 @@
 #' Only complex128 is written, and reading complex64 raises
 #' `anndata_dtype_error` because rhdf5 reads it incorrectly.
 #' `bytes` is read as a `raw` vector.
-#' Integer, logical and character values with `NA` need the nullable
-#' encodings, so writing them raises `anndata_io_registry_error`.
+#' Integer, logical and character values with `NA` are written as the nullable
+#' Elements, see [io-nullable].
+#' Complex values with `NA` cannot be written and raise
+#' `anndata_io_registry_error`.
 #'
 #' @param x An atomic vector, matrix or array.
 #' @param loc An open rhdf5 file or group handle.
@@ -210,6 +212,10 @@ write_values <- function(store, key, value, dataset_kwargs, path) {
       r_class = r_class,
       call = call
     )
+  }
+  kind <- nullable_kind(value, plain)
+  if (!is.null(kind)) {
+    return(write_nullable(store, key, value, kind, dataset_kwargs, path, call))
   }
   check_no_missing(plain, path, call)
   scalar <- length(value) == 1L && is.null(dim(value))
