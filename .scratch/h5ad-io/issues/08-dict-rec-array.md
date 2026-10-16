@@ -1,6 +1,6 @@
 # Dict and rec-array
 
-Status: ready-for-agent
+Status: done
 Type: task
 Blocked by: 05, 06
 
@@ -51,3 +51,11 @@ Reading non-ASCII rec-arrays from Python works.
 Question: keep the error until h5ad-io/15 (variable-length UTF-8 fields, which fix this), or write the file anyway as the decision says?
 Recommended: keep the error, and let ticket 15 lift it.
 Also not done: `dataset_kwargs` (compression) is ignored for rec-arrays, which are written uncompressed, and a rec-array with no rows raises on write (rhdf5 needs a non-empty chunk).
+
+2026-10-16 (loop run, closing)
+
+Applied the 2026-10-16 decisions: the write error for non-ASCII string fields stays (documented in the help), and the tests already check that `rec_array_basic` and `rec_array_object_field` raise `anndata_io_registry_error` on write while the Python to R direction still reads them.
+`dataset_kwargs` and zero-row rec-arrays are listed under h5ad-io/15.
+No code changes were needed.
+Full `scripts/check.sh` passes and the reviewer returned PASS.
+Status set to `done`, version bumped to 0.0.0.9034.
