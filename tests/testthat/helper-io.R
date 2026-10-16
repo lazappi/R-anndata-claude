@@ -122,3 +122,15 @@ make_encoded_group <- function(store, key, type = NULL, version = NULL) {
   }
   group
 }
+
+# The h5ad fixture of a case read with the HDF5 backend, `NULL` when the case
+# has no h5ad fixture (both were written by Python from one case)
+h5_case_elem <- function(case, env = parent.frame()) {
+  file <- fixture_path(file.path("h5ad", paste0(case, ".h5")))
+  if (!file.exists(file)) {
+    return(NULL)
+  }
+  store <- rhdf5::H5Fopen(file, flags = "H5F_ACC_RDONLY")
+  withr::defer(rhdf5::h5closeAll(), envir = env)
+  read_elem(store, "x")
+}

@@ -44,18 +44,6 @@ test_that("complex64 arrays raise the dtype error as in h5ad", {
   )
 })
 
-# The h5ad fixture of a case read with the HDF5 backend, `NULL` when the case
-# has no h5ad fixture (both were written by Python from one case)
-h5_case_elem <- function(case, env = parent.frame()) {
-  file <- fixture_path(file.path("h5ad", paste0(case, ".h5")))
-  if (!file.exists(file)) {
-    return(NULL)
-  }
-  store <- rhdf5::H5Fopen(file, flags = "H5F_ACC_RDONLY")
-  withr::defer(rhdf5::h5closeAll(), envir = env)
-  read_elem(store, "x")
-}
-
 # Writes `value` as the Element `x` of a new v3 store and returns its path
 write_zarr_like <- function(value, dir) {
   path <- tempfile("r", tmpdir = dir, fileext = ".zarr")
