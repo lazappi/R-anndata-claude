@@ -71,6 +71,24 @@ layers_without_x <- function(adata) {
   layers[!is.na(names(layers) %||% character())]
 }
 
+# Python's `write_sparse_as_dense`, which keeps the dtype of the data
+densify <- function(x) {
+  dense <- as.matrix(x)
+  dtype <- get_dtype(x)[["data"]]
+  if (!is.null(dtype) && !is.logical(dense)) {
+    dense <- set_dtype(dense, dtype)
+  }
+  dense
+}
+
+# Writes X or raw X, dense when `name` is in `as_dense` and the matrix is sparse
+write_x_elem <- function(group, x, name, dataset_kwargs, call) {
+  if (name %in% dataset_kwargs$as_dense && methods::is(x, "sparseMatrix")) {
+    x <- densify(x)
+  }
+  write_elem(group, "X", x, dataset_kwargs, call)
+}
+
 #' @rdname io-anndata
 write_anndata <- function(store, key, value, dataset_kwargs, path) {
   call <- rlang::caller_env()
@@ -85,7 +103,7 @@ write_anndata <- function(store, key, value, dataset_kwargs, path) {
   set_elem_attr(group, "encoding-version", "0.1.0")
 
   if (!is.null(value$X)) {
-    write_elem(group, "X", value$X, dataset_kwargs, call)
+    write_x_elem(group, value$X, "X", dataset_kwargs, call)
   }
   slots <- list(
     obs = value$obs,
@@ -113,7 +131,7 @@ write_raw <- function(store, key, value, dataset_kwargs, path) {
   on.exit(rhdf5::H5Gclose(group), add = TRUE)
   set_elem_attr(group, "encoding-type", "raw")
   set_elem_attr(group, "encoding-version", "0.1.0")
-  write_elem(group, "X", value$X, dataset_kwargs, call)
+  write_x_elem(group, value$X, "raw/X", dataset_kwargs, call)
   write_elem(group, "var", value$var, dataset_kwargs, call)
   write_elem(group, "varm", as.list(value$varm), dataset_kwargs, call)
   invisible(NULL)
@@ -132,12 +150,75 @@ anndata_slot_keys <- c(
   "raw"
 )
 
+# The options of `read_h5ad()` that reach the readers, set for one read
+read_state <- new.env(parent = emptyenv())
+read_state$as_sparse <- character()
+
+# Python's `read_dense_as_csr` and `read_dense_as_csc`, in chunks of
+# `chunk_size` rows (CSR) or columns (CSC)
+dense_as_sparse <- function(x, path, call) {
+  if (methods::is(x, "sparseMatrix")) {
+    anndata_abort(
+      "Cannot read {.path {path}} as sparse, it is already stored as sparse.",
+      "anndata_invalid_argument_error",
+      call = call
+    )
+  }
+  if (length(dim(x)) != 2L) {
+    anndata_abort(
+      "Cannot read {.path {path}} as sparse, it is not 2-dimensional.",
+      "anndata_invalid_argument_error",
+      call = call
+    )
+  }
+  csr <- identical(read_state$fmt, "csr")
+  dtype <- get_dtype(x) %||% if (is.logical(x)) "bool" else native_dtype(x)
+  plain <- drop_dtype(x)
+  size <- dim(plain)[if (csr) 1L else 2L]
+  # A symmetric matrix would get a symmetric class, so ask for a general one
+  as_csc <- function(m) {
+    methods::as(methods::as(m, "generalMatrix"), "CsparseMatrix")
+  }
+  if (size == 0L) {
+    combined <- as_csc(plain)
+  } else {
+    chunks <- lapply(
+      seq(1L, size, by = read_state$chunk_size),
+      function(start) {
+        index <- seq(start, min(start + read_state$chunk_size - 1L, size))
+        as_csc(
+          if (csr) {
+            plain[index, , drop = FALSE]
+          } else {
+            plain[, index, drop = FALSE]
+          }
+        )
+      }
+    )
+    combined <- if (csr) do.call(rbind, chunks) else do.call(cbind, chunks)
+  }
+  if (csr) {
+    combined <- methods::as(combined, "RsparseMatrix")
+  }
+  default <- if (is.logical(plain)) "bool" else "float64"
+  if (!identical(dtype, default)) {
+    combined <- set_dtype(combined, c(data = dtype))
+  }
+  combined
+}
+
 read_anndata_elem <- function(elem, path, store) {
+  call <- rlang::caller_env()
   members <- rhdf5::h5ls(elem, recursive = FALSE)$name
   prefix <- if (identical(path, "/")) "/" else paste0(path, "/")
   slots <- list()
   for (key in intersect(anndata_slot_keys, members)) {
-    slots[key] <- list(read_elem(store, paste0(prefix, key)))
+    key_path <- paste0(prefix, key)
+    value <- read_elem(store, key_path)
+    if (key == "X" && substring(key_path, 2L) %in% read_state$as_sparse) {
+      value <- dense_as_sparse(value, key_path, call)
+    }
+    slots[key] <- list(value)
   }
   # Higher-dimensional X and layers violate the spec, so the constructor
   # refuses them and they are set afterwards, which only warns as Python does

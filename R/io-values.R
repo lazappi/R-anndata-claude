@@ -146,12 +146,21 @@ check_no_missing <- function(x, path, call) {
 }
 
 #' @rdname io-values
-write_bool_dataset <- function(loc, name, x, scalar, call) {
+write_bool_dataset <- function(
+  loc,
+  name,
+  x,
+  scalar,
+  call,
+  dataset_kwargs = list()
+) {
   dims <- dim(x) %||% length(x)
   space <- h5_space(dims, scalar)
   on.exit(rhdf5::H5Sclose(space), add = TRUE)
   type <- bool_type()
-  dset <- rhdf5::H5Dcreate(loc, name, type, space)
+  dcpl <- if (!scalar) make_dcpl(dataset_kwargs, rev(dims), type)
+  on.exit(close_dcpl(dcpl), add = TRUE)
+  dset <- rhdf5::H5Dcreate(loc, name, type, space, dcpl = dcpl)
   on.exit(rhdf5::H5Dclose(dset), add = TRUE, after = FALSE)
   if (length(x) > 0L) {
     rhdf5::H5Dwrite(
@@ -164,11 +173,21 @@ write_bool_dataset <- function(loc, name, x, scalar, call) {
 }
 
 #' @rdname io-values
-write_complex_dataset <- function(loc, name, x, scalar, call) {
+write_complex_dataset <- function(
+  loc,
+  name,
+  x,
+  scalar,
+  call,
+  dataset_kwargs = list()
+) {
   dims <- dim(x) %||% length(x)
   space <- h5_space(dims, scalar)
   on.exit(rhdf5::H5Sclose(space), add = TRUE)
-  dset <- rhdf5::H5Dcreate(loc, name, complex_type(), space)
+  type <- complex_type()
+  dcpl <- if (!scalar) make_dcpl(dataset_kwargs, rev(dims), type)
+  on.exit(close_dcpl(dcpl), add = TRUE)
+  dset <- rhdf5::H5Dcreate(loc, name, type, space, dcpl = dcpl)
   on.exit(rhdf5::H5Dclose(dset), add = TRUE, after = FALSE)
   if (length(x) > 0L) {
     rhdf5::H5Dwrite(dset, as.vector(row_major(as.vector(x), dims)))
@@ -177,11 +196,21 @@ write_complex_dataset <- function(loc, name, x, scalar, call) {
 }
 
 #' @rdname io-values
-write_string_dataset <- function(loc, name, x, scalar, call) {
+write_string_dataset <- function(
+  loc,
+  name,
+  x,
+  scalar,
+  call,
+  dataset_kwargs = list()
+) {
   dims <- dim(x) %||% length(x)
   space <- h5_space(dims, scalar)
   on.exit(rhdf5::H5Sclose(space), add = TRUE)
-  dset <- rhdf5::H5Dcreate(loc, name, string_type(), space)
+  type <- string_type()
+  dcpl <- if (!scalar) make_dcpl(dataset_kwargs, rev(dims), type)
+  on.exit(close_dcpl(dcpl), add = TRUE)
+  dset <- rhdf5::H5Dcreate(loc, name, type, space, dcpl = dcpl)
   on.exit(rhdf5::H5Dclose(dset), add = TRUE, after = FALSE)
   if (length(x) > 0L) {
     rhdf5::H5Dwrite(dset, as.vector(row_major(as.vector(x), dims)))
@@ -221,11 +250,39 @@ write_values <- function(store, key, value, dataset_kwargs, path) {
   scalar <- length(value) == 1L && is.null(dim(value))
   switch(
     typeof(plain),
-    character = write_string_dataset(store, key, plain, scalar, call),
-    logical = write_bool_dataset(store, key, plain, scalar, call),
-    complex = write_complex_dataset(store, key, plain, scalar, call),
+    character = write_string_dataset(
+      store,
+      key,
+      plain,
+      scalar,
+      call,
+      dataset_kwargs
+    ),
+    logical = write_bool_dataset(
+      store,
+      key,
+      plain,
+      scalar,
+      call,
+      dataset_kwargs
+    ),
+    complex = write_complex_dataset(
+      store,
+      key,
+      plain,
+      scalar,
+      call,
+      dataset_kwargs
+    ),
     integer = ,
-    double = write_dataset(store, key, value, scalar = scalar, call = call),
+    double = write_dataset(
+      store,
+      key,
+      value,
+      scalar = scalar,
+      dataset_kwargs = dataset_kwargs,
+      call = call
+    ),
     {
       r_class <- class(plain)
       abort_io_registry(

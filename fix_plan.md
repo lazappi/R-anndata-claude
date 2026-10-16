@@ -51,7 +51,7 @@ The human owns the order of the Queue.
 - [x] h5ad-io/08: dict and rec-array (`.scratch/h5ad-io/issues/08-dict-rec-array.md`)
 - [x] h5ad-io/09: dataframe (`.scratch/h5ad-io/issues/09-dataframe.md`)
 - [x] h5ad-io/10: AnnData and Raw, read_h5ad and write_h5ad basics (`.scratch/h5ad-io/issues/10-anndata-raw-roundtrip.md`)
-- [ ] h5ad-io/11: read_h5ad and write_h5ad options (`.scratch/h5ad-io/issues/11-read-write-options.md`)
+- [x] h5ad-io/11: read_h5ad and write_h5ad options (`.scratch/h5ad-io/issues/11-read-write-options.md`)
 - [ ] h5ad-io/12: realistic and compressed fixtures (`.scratch/h5ad-io/issues/12-realistic-fixtures.md`)
 - [ ] h5ad-io/13: real-world file test (`.scratch/h5ad-io/issues/13-real-world-file.md`)
 - [ ] h5ad-io/14: package vignette (`.scratch/h5ad-io/issues/14-vignette.md`)

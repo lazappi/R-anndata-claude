@@ -22,6 +22,20 @@
 #' @param filename Path of the `.h5ad` file.
 #' @param backed Backed mode, not yet supported so it must be `NULL` or
 #'   `FALSE`.
+#' @param as_sparse Elements stored dense to read as sparse matrices, `"X"`
+#'   and/or `"raw/X"` (`"raw.X"` is accepted too).
+#'   An Element that is already sparse on disk is an error.
+#' @param as_sparse_fmt Sparse format of `as_sparse`, `"csr"` or `"csc"`.
+#' @param chunk_size Number of rows (CSR) or columns (CSC) converted to sparse
+#'   at a time.
+#' @param compression `NULL`, `"gzip"` or `"lzf"`, the HDF5 filter applied to
+#'   every dataset except scalars.
+#' @param compression_opts The gzip level from 0 to 9 (4 when `NULL`), which
+#'   `"lzf"` does not accept.
+#' @param as_dense Sparse matrices to write dense, `"X"` and/or `"raw/X"`
+#'   (`"raw.X"` is accepted too), which keeps the On-disk dtype.
+#'   Dense matrices are written as they are.
+#'   Unlike Python the `/raw` group keeps its Encoding attributes.
 #' @param adata An [AnnData()].
 #' @param convert_strings_to_categoricals Whether to convert character columns
 #'   to factors before writing.
@@ -54,7 +68,13 @@ check_filename <- function(filename, call) {
 
 #' @rdname h5ad
 #' @export
-read_h5ad <- function(filename, backed = NULL) {
+read_h5ad <- function(
+  filename,
+  backed = NULL,
+  as_sparse = character(),
+  as_sparse_fmt = c("csr", "csc"),
+  chunk_size = 6000L
+) {
   call <- rlang::current_env()
   if (!is.null(backed) && !isFALSE(backed)) {
     abort_not_supported(
@@ -62,6 +82,42 @@ read_h5ad <- function(filename, backed = NULL) {
       call = call
     )
   }
+  if (
+    !is.character(as_sparse_fmt) ||
+      length(as_sparse_fmt) == 0L ||
+      !all(as_sparse_fmt %in% c("csr", "csc"))
+  ) {
+    abort_not_supported(
+      "Dense formats can only be read to CSR or CSC matrices at this time.",
+      call = call
+    )
+  }
+  as_sparse_fmt <- as_sparse_fmt[[1L]]
+  if (!is.character(as_sparse) || anyNA(as_sparse)) {
+    abort_invalid_argument("{.arg as_sparse} must be a character vector.", call)
+  }
+  as_sparse[as_sparse == "raw.X"] <- "raw/X"
+  if (!all(as_sparse %in% c("X", "raw/X"))) {
+    abort_not_supported(
+      "Currently only {.val X} and {.val raw/X} can be read as sparse.",
+      call = call
+    )
+  }
+  valid_chunk <- is.numeric(chunk_size) &&
+    length(chunk_size) == 1L &&
+    !is.na(chunk_size) &&
+    chunk_size >= 1 &&
+    chunk_size == round(chunk_size)
+  if (!valid_chunk) {
+    abort_invalid_argument(
+      "{.arg chunk_size} must be a positive whole number.",
+      call
+    )
+  }
+  read_state$as_sparse <- as_sparse
+  read_state$fmt <- as_sparse_fmt
+  read_state$chunk_size <- as.integer(chunk_size)
+  on.exit(read_state$as_sparse <- character(), add = TRUE)
   filename <- check_filename(filename, call)
   if (!file.exists(filename)) {
     anndata_abort(
@@ -80,6 +136,9 @@ read_h5ad <- function(filename, backed = NULL) {
 write_h5ad <- function(
   adata,
   filename,
+  compression = NULL,
+  compression_opts = NULL,
+  as_dense = character(),
   convert_strings_to_categoricals = TRUE # nolint: object_length_linter.
 ) {
   call <- rlang::current_env()
@@ -92,6 +151,29 @@ write_h5ad <- function(
   }
   filename <- check_filename(filename, call)
   check_x_and_layers_are_2d(adata, call)
+  if (!is.character(as_dense) || anyNA(as_dense)) {
+    abort_invalid_argument("{.arg as_dense} must be a character vector.", call)
+  }
+  as_dense[as_dense == "raw.X"] <- "raw/X"
+  if (!all(as_dense %in% c("X", "raw/X"))) {
+    abort_not_supported(
+      "Currently, only {.val X} and {.val raw/X} are supported values in
+       {.arg as_dense}.",
+      call = call
+    )
+  }
+  if ("raw/X" %in% as_dense && is.null(adata$raw)) {
+    abort_invalid_argument(
+      "Cannot specify writing {.val raw/X} to dense if it doesn't exist.",
+      call
+    )
+  }
+  check_compression(compression, compression_opts, call)
+  dataset_kwargs <- list(
+    compression = compression,
+    compression_opts = compression_opts,
+    as_dense = as_dense
+  )
   if (convert_strings_to_categoricals) {
     adata$strings_to_categoricals()
     raw <- adata$raw
@@ -101,7 +183,7 @@ write_h5ad <- function(
   }
   store <- rhdf5::H5Fcreate(filename, flags = "H5F_ACC_TRUNC")
   on.exit(rhdf5::H5Fclose(store), add = TRUE)
-  write_elem(store, "/", adata, call = call)
+  write_elem(store, "/", adata, dataset_kwargs, call = call)
   invisible(NULL)
 }
 

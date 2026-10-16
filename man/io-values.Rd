@@ -10,11 +10,11 @@
 \usage{
 h5_space(dims, scalar)
 
-write_bool_dataset(loc, name, x, scalar, call)
+write_bool_dataset(loc, name, x, scalar, call, dataset_kwargs = list())
 
-write_complex_dataset(loc, name, x, scalar, call)
+write_complex_dataset(loc, name, x, scalar, call, dataset_kwargs = list())
 
-write_string_dataset(loc, name, x, scalar, call)
+write_string_dataset(loc, name, x, scalar, call, dataset_kwargs = list())
 }
 \arguments{
 \item{dims}{Dimensions of the array as Python sees them.}

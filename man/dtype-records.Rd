@@ -37,7 +37,7 @@ write_dataset(
   name,
   x,
   scalar = FALSE,
-  dcpl = NULL,
+  dataset_kwargs = list(),
   call = rlang::caller_env()
 )
 }
@@ -56,7 +56,8 @@ write_dataset(
 
 \item{scalar}{Whether to write a scalar dataspace.}
 
-\item{dcpl}{An optional dataset creation property list.}
+\item{dataset_kwargs}{A list of dataset creation options, see
+\link{io-compression}.}
 }
 \description{
 Internal mechanism that keeps the On-disk dtype of numeric Elements that R

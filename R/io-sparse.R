@@ -64,9 +64,15 @@ write_sparse <- function(store, key, value, dataset_kwargs, path) {
   for (part in names(parts)) {
     values <- parts[[part]]
     if (identical(dtypes[[part]], "bool")) {
-      write_bool_dataset(group, part, values, FALSE, call)
+      write_bool_dataset(group, part, values, FALSE, call, dataset_kwargs)
     } else {
-      write_dataset(group, part, set_dtype(values, dtypes[[part]]), call = call)
+      write_dataset(
+        group,
+        part,
+        set_dtype(values, dtypes[[part]]),
+        dataset_kwargs = dataset_kwargs,
+        call = call
+      )
     }
   }
   invisible(NULL)

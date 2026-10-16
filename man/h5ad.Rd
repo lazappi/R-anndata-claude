@@ -6,9 +6,22 @@
 \alias{write_h5ad}
 \title{Read and write h5ad files}
 \usage{
-read_h5ad(filename, backed = NULL)
+read_h5ad(
+  filename,
+  backed = NULL,
+  as_sparse = character(),
+  as_sparse_fmt = c("csr", "csc"),
+  chunk_size = 6000L
+)
 
-write_h5ad(adata, filename, convert_strings_to_categoricals = TRUE)
+write_h5ad(
+  adata,
+  filename,
+  compression = NULL,
+  compression_opts = NULL,
+  as_dense = character(),
+  convert_strings_to_categoricals = TRUE
+)
 }
 \arguments{
 \item{filename}{Path of the \code{.h5ad} file.}
@@ -16,7 +29,27 @@ write_h5ad(adata, filename, convert_strings_to_categoricals = TRUE)
 \item{backed}{Backed mode, not yet supported so it must be \code{NULL} or
 \code{FALSE}.}
 
+\item{as_sparse}{Elements stored dense to read as sparse matrices, \code{"X"}
+and/or \code{"raw/X"} (\code{"raw.X"} is accepted too).
+An Element that is already sparse on disk is an error.}
+
+\item{as_sparse_fmt}{Sparse format of \code{as_sparse}, \code{"csr"} or \code{"csc"}.}
+
+\item{chunk_size}{Number of rows (CSR) or columns (CSC) converted to sparse
+at a time.}
+
 \item{adata}{An \code{\link[=AnnData]{AnnData()}}.}
+
+\item{compression}{\code{NULL}, \code{"gzip"} or \code{"lzf"}, the HDF5 filter applied to
+every dataset except scalars.}
+
+\item{compression_opts}{The gzip level from 0 to 9 (4 when \code{NULL}), which
+\code{"lzf"} does not accept.}
+
+\item{as_dense}{Sparse matrices to write dense, \code{"X"} and/or \code{"raw/X"}
+(\code{"raw.X"} is accepted too), which keeps the On-disk dtype.
+Dense matrices are written as they are.
+Unlike Python the \verb{/raw} group keeps its Encoding attributes.}
 
 \item{convert_strings_to_categoricals}{Whether to convert character columns
 to factors before writing.}

@@ -38,7 +38,8 @@
 #' @param loc An open rhdf5 file or group handle.
 #' @param name Name or path of a dataset below `loc`.
 #' @param scalar Whether to write a scalar dataspace.
-#' @param dcpl An optional dataset creation property list.
+#' @param dataset_kwargs A list of dataset creation options, see
+#'   [io-compression].
 #' @param call The call reported by errors.
 #'
 #' @name dtype-records
@@ -362,7 +363,7 @@ write_dataset <- function(
   name,
   x,
   scalar = FALSE,
-  dcpl = NULL,
+  dataset_kwargs = list(),
   call = rlang::caller_env()
 ) {
   path <- elem_path(loc, name)
@@ -379,6 +380,10 @@ write_dataset <- function(
     rhdf5::H5Screate_simple(rev(dims))
   }
   on.exit(rhdf5::H5Sclose(space), add = TRUE)
+  dcpl <- if (!scalar) {
+    make_dcpl(dataset_kwargs, rev(dims), h5_numeric_types[[dtype]])
+  }
+  on.exit(close_dcpl(dcpl), add = TRUE)
   dset <- rhdf5::H5Dcreate(
     loc,
     name,
