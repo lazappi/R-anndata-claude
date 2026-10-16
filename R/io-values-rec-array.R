@@ -23,7 +23,8 @@
 #' `anndata_io_registry_error`, as does a rec-array with no rows.
 #' Python's `anndata` decodes fixed-length strings as ASCII and fails to read
 #' any other text, so a string field with non-ASCII text also raises
-#' `anndata_io_registry_error` rather than write a file Python cannot read.
+#' `anndata_io_registry_error` rather than write a file Python cannot read
+#' (zarr stores strings as UTF-32, so it has no such limit).
 #' Non-ASCII text is read without problems.
 #' Rec-arrays are never compressed, so `dataset_kwargs` has no effect on them.
 #' Integers of 2^53 or more raise `anndata_dtype_overflow_error` on read.
@@ -55,7 +56,7 @@ new_rec_array <- function(x) {
 }
 
 # The field as an int32, float64 or character vector, the types rhdf5 writes
-rec_array_field <- function(field, name, path, call) {
+rec_array_field <- function(field, name, path, call, ascii_only = TRUE) {
   field <- drop_dtype(field)
   if (is.factor(field)) {
     field <- as.character(field)
@@ -83,7 +84,9 @@ rec_array_field <- function(field, name, path, call) {
     )
   }
   # anndata decodes fixed-length strings as ASCII, so it cannot read others
-  if (is.character(field) && anyNA(iconv(field, "UTF-8", "ASCII"))) {
+  if (
+    ascii_only && is.character(field) && anyNA(iconv(field, "UTF-8", "ASCII"))
+  ) {
     abort_unwritable(
       path,
       paste0(
@@ -113,7 +116,14 @@ write_rec_array <- function(store, key, value, dataset_kwargs, path) {
     abort_unwritable(path, "it has no fields or no rows", call)
   }
   columns <- lapply(seq_along(fields), function(i) {
-    rec_array_field(.subset2(value, i), fields[[i]], path, call)
+    # zarr stores strings as UTF-32, so only HDF5 is limited to ASCII
+    rec_array_field(
+      .subset2(value, i),
+      fields[[i]],
+      path,
+      call,
+      ascii_only = !inherits(store, "zarr_node")
+    )
   })
   names(columns) <- fields
   frame <- structure(

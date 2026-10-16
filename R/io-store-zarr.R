@@ -44,7 +44,9 @@ zarr_backend <- function() {
     complex_write = zarr_complex_write,
     string_write = zarr_string_write,
     string_read = zarr_string_read,
-    null_write = zarr_null_write
+    null_write = zarr_null_write,
+    table_read = zarr_table_read,
+    table_write = zarr_table_write
   )
 }
 

@@ -1,8 +1,8 @@
 # Tests of the compound encodings on zarr v3 stores (ticket zarr-io/07): the
-# nullable arrays, categorical, dataframe and dict.
+# nullable arrays, categorical, dataframe, dict and rec-array.
 # The three round-trip directions run over every fixture of these encodings.
-# rec-array is not here yet, because zarr stores it as a `struct` array that
-# needs its own table backend operations (see the ticket).
+# rec-array field dtypes are not kept (ADR 0005), so its Python -> R -> Python
+# checks compare values only.
 
 skip_if_not_installed("Rarr", "2.1.48")
 
@@ -12,7 +12,8 @@ compound_zarr_encodings <- c(
   "nullable-string-array",
   "categorical",
   "dataframe",
-  "dict"
+  "dict",
+  "rec-array"
 )
 
 # The fixture cases of `variant` whose Element is a compound encoding, as a
@@ -30,7 +31,20 @@ compound_zarr_cases <- function(variant = "v3") {
     },
     logical(1)
   )
-  paths[keep & !grepl("^anndata_", names(paths))]
+  # The int64 field of rec_array_int64_big cannot be read (tested separately)
+  paths[keep & !grepl("^anndata_|int64_big", names(paths))]
+}
+
+# The R value a rec-array has after a write, which stores logical fields as
+# int32 (ADR 0005)
+rec_array_as_written <- function(value) {
+  if (!inherits(value, "anndata_rec_array")) {
+    return(value)
+  }
+  value[] <- lapply(value, function(field) {
+    if (is.logical(field)) as.integer(field) else field
+  })
+  value
 }
 
 # Writes `value` as the Element `x` of a new v3 store and returns its path
@@ -82,7 +96,29 @@ test_that("Python -> R -> Python: compound Elements written by R match", {
     function(path) write_compound_like(read_elem(zarr_open(path), "x"), dir),
     character(1)
   )
-  expect_all_equivalent(unname(written), unname(originals))
+  # Rec-array field dtypes are exempt (ADR 0005), their values are checked by
+  # reading the written store back in R
+  expect_all_equivalent(
+    unname(written),
+    unname(originals),
+    rec_array_paths = "/x"
+  )
+  for (case in grep("^rec_array", names(originals), value = TRUE)) {
+    expect_identical(
+      read_elem(zarr_open(written[[case]]), "x"),
+      rec_array_as_written(read_elem(zarr_open(originals[[case]]), "x")),
+      label = case
+    )
+  }
+})
+
+# Python rejects nothing here, but R must refuse 64-bit values it cannot hold
+test_that("an int64 rec-array field of 2^53 or more raises on read", {
+  path <- zarr_variant_paths("v3")[["rec_array_int64_big"]]
+  expect_anndata_condition(
+    read_elem(zarr_open(path), "x"),
+    "anndata_dtype_overflow_error"
+  )
 })
 
 test_that("R -> Python -> R: Python reads and rewrites what R wrote", {
@@ -97,6 +133,10 @@ test_that("R -> Python -> R: Python reads and rewrites what R wrote", {
   rewritten <- python_rewrite(unname(written), ext = ".zarr")
   for (i in seq_along(values)) {
     actual <- read_elem(zarr_open(rewritten[[i]]), "x")
-    expect_identical(actual, values[[i]], label = names(values)[[i]])
+    expect_identical(
+      actual,
+      rec_array_as_written(values[[i]]),
+      label = names(values)[[i]]
+    )
   }
 })

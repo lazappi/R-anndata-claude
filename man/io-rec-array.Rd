@@ -48,7 +48,8 @@ Integer and string fields cannot hold \code{NA}, so writing one raises
 \code{anndata_io_registry_error}, as does a rec-array with no rows.
 Python's \code{anndata} decodes fixed-length strings as ASCII and fails to read
 any other text, so a string field with non-ASCII text also raises
-\code{anndata_io_registry_error} rather than write a file Python cannot read.
+\code{anndata_io_registry_error} rather than write a file Python cannot read
+(zarr stores strings as UTF-32, so it has no such limit).
 Non-ASCII text is read without problems.
 Rec-arrays are never compressed, so \code{dataset_kwargs} has no effect on them.
 Integers of 2^53 or more raise \code{anndata_dtype_overflow_error} on read.
