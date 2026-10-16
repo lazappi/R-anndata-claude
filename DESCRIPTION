@@ -18,6 +18,7 @@ Imports:
     lifecycle,
     methods,
     Matrix,
+    pizzarr,
     R6,
     rhdf5,
     rlang,

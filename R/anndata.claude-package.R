@@ -9,5 +9,6 @@
 #' @importFrom cli cli_abort
 #' @importFrom rlang abort %||%
 #' @importFrom lifecycle deprecated
+#' @importFrom pizzarr zarr_open
 ## usethis namespace: end
 NULL

@@ -1,6 +1,6 @@
 # zarr library spike
 
-Status: ready-for-agent
+Status: needs-info
 Type: research
 Blocked by: none
 
@@ -38,3 +38,22 @@ Also recommend:
 - `scripts/check.sh` passes
 
 ## Comments
+
+2026-10-16 (loop run)
+
+Done: findings document `.scratch/zarr-io/zarr-spike.md` with a verdict for every item for Rarr, pizzarr and zarr (blosc covered as a codec package), the recommendation (pizzarr with wrappers, and the store abstraction shape), probe scripts in `.scratch/zarr-io/spike/`, `tests/python/zarr_spike_fixtures.py` and `tests/python/zarr_describe.py`, `pizzarr` added to `DESCRIPTION` Imports (placeholder `@importFrom` in the package file), and `.scratch` excluded from lintr (throwaway scripts).
+
+Not done, the package tests for pizzarr's verdicts (acceptance criterion 2).
+They are written (23 expectations over 15 tests, 123 passing under `scripts/check.sh --quick`) but fail under the full `R CMD check` with `blosc package must be installed to use the Blosc codec`, for the Python-written v2 stores (Python's v2 default compressor is blosc/lz4).
+`blosc` is installed and loads in the same `.libPaths()` in a separate session, and the same tests pass under `devtools::test()`.
+Tried: reinstalling `zlib`/`stringfish`/`RcppParallel` (unrelated pizzarr load failure, fixed), a `.libPaths()` and `loadNamespace("blosc")` diagnostic inside the check (libs are the user and system libraries, the loadNamespace line was not captured), and three full check runs.
+The tests are in the git stash `zarr-io/01: pizzarr verdict tests (fail under R CMD check, blosc)`, apply it with `git stash pop`.
+
+Questions for the human:
+
+1. Is `blosc` (GPL (>= 3), needs `libblosc`) acceptable as a dependency for a BSD-3 package? pizzarr needs it for any blosc-compressed chunk, which includes every Python-written v2 store.
+   If not, v2 reading needs our own blosc decoding (fallback step 2) or must be dropped.
+2. Why does pizzarr not see `blosc` under `R CMD check`? Recommended next step: run the failing test under `R CMD check` with `loadNamespace("blosc")` printed (the output was not captured above) before deciding.
+3. Given the gaps (v3 strings, v3 scalars, sharding, empty v2 strings, consolidated writing), is pizzarr plus wrappers acceptable or should zarr-io go to fallback step 2 (own R implementation of the zarr subset, reusing pizzarr's codecs)? Recommended: pizzarr for metadata, groups, attributes and numeric chunks, and our own string and sharding codecs.
+
+Recommended answer to 1: accept `blosc` in Suggests only (v2 blosc reading and tests then skip when it is absent), pending the human's call.
