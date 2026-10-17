@@ -56,7 +56,9 @@ write_sparse <- function(store, key, value, dataset_kwargs, path) {
   set_elem_attr(group, "encoding-version", "0.1.0")
   write_shape_attr(group, dim(value))
 
-  # Python writes the components as plain datasets with no Encoding attributes
+  # Python writes the components as plain datasets with no Encoding attributes,
+  # resizable in HDF5 so that `append()` can grow them
+  dataset_kwargs$resizable <- TRUE
   for (part in names(parts)) {
     values <- parts[[part]]
     if (identical(dtypes[[part]], "bool")) {

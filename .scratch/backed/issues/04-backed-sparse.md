@@ -20,4 +20,11 @@ The backed sparse class for CSR and CSC, `sparse_dataset()`, partial reads of `d
 - `read_sparse_elem()` now ends in `new_sparse_matrix()`, shared with the backed reader
 - Python rejects or differs for some selections (CSR negative int, CSC negative column slice), R selects like a matrix and the tests say so
 - `sparse_dataset()` takes an rhdf5 group handle and uses absolute paths from `node_path()`. Not-sparse input raises `anndata_invalid_argument_error`
-- Remaining: `append()` and the h5sparse legacy attributes, listed as sub-items in `fix_plan.md`, so the ticket stays `in-progress`
+- Remaining: the h5sparse legacy attributes, listed as a sub-item in `fix_plan.md`, so the ticket stays `in-progress`
+
+2026-10-17 (second run): Added `sparse_dataset()$append()` (`backed_sparse_append()` in `R/backed-sparse.R`), tested against every `append_*` row of the table.
+- Python's checks run in the same order. Errors are `anndata_invalid_argument_error` (not sparse), `anndata_invalid_value_error` (format, size, 32-bit indptr overflow, non-resizable datasets) and `anndata_read_only_error`
+- The shape now lives in the handle's `state` environment (`backed_shape()`), so `append()` grows it in place and clears the cached `indptr`
+- A group handle gives no file intent in rhdf5, so read-only is found by a probe attribute write
+- Python writes sparse parts with `maxshape=(None,)`, so R's HDF5 writer now does too (`dataset_kwargs$resizable`, chunked via `make_dcpl()`), otherwise R-written files could not be appended to
+- `append()` does not take a Zarr group (backed mode is HDF5 only)

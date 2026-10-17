@@ -65,9 +65,11 @@ as_array <- function(x) {
 }
 
 #' @rdname io-values
-h5_space <- function(dims, scalar) {
+h5_space <- function(dims, scalar, resizable = FALSE) {
   if (scalar) {
     rhdf5::H5Screate("H5S_SCALAR")
+  } else if (resizable) {
+    rhdf5::H5Screate_simple(rev(dims), rep(rhdf5::H5Sunlimited(), length(dims)))
   } else {
     rhdf5::H5Screate_simple(rev(dims))
   }
@@ -183,7 +185,7 @@ write_string_dataset <- function(
 
 h5_write_bool <- function(loc, name, x, scalar, call, dataset_kwargs) {
   dims <- dim(x) %||% length(x)
-  space <- h5_space(dims, scalar)
+  space <- h5_space(dims, scalar, isTRUE(dataset_kwargs$resizable))
   on.exit(rhdf5::H5Sclose(space), add = TRUE)
   type <- bool_type()
   dcpl <- if (!scalar) make_dcpl(dataset_kwargs, rev(dims), type)

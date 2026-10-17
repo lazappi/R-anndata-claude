@@ -27,7 +27,10 @@ The handle reads only the parts of \code{data} and \code{indices} that an index 
 object holds as \code{X}.
 It reads from the group while the group stays open, and the caller closes
 the group.
-Python's \code{append()} is not available yet.
+\code{handle$append(value)} adds the rows (CSR) or columns (CSC) of a sparse
+matrix in the same format to the file, which must be open read-write and
+hold resizable \code{data}, \code{indices} and \code{indptr} (as files written by Python
+do), and the handle's shape grows with it.
 }
 \examples{
 path <- tempfile(fileext = ".h5ad")

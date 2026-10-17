@@ -1,5 +1,7 @@
 # anndata.claude (development version)
 
+* `sparse_dataset()` handles have `$append()` to add rows (CSR) or columns (CSC) to a sparse matrix on disk, and sparse matrices written to HDF5 are now resizable like Python's, so the files can be appended to.
+
 * A backed sparse `X` (CSR or CSC) supports `dim()`, `[` with every matrix index form (reading only the needed parts of `data` and `indices`), `as.matrix()`, `$to_memory()` and views, and `sparse_dataset()` makes the same handle for an open rhdf5 group.
 
 * A backed dense `X` supports `dim()`, `[` with every matrix index form (reading only the selected part of the file), `as.matrix()` and views that read only their subset.

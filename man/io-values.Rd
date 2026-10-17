@@ -8,7 +8,7 @@
 \alias{write_string_dataset}
 \title{Arrays, scalars, strings, null and bytes}
 \usage{
-h5_space(dims, scalar)
+h5_space(dims, scalar, resizable = FALSE)
 
 write_bool_dataset(loc, name, x, scalar, call, dataset_kwargs = list())
 

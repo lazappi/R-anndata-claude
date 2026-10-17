@@ -95,7 +95,8 @@ guess_chunk <- function(dims, typesize) {
 #' @rdname io-compression
 make_dcpl <- function(dataset_kwargs, dims, type) {
   compression <- dataset_kwargs$compression
-  if (is.null(compression) || length(dims) == 0L) {
+  resizable <- isTRUE(dataset_kwargs$resizable)
+  if ((is.null(compression) && !resizable) || length(dims) == 0L) {
     return(NULL)
   }
   # A handle is a string of digits, a predefined type is named like `H5T_*`
@@ -104,7 +105,9 @@ make_dcpl <- function(dataset_kwargs, dims, type) {
   # rhdf5 gives no size for variable-length strings, which h5py takes as 16
   typesize <- rhdf5::H5Tget_size(tid)
   rhdf5::H5Pset_chunk(dcpl, guess_chunk(dims, typesize %||% 16L))
-  if (identical(compression, "gzip")) {
+  if (is.null(compression)) {
+    # Resizable only, which HDF5 stores in chunks
+  } else if (identical(compression, "gzip")) {
     rhdf5::H5Pset_deflate(dcpl, dataset_kwargs$compression_opts %||% 4L)
   } else {
     if (utils::packageVersion("rhdf5") >= "2.57.12") {

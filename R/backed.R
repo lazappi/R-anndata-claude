@@ -248,7 +248,9 @@ new_backed_x <- function(
       encoding = encoding,
       dtype = dtype,
       # Sparse only: the environment that holds `indptr` once it was read
-      cache = if (!dense && cache_indptr) new.env(parent = emptyenv())
+      cache = if (!dense && cache_indptr) new.env(parent = emptyenv()),
+      # The shape lives here so that `append()` can grow it in place
+      state = list2env(list(shape = as.integer(shape)), parent = emptyenv())
     ),
     class = c(
       if (dense) "backed_dense" else "backed_sparse",
@@ -273,13 +275,16 @@ new_backed_x <- function(
 #' @export
 #' @noRd
 dim.backed_x <- function(x) {
-  .subset2(x, "shape")
+  backed_shape(x)
 }
+
+# The current shape, which `sparse_dataset()$append()` changes
+backed_shape <- function(x) .subset2(x, "state")$shape
 
 #' @export
 #' @noRd
 format.backed_x <- function(x, ...) {
-  shape <- .subset2(x, "shape")
+  shape <- backed_shape(x)
   encoding <- .subset2(x, "encoding")
   dtype <- .subset2(x, "dtype")
   if (identical(encoding, "array")) {

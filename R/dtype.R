@@ -388,11 +388,7 @@ h5_write_dataset <- function(loc, name, x, scalar, dataset_kwargs, call) {
     values[is.na(values)] <- NaN
   }
   dims <- dim(x) %||% length(x)
-  space <- if (scalar) {
-    rhdf5::H5Screate("H5S_SCALAR")
-  } else {
-    rhdf5::H5Screate_simple(rev(dims))
-  }
+  space <- h5_space(dims, scalar, isTRUE(dataset_kwargs$resizable))
   on.exit(rhdf5::H5Sclose(space), add = TRUE)
   dcpl <- if (!scalar) {
     make_dcpl(dataset_kwargs, rev(dims), h5_numeric_types[[dtype]])

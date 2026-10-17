@@ -10,10 +10,13 @@ sparse_class <- function(kind) {
 }
 
 # Opens `X` of a fresh file as a group handle for sparse_dataset()
-local_sparse_group <- function(kind, env = parent.frame()) {
+local_sparse_group <- function(kind, env = parent.frame(), mode = "r") {
   case <- local_backed(kind, "r", env = env)
   case$adata$file$close()
-  file <- rhdf5::H5Fopen(case$path, flags = "H5F_ACC_RDONLY")
+  file <- rhdf5::H5Fopen(
+    case$path,
+    flags = if (mode == "r") "H5F_ACC_RDONLY" else "H5F_ACC_RDWR"
+  )
   group <- rhdf5::H5Gopen(file, "X")
   withr::defer(
     {
@@ -334,8 +337,7 @@ test_that("the shape of backed sparse X comes from dim()", {
   )
 })
 
-# The rows of sparse_dataset() in the table that do not append, which is
-# tested with the writing tickets
+# The rows of sparse_dataset() in the table that do not append
 test_that("sparse_dataset gives a handle like Python's", {
   table <- backed_cases()$sparse_dataset
   for (kind in sparse_kinds) {
@@ -440,4 +442,142 @@ test_that("sparse_dataset rejects other arguments and Elements", {
     expect_error(sparse_dataset(elem), class = "anndata_invalid_argument_error")
     rhdf5::H5Oclose(elem)
   }
+})
+
+# The values the append_* rows of the table add, in the format of the file
+append_value <- function(kind, label) {
+  csr <- kind == "csr"
+  dims <- if (csr) c(2L, 3L) else c(4L, 2L)
+  ones <- function(dims) {
+    methods::as(matrix(1, dims[[1L]], dims[[2L]]), "generalMatrix")
+  }
+  as_kind <- function(x, csr) {
+    methods::as(x, if (csr) "RsparseMatrix" else "CsparseMatrix")
+  }
+  switch(
+    label,
+    append_same = ,
+    append_float64 = as_kind(ones(dims), csr),
+    append_other_format = as_kind(ones(dims), !csr),
+    append_coo = methods::as(ones(c(2L, 3L)), "TsparseMatrix"),
+    append_dense = matrix(1, 2, 3),
+    append_empty = as_kind(
+      methods::as(
+        matrix(0, if (csr) 0L else 4L, if (csr) 3L else 0L),
+        "dMatrix"
+      ),
+      csr
+    ),
+    append_wrong_size = as_kind(ones(if (csr) c(2L, 5L) else c(5L, 2L)), csr)
+  )
+}
+
+# Each append_* row of the table: the matrix on disk after a successful append
+# (values, the shape attribute and the handle's shape), or the failure
+test_that("sparse_dataset()$append() matches the table", {
+  table <- backed_cases()$sparse_dataset
+  error_classes <- c(
+    append_other_format = "anndata_invalid_value_error",
+    append_coo = "anndata_invalid_value_error",
+    append_dense = "anndata_invalid_argument_error",
+    append_wrong_size = "anndata_invalid_value_error"
+  )
+  for (kind in sparse_kinds) {
+    for (label in grep("^append_", names(table[[kind]]), value = TRUE)) {
+      row <- table[[kind]][[label]]
+      if (label == "append_read_only") {
+        next
+      }
+      group <- local_sparse_group(kind, mode = "r+")$group
+      handle <- sparse_dataset(group)
+      value <- append_value(kind, label)
+      if (!is.null(row$error)) {
+        expect_error(handle$append(value), class = error_classes[[label]])
+        expect_equal(dim(handle), c(4L, 3L), info = paste(kind, label))
+        next
+      }
+      handle$append(value)
+      expect_equal(dim(handle), unlist(row$shape), info = paste(kind, label))
+      expect_equal(
+        as.vector(attr_read(group, "shape")),
+        unlist(row$attr_shape)
+      )
+      expect_equal(handle$dtype, row$data_dtype)
+      expect_equal(
+        unname(as.matrix(drop_dtype(handle$to_memory()))),
+        table_matrix(row$after),
+        info = paste(kind, label)
+      )
+      expect_equal(
+        unname(as.matrix(drop_dtype(handle[]))),
+        table_matrix(row$after),
+        info = paste(kind, label)
+      )
+    }
+  }
+})
+
+# Python's append_read_only row (the file has no write intent), and a handle
+# whose cached indptr must not outlive an append
+test_that("append() needs a writable file and refreshes the indptr cache", {
+  for (kind in sparse_kinds) {
+    handle <- sparse_dataset(local_sparse_group(kind)$group)
+    expect_error(
+      handle$append(append_value(kind, "append_same")),
+      class = "anndata_read_only_error"
+    )
+    handle <- sparse_dataset(local_sparse_group(kind, mode = "r+")$group)
+    before <- handle[]
+    handle$append(append_value(kind, "append_same"))
+    expect_equal(nrow(handle[]) + ncol(handle[]), sum(dim(before)) + 2L)
+  }
+})
+
+# Files written by R must be appendable like Python's: data, indices and
+# indptr are chunked with an unlimited maximum (bool, empty and CSC included),
+# and a group with fixed-size datasets raises a classed error and is untouched
+test_that("R writes resizable sparse parts and append() checks for them", {
+  dir <- withr::local_tempdir()
+  path <- file.path(dir, "sparse.h5ad")
+  as_csr <- function(x) methods::as(x, "RsparseMatrix")
+  bool <- as_csr(Matrix::Matrix(diag(3) > 0, sparse = TRUE))
+  empty <- as_csr(Matrix::Matrix(matrix(0, 2, 3), sparse = TRUE))
+  csc <- methods::as(matrix(c(1, 4, 2, 3), 2), "generalMatrix")
+  csc <- methods::as(csc, "CsparseMatrix")
+  adata <- AnnData(X = bool)
+  write_h5ad(adata, path)
+  file <- rhdf5::H5Fopen(path, flags = "H5F_ACC_RDWR")
+  withr::defer(rhdf5::H5Fclose(file))
+  write_elem(file, "k1", empty)
+  write_elem(file, "k2", csc)
+  for (key in c("X", "k1", "k2")) {
+    for (part in c("data", "indices", "indptr")) {
+      dset <- rhdf5::H5Dopen(file, paste0(key, "/", part))
+      space <- rhdf5::H5Dget_space(dset)
+      expect_equal(rhdf5::H5Sget_simple_extent_dims(space)$maxsize, -1)
+      rhdf5::H5Sclose(space)
+      rhdf5::H5Dclose(dset)
+    }
+  }
+  group <- rhdf5::H5Gopen(file, "k1")
+  withr::defer(rhdf5::H5Gclose(group))
+  handle <- sparse_dataset(group)
+  handle$append(as_csr(matrix(c(1, 0, 0, 0, 2, 0), 2, byrow = TRUE)))
+  expect_equal(dim(handle), c(4L, 3L))
+  expect_equal(sum(handle[]), 3)
+
+  fixed <- group_create(file, "fixed")
+  withr::defer(node_close(fixed))
+  set_elem_attr(fixed, "encoding-type", "csr_matrix")
+  set_elem_attr(fixed, "encoding-version", "0.1.0")
+  write_shape_attr(fixed, c(1L, 2L))
+  write_dataset(fixed, "data", set_dtype(1, "float64"))
+  write_dataset(fixed, "indices", set_dtype(0L, "int32"))
+  write_dataset(fixed, "indptr", set_dtype(c(0L, 1L), "int32"))
+  handle <- sparse_dataset(fixed)
+  expect_error(
+    handle$append(as_csr(matrix(c(1, 0), 1))),
+    class = "anndata_invalid_value_error"
+  )
+  expect_equal(dim(handle), c(1L, 2L))
 })
