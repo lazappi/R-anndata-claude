@@ -98,7 +98,7 @@ The human owns the order of the Queue.
   - [x] The `filename` setter (rows `filename_*`)
   - [x] Chunked copy with `min_rows_for_chunked_h5_copy`
   - [x] Raw rows (`raw_X_assign`, `raw_assign`, `raw_operations`) and `write_obs_edit`
-- [ ] backed/06: chunked_X, chunk_X and read_elem_partial (`.scratch/backed/issues/06-backed-chunks-and-partial.md`)
+- [x] backed/06: chunked_X, chunk_X and read_elem_partial (`.scratch/backed/issues/06-backed-chunks-and-partial.md`)
 - [ ] backed/07: backed mode documentation (`.scratch/backed/issues/07-backed-docs.md`)
 - [x] lazy/01: lazy seeds spike (`.scratch/lazy/issues/01-lazy-seeds-spike.md`)
   - [x] HDF5Array seeds, ZarrArray and `DataFrame` with DelayedArray columns probed, first draft of `.scratch/lazy/seeds-spike.md`

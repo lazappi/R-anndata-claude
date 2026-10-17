@@ -152,10 +152,14 @@ read_attr_strings <- function(elem, name, path, call) {
   as.character(attr_read(elem, name))
 }
 
-read_dataframe_elem <- function(elem, path, store) {
+read_dataframe_elem <- function(elem, path, store, items = NULL) {
   call <- rlang::caller_env()
   col_names <- read_attr_strings(elem, "column-order", path, call)
   index_key <- read_attr_strings(elem, "_index", path, call)
+  # Only for `read_elem_partial()`: unknown items are ignored, as in Python
+  if (!is.null(items)) {
+    col_names <- col_names[col_names %in% items]
+  }
 
   index <- read_elem(store, paste0(path, "/", index_key))
   dim(index) <- NULL

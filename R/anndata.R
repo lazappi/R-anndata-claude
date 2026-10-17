@@ -586,6 +586,24 @@ AnnDataClass <- R6Class(
         }
       )
     },
+    #' @description The rows of X in chunks, read one at a time for a backed
+    #'   object. Returns a list with one element per chunk, itself a list with
+    #'   the `chunk` (X's own matrix class) and the 1-based `start` and `end`
+    #'   rows (inclusive).
+    #' @param chunk_size Rows per chunk (`6000` for `NULL`). A negative size
+    #'   gives a single chunk and zero is an error.
+    chunked_X = function(chunk_size = NULL) {
+      chunked_x(self, chunk_size, rlang::caller_env())
+    },
+    #' @description A dense matrix of rows of X, random or chosen.
+    #' @param select A single number of rows to sample at random (capped at
+    #'   `n_obs`), or an index of rows (positions, negative or logical
+    #'   vectors or `obs_names`, repeats and any order allowed). Wrap a
+    #'   single position in `I()` to select it.
+    #' @param replace Whether a random sample is drawn with replacement.
+    chunk_X = function(select = 1000L, replace = TRUE) {
+      chunk_x(self, select, replace, rlang::caller_env())
+    },
     #' @description Makes `obs_names` unique in place by appending `join` and a
     #'   counter to repeated names (the first is kept, `NA` is ignored).
     #' @param join String between a name and its counter.

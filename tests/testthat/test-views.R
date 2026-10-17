@@ -814,6 +814,31 @@ test_that("a written View is Structurally equivalent to Python's", {
   expect_python_equal(mine, theirs)
 })
 
+# Why: the `chunked_X` and `chunk_X` rows (deferred by views/04, added by
+# backed/06), a View reads its own rows. The table's `chunk_X` selects its
+# first row and `chunked_X` uses chunks of one row
+test_that("a View chunks its own rows as the table says", {
+  view <- view_of(view_parent())
+  ops <- view_cases()$operations
+  chunks <- view$chunked_X(1L)
+  expected <- ops$chunked_X$result
+  expect_length(chunks, length(expected))
+  for (i in seq_along(chunks)) {
+    expect_equal(chunks[[i]]$start, expected[[i]][[2L]] + 1L)
+    expect_equal(chunks[[i]]$end, expected[[i]][[3L]])
+    expect_equal(
+      unname(as.matrix(chunks[[i]]$chunk)),
+      unname(table_matrix(expected[[i]][[1L]]))
+    )
+  }
+  expect_equal(
+    unname(view$chunk_X(I(1))),
+    unname(table_matrix(ops$chunk_X$result)),
+    ignore_attr = TRUE
+  )
+  expect_true(view$is_view)
+})
+
 # Why: rows of the operations table for methods R does not have yet are
 # deferred (human decision, views/04). Each names the sub-project that owns
 # it, which must pass the row when it adds the method. The test keeps the rows
@@ -821,8 +846,6 @@ test_that("a written View is Structurally equivalent to Python's", {
 # and update this list
 test_that("table rows for methods owned by later sub-projects are deferred", {
   deferred <- list(
-    chunked_X = "backed",
-    chunk_X = "backed",
     write_csvs = "other-formats",
     write_loom = "other-formats"
   )
