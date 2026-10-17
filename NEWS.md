@@ -8,6 +8,7 @@
 * `read_zarr()` and `read_elem()` also read zarr v2 stores, including consolidated metadata, blosc compression and rec-arrays.
 * `adata[i, j]` returns a View that shares X, layers and the aligned mappings with its parent (as in Python), has `is_view` `TRUE` and prints with a `View of ` prefix.
   Views of Views refer to the original parent, and modifying a View makes it an independent object and leaves the parent unchanged, with Python's `anndata_implicit_modification_warning` messages (R cannot tell `view$obs$col <- x` from `view$obs <- x`, so these always warn).
+  Values extracted from a View are plain R objects, so `x <- view$X; x[1, 1] <- 0` does not change the View as it does in Python.
 
 # anndata.claude 0.0.1
 

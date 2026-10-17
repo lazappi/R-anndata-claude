@@ -88,8 +88,21 @@ X, \code{layers}, \code{obsm}, \code{varm}, \code{obsp} and \code{varp} are read
 every access, so a View shows later changes to the parent's X.
 \code{obs}, \code{var}, \code{uns} and \code{raw} are snapshots taken when the View is created.
 A View of a View refers to the original parent.
-Modifying a View turns it into an independent object and leaves the parent
-unchanged.
+Modifying a View turns it into an independent object (\code{is_view} becomes
+\code{FALSE}) and leaves the parent unchanged.
+This includes nested forms such as \code{view$X[1, 1] <- 0}, \code{view$obs$col <- x}
+and \code{view$uns$k <- v}, and deleting a key with \code{view$obsm[["k"]] <- NULL}.
+Where Python warns, an \code{anndata_implicit_modification_warning} is raised.
+R cannot tell \code{view$obs$col <- x} from \code{view$obs <- x}, so both warn with
+the message for assigning the whole Slot.
+\code{copy()} of a View returns an independent object, \code{transpose()} raises an
+error, and writing a View to h5ad or zarr writes the subset.
+
+\strong{Deviation from Python:} accessors return plain R values and not View
+wrappers.
+In Python \verb{x = view.X; x[0, 0] = 1} modifies the View, but in R
+\verb{x <- view$X; x[1, 1] <- 1} only changes \code{x} and the View is unaffected.
+Assign through the View (\code{view$X[1, 1] <- 1}) to modify it.
 }
 
 \section{Deprecated methods}{

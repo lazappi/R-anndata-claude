@@ -58,6 +58,20 @@ adata[1:2, ]
 adata[-1, c("gene1", "gene3")]$shape
 ```
 
+Subsetting returns a View, which shares data with the original `AnnData` and prints with a `View of ` prefix.
+Modifying a View makes it an independent object and leaves the original unchanged, with a warning.
+
+```{r view}
+sub <- adata[1:2, ]
+sub$is_view
+sub$obs[["batch"]] <- c("x", "y")
+sub$is_view
+adata$obs[["batch"]]
+```
+
+Values extracted from a View are plain R objects, so unlike Python `x <- sub$X; x[1, 1] <- 0` does not change the View.
+Assign through the View (`sub$X[1, 1] <- 0`) instead.
+
 ## Write and read h5ad
 
 ```{r h5ad}

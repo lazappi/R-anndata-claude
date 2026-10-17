@@ -30,8 +30,21 @@
 #' every access, so a View shows later changes to the parent's X.
 #' `obs`, `var`, `uns` and `raw` are snapshots taken when the View is created.
 #' A View of a View refers to the original parent.
-#' Modifying a View turns it into an independent object and leaves the parent
-#' unchanged.
+#' Modifying a View turns it into an independent object (`is_view` becomes
+#' `FALSE`) and leaves the parent unchanged.
+#' This includes nested forms such as `view$X[1, 1] <- 0`, `view$obs$col <- x`
+#' and `view$uns$k <- v`, and deleting a key with `view$obsm[["k"]] <- NULL`.
+#' Where Python warns, an `anndata_implicit_modification_warning` is raised.
+#' R cannot tell `view$obs$col <- x` from `view$obs <- x`, so both warn with
+#' the message for assigning the whole Slot.
+#' `copy()` of a View returns an independent object, `transpose()` raises an
+#' error, and writing a View to h5ad or zarr writes the subset.
+#'
+#' **Deviation from Python:** accessors return plain R values and not View
+#' wrappers.
+#' In Python `x = view.X; x[0, 0] = 1` modifies the View, but in R
+#' `x <- view$X; x[1, 1] <- 1` only changes `x` and the View is unaffected.
+#' Assign through the View (`view$X[1, 1] <- 1`) to modify it.
 #'
 #' @section Deprecated methods:
 #' `r lifecycle::badge("deprecated")`

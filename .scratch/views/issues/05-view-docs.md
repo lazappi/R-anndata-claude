@@ -1,6 +1,6 @@
 # Views documentation
 
-Status: ready-for-agent
+Status: done
 Type: task
 Blocked by: 04
 
@@ -14,3 +14,6 @@ Document Views: a vignette paragraph, the `AnnData()` help page (lazy and snapsh
 - `scripts/check.sh` passes
 
 ## Comments
+
+2026-10-17: Extended the `Views` section of the `AnnData()` help page (copy-on-write forms, warning, `copy()`, `transpose()`, writing, and the documented deviation for extracted values), added a vignette View example and a NEWS line.
+Full check passes (0 errors, warnings, notes) and the reviewer passed.
