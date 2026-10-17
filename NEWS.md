@@ -1,4 +1,6 @@
-# anndata.claude (development version)
+# anndata.claude 0.0.2
+
+Second milestone: zarr I/O and Views.
 
 * `read_zarr()` and `write_zarr()` (also `adata$write_zarr()`) read and write zarr v3 stores that round trip with Python.
   Dataset arguments `compressors` (zstd, gzip, blosc or none) and `chunks` are supported.
@@ -9,6 +11,14 @@
 * `adata[i, j]` returns a View that shares X, layers and the aligned mappings with its parent (as in Python), has `is_view` `TRUE` and prints with a `View of ` prefix.
   Views of Views refer to the original parent, and modifying a View makes it an independent object and leaves the parent unchanged, with Python's `anndata_implicit_modification_warning` messages (R cannot tell `view$obs$col <- x` from `view$obs <- x`, so these always warn).
   Values extracted from a View are plain R objects, so `x <- view$X; x[1, 1] <- 0` does not change the View as it does in Python.
+* `adata$write()` is a shortcut for `write_h5ad()`, as in Python.
+
+## Known limitations
+
+* Writing zarr v2 and zip stores (`.zarr.zip`) are not supported.
+* rec-arrays in zarr are always compressed with zstd, ignoring `compressors`.
+* rec-array field dtypes are still not preserved in h5ad (ADR 0005), and unsorted sparse indices are sorted on read (ADR 0006).
+* Legacy formats, backed mode, concatenation and lazy arrays are not yet supported.
 
 # anndata.claude 0.0.1
 
