@@ -4,6 +4,7 @@
   Dataset arguments `compressors` (zstd, gzip, blosc or none) and `chunks` are supported.
   The settings `zarr_write_format` and `auto_shard_zarr_v3` are added (writing v2 is not yet supported).
   Arrays are sharded like Python's by default, and the `shards` dataset argument sets the shard shape or `NULL` for none.
+* `read_zarr()` and `read_elem()` also read zarr v2 stores, including consolidated metadata, blosc compression and rec-arrays.
 
 # anndata.claude 0.0.1
 

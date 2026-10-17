@@ -63,7 +63,7 @@ test_that("Python -> R: basic Elements read as in h5ad", {
   # The zarr and h5ad fixtures of a case hold the same Element, so the HDF5
   # reading is the expected value
   checked <- 0L
-  for (variant in c("v3", "v3_unsharded", "v3_unconsolidated")) {
+  for (variant in c("v3", "v2", "v3_unsharded", "v3_unconsolidated")) {
     cases <- basic_zarr_cases(variant)
     for (case in names(cases)) {
       expected <- h5_case_elem(case)

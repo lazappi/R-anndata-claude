@@ -72,7 +72,7 @@ The human owns the order of the Queue.
   - [x] vignette-independent NEWS entry for zarr (the settings help text changes with ticket 09, sharding)
   - [x] `read_elem()`/`write_elem()` tests on zarr groups with a path and error parity with h5ad (forward slashes, bad keys)
 - [x] zarr-io/09: writing sharded zarr v3 (`.scratch/zarr-io/issues/09-zarr-shard-writing.md`)
-- [ ] zarr-io/10: reading zarr v2 (`.scratch/zarr-io/issues/10-zarr-v2-read.md`)
+- [x] zarr-io/10: reading zarr v2 (`.scratch/zarr-io/issues/10-zarr-v2-read.md`)
 - [ ] zarr-io/11: writing zarr v2 (`.scratch/zarr-io/issues/11-zarr-v2-write.md`)
 - [ ] zarr-io/12: zarr documentation (`.scratch/zarr-io/issues/12-zarr-docs.md`)
 

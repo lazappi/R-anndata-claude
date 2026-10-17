@@ -38,7 +38,10 @@ zarr_field_kinds <- c(
 )
 
 # The name and byte width of each field of a `struct` data type
-zarr_struct_fields <- function(meta, path, call) {
+zarr_struct_fields <- function(meta, path, call, version = 3L) {
+  if (version == 2L) {
+    return(zarr_v2_struct_fields(meta, path, call))
+  }
   fields <- meta$data_type$configuration$fields
   lapply(fields, function(field) {
     type <- field$data_type
@@ -58,6 +61,78 @@ zarr_struct_fields <- function(meta, path, call) {
   })
 }
 
+# The fields of a v2 structured dtype (a list of `[name, typestr]` pairs), in
+# the form `zarr_struct_fields()` gives for v3
+zarr_v2_struct_fields <- function(meta, path, call) {
+  kinds <- c(
+    "|u1" = "uint8",
+    "|i1" = "int8",
+    "<i2" = "int16",
+    "<u2" = "uint16",
+    "<i4" = "int32",
+    "<u4" = "uint32",
+    "<i8" = "int64",
+    "<u8" = "uint64",
+    "<f4" = "float32",
+    "<f8" = "float64",
+    "|b1" = "bool"
+  )
+  lapply(meta$dtype, function(field) {
+    name <- field[[1L]]
+    typestr <- field[[2L]]
+    width <- suppressWarnings(as.integer(substring(typestr, 3L)))
+    if (startsWith(typestr, ">")) {
+      abort_not_supported(
+        "Cannot read {.path {path}}, it is big-endian.",
+        path = path
+      )
+    }
+    if (typestr %in% names(kinds)) {
+      type <- kinds[[typestr]]
+      size <- zarr_value_sizes[[type]]
+    } else if (grepl("^<U[0-9]+$", typestr)) {
+      type <- "fixed_length_utf32"
+      size <- 4L * width
+    } else if (grepl("^\\|S[0-9]+$", typestr)) {
+      type <- "null_terminated_bytes"
+      size <- width
+    } else {
+      abort_dataset_type(
+        path,
+        paste0("field \"", name, "\" has the unsupported type ", typestr),
+        call
+      )
+    }
+    list(name = name, type = type, size = size)
+  })
+}
+
+# The bytes of one v2 chunk file (decoded by the array's compressor), by
+# reading it back as a 1-d uint8 array of `size` values
+zarr_v2_unpack <- function(file, size, meta) {
+  tmp <- tempfile("zarr-v2-bytes")
+  on.exit(unlink(tmp, recursive = TRUE), add = TRUE)
+  dir.create(tmp)
+  jsonlite::write_json(
+    list(
+      zarr_format = 2L,
+      shape = list(size),
+      chunks = list(size),
+      dtype = "|u1",
+      compressor = meta$compressor,
+      filters = NULL,
+      fill_value = 0L,
+      order = "C"
+    ),
+    file.path(tmp, ".zarray"),
+    auto_unbox = TRUE,
+    null = "null"
+  )
+  file.copy(file, file.path(tmp, "0"))
+  values <- suppressMessages(Rarr::read_zarr_array(tmp))
+  as.raw(as.vector(values))
+}
+
 # The bytes of a chunk compressed with zstd, by reading them back as a 1-d
 # uint8 array of `size` values (the inverse of `zarr_zstd()`)
 zarr_unzstd <- function(file, size) {
@@ -74,6 +149,31 @@ zarr_unzstd <- function(file, size) {
 # is all zero)
 zarr_struct_bytes <- function(array, itemsize, path, call) {
   meta <- array$meta
+  if (array$node$version == 2L) {
+    if (!identical(meta$order, "C") || length(meta$filters) > 0L) {
+      abort_not_supported(
+        "Cannot read {.path {path}}, it is not C order or it has filters.",
+        path = path
+      )
+    }
+    dir <- zarr_dir(array$node)
+    chunk_rows <- meta$chunks[[1L]]
+    count <- chunk_rows * itemsize
+    chunks <- lapply(
+      seq_len(ceiling(array$shape / chunk_rows)) - 1L,
+      function(i) {
+        file <- file.path(dir, i)
+        if (!file.exists(file)) {
+          raw(count)
+        } else if (is.null(meta$compressor)) {
+          readBin(file, "raw", file.size(file))
+        } else {
+          zarr_v2_unpack(file, count, meta)
+        }
+      }
+    )
+    return(as.raw(unlist(chunks))[seq_len(array$shape * itemsize)])
+  }
   codecs <- vapply(meta$codecs, function(codec) codec$name, character(1))
   if (!all(codecs %in% c("bytes", "zstd"))) {
     abort_not_supported(
@@ -169,10 +269,10 @@ zarr_field_values <- function(bytes, field, path, call) {
 zarr_table_read <- function(store, path, call) {
   array <- zarr_array_meta(store, path)
   node_path <- array$node$path
-  if (!identical(array$dtype, "struct") || array$node$version != 3L) {
-    abort_dataset_type(node_path, "it is not a zarr v3 struct array", call)
+  if (!identical(array$dtype, "struct")) {
+    abort_dataset_type(node_path, "it is not a zarr struct array", call)
   }
-  fields <- zarr_struct_fields(array$meta, node_path, call)
+  fields <- zarr_struct_fields(array$meta, node_path, call, array$node$version)
   sizes <- vapply(fields, function(field) field$size, integer(1))
   itemsize <- sum(sizes)
   bytes <- matrix(

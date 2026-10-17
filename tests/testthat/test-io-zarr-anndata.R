@@ -52,7 +52,7 @@ test_that("Python -> R: read_zarr reads the fixtures as read_h5ad does", {
   # The zarr and h5ad fixtures of a case hold the same object. The unsharded
   # and unconsolidated variants are other layouts of the same store.
   checked <- 0L
-  for (variant in c("v3", "v3_unsharded", "v3_unconsolidated")) {
+  for (variant in c("v3", "v2", "v3_unsharded", "v3_unconsolidated")) {
     cases <- zarr_adata_cases(variant)
     for (case in names(cases)) {
       expect_identical(
@@ -68,7 +68,14 @@ test_that("Python -> R: read_zarr reads the fixtures as read_h5ad does", {
 
 test_that("Python -> R -> Python: write_zarr matches the Python stores", {
   skip_if_no_python()
-  originals <- zarr_adata_cases()
+  # Python's v2 stores are read and rewritten as v3, which is Structurally
+  # equivalent (only the format differs)
+  v3 <- zarr_adata_cases()
+  v2 <- zarr_adata_cases("v2")
+  originals <- c(
+    stats::setNames(v3, paste0("v3_", names(v3))),
+    stats::setNames(v2, paste0("v2_", names(v2)))
+  )
   dir <- withr::local_tempdir()
   written <- vapply(
     names(originals),

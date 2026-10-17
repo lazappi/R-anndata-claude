@@ -72,7 +72,7 @@ test_that("Python -> R: compound Elements read as in h5ad", {
   # The zarr and h5ad fixtures of a case hold the same Element, so the HDF5
   # reading is the expected value
   checked <- 0L
-  for (variant in c("v3", "v3_unsharded", "v3_unconsolidated")) {
+  for (variant in c("v3", "v2", "v3_unsharded", "v3_unconsolidated")) {
     cases <- compound_zarr_cases(variant)
     for (case in names(cases)) {
       expected <- h5_case_elem(case)
@@ -139,4 +139,81 @@ test_that("R -> Python -> R: Python reads and rewrites what R wrote", {
       label = names(values)[[i]]
     )
   }
+})
+
+# A copy of the v2 `rec_array_widths` store whose array metadata is edited by
+# `edit`, returning the store
+local_v2_rec_array <- function(edit, env = parent.frame()) {
+  source <- zarr_variant_paths("v2")[["rec_array_widths"]]
+  dir <- withr::local_tempdir(.local_envir = env)
+  file.copy(source, dir, recursive = TRUE)
+  path <- file.path(dir, basename(source))
+  file <- file.path(path, "x", ".zarray")
+  meta <- jsonlite::read_json(file)
+  jsonlite::write_json(
+    edit(meta, file.path(path, "x")),
+    file,
+    auto_unbox = TRUE,
+    null = "null",
+    digits = NA
+  )
+  zarr_open(path)
+}
+
+test_that("v2 rec-arrays that are uncompressed or have a missing chunk read", {
+  # Python writes blosc by default, so the other compressor and fill-value
+  # paths need an edited copy of a fixture
+  expected <- read_elem(
+    zarr_open(zarr_variant_paths("v2")[["rec_array_widths"]]),
+    "x"
+  )
+  plain <- local_v2_rec_array(function(meta, dir) {
+    chunk <- file.path(dir, "0")
+    bytes <- zarr_v2_unpack(chunk, 2L * 20L, meta)
+    writeBin(bytes, chunk)
+    meta$compressor <- NULL
+    meta
+  })
+  expect_identical(read_elem(plain, "x"), expected)
+  missing <- local_v2_rec_array(function(meta, dir) {
+    unlink(file.path(dir, "0"))
+    meta
+  })
+  zeros <- read_elem(missing, "x")
+  expect_equal(nrow(zeros), 2L)
+  expect_true(all(unlist(zeros[names(zeros) != "b"]) == 0))
+})
+
+test_that("v2 rec-arrays the reader cannot decode raise classed errors", {
+  # Big-endian, Fortran order, filters and unknown field types must not be
+  # read as if they were plain little-endian records
+  big <- local_v2_rec_array(function(meta, dir) {
+    meta$dtype[[2L]][[2L]] <- ">i2"
+    meta
+  })
+  expect_anndata_condition(
+    read_elem(big, "x"),
+    "anndata_not_supported_error"
+  )
+  fortran <- local_v2_rec_array(function(meta, dir) {
+    meta$order <- "F"
+    meta
+  })
+  expect_anndata_condition(
+    read_elem(fortran, "x"),
+    "anndata_not_supported_error"
+  )
+  filtered <- local_v2_rec_array(function(meta, dir) {
+    meta$filters <- list(list(id = "delta", dtype = "|u1"))
+    meta
+  })
+  expect_anndata_condition(
+    read_elem(filtered, "x"),
+    "anndata_not_supported_error"
+  )
+  unknown <- local_v2_rec_array(function(meta, dir) {
+    meta$dtype[[2L]][[2L]] <- "<c8"
+    meta
+  })
+  expect_anndata_condition(read_elem(unknown, "x"), "anndata_dtype_error")
 })
