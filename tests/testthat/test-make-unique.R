@@ -7,13 +7,7 @@ make_named <- function(names) {
 
 # Guards the committed expectations against drifting from what Python gives
 test_that("the committed make_unique expectations match Python", {
-  skip_if_no_python()
-  fresh <- withr::local_tempfile(fileext = ".json")
-  run_python("make_unique_cases.py", fresh)
-  expect_equal(
-    readLines(fresh),
-    readLines(fixture_path("make_unique_cases.json"))
-  )
+  expect_generator_current("make_unique_cases.py")
 })
 
 # Python's make_index_unique results are the reference (committed JSON), so

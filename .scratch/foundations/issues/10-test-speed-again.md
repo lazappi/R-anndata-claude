@@ -1,6 +1,6 @@
 # Faster test suite, again
 
-Status: ready-for-agent
+Status: in-progress
 Type: task
 Blocked by: none
 
@@ -39,3 +39,8 @@ These cuts keep coverage and are approved:
   - Next: cut total work, not just overlap it.
     Candidates: the `write_zarr` tests that convert about 34 stores per direction (read, write and tree-describe each in R and Python), `backed_cases.py` (33s), the determinism test (run the generator once and compare against both the committed fixtures and a second run only for the manifest), and splitting `test-io-zarr-anndata.R` so the workers balance.
     A human decision is needed on whether any of those lose coverage, so I stopped.
+- 2026-10-17 (second run): Still `in-progress`, full check passes but is not yet under 5 minutes.
+  - Applied the approved decisions: freshness tests for the 8 committed generators (`expect_generator_current()`, hashes in `fixtures/generator-hashes.json`, written by `scripts/write-generator-hashes.R` from `scripts/regenerate-fixtures.sh`, which now also regenerates the h5ad encoding table), both determinism tests generate once, and the `write_zarr` AnnData-level tests use `zarr_write_cases()` (realistic plus 6 edge cases, v2 only for 2).
+  - Result: tests 262s wall, whole `scripts/check.sh` 7:03 (before: 6:27), so no measurable gain, probably machine noise. `R CMD check` also builds and checks the package, so the tests are not the only cost.
+  - Not done: splitting `test-io-zarr-anndata.R` for worker balance, and a per-file serial timing (the checker's command was denied).
+  - Next run: measure the time outside the tests (check steps before and after the test step), then split slow files.

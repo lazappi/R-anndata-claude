@@ -4,10 +4,7 @@ view_cases <- function() {
 
 # Guards the committed View operations table against drifting from Python
 test_that("the committed View operations table matches Python", {
-  skip_if_no_python()
-  fresh <- withr::local_tempfile(fileext = ".json")
-  run_python("view_cases.py", fresh)
-  expect_equal(readLines(fresh), readLines(fixture_path("view_cases.json")))
+  expect_generator_current("view_cases.py")
 })
 
 # The table must keep covering every operation the views spec lists, so later

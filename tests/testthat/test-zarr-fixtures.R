@@ -109,25 +109,7 @@ test_that("fixtures have the layouts Python writes by default", {
 # Guards the zarr encoding table like the h5ad one: its observed block is
 # generated from the fixtures, so it must match what regenerating it gives
 test_that("the committed zarr encoding table matches the fixtures", {
-  skip_if_no_python()
-  doc <- testthat::test_path(
-    "..",
-    "..",
-    ".scratch",
-    "zarr-io",
-    "encoding-table.md"
-  )
-  skip_if_not(file.exists(doc), "the encoding table is not in the check copy")
-
-  copy <- withr::local_tempfile(fileext = ".md")
-  file.copy(doc, copy)
-  run_python(
-    "zarr_encoding_table.py",
-    zarr_fixture_dir(),
-    copy
-  )
-
-  expect_equal(readLines(copy), readLines(doc))
+  expect_generator_current("zarr_encoding_table.py")
 })
 
 # Guards determinism: regenerating must not change any fixture structurally,
@@ -135,23 +117,11 @@ test_that("the committed zarr encoding table matches the fixtures", {
 test_that("regenerated zarr fixtures are deterministic and committed", {
   skip_if_no_python()
 
+  # Generated once (about 50s), a second run would only repeat the comparison
   first <- withr::local_tempdir()
-  second <- withr::local_tempdir()
-  # Each generation takes about 50s, so the two run side by side
-  results <- parallel::mclapply(
-    list(first, second),
-    function(dir) run_python_raw("generate_zarr_fixtures.py", dir),
-    mc.cores = 2L
-  )
-  for (result in results) {
-    expect_identical(result$status, 0L, info = result$stderr)
-  }
+  run_python("generate_zarr_fixtures.py", first)
 
   manifest <- zarr_fixture_manifest()
-  expect_equal(
-    readLines(file.path(first, "manifest.json")),
-    readLines(file.path(second, "manifest.json"))
-  )
   expect_equal(
     readLines(file.path(first, "manifest.json")),
     readLines(zarr_fixture_path("manifest.json"))
@@ -159,7 +129,6 @@ test_that("regenerated zarr fixtures are deterministic and committed", {
   files <- unlist(lapply(manifest$variants, function(variant) {
     vapply(variant$cases, function(case) case$file, character(1))
   }))
-  expect_all_equivalent(file.path(first, files), file.path(second, files))
   expect_all_equivalent(
     file.path(first, files),
     zarr_fixture_path(files)

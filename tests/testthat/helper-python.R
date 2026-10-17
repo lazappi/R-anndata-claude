@@ -16,6 +16,51 @@ python_project <- function() {
   )
 }
 
+# A hash of a generator script, its extra inputs (other scripts it depends on)
+# and the uv lock file. `scripts/write-generator-hashes.R` stores it next to the
+# generated fixtures, so freshness tests compare hashes, not run Python
+generator_hash <- function(
+  script,
+  extra = character(),
+  dir = python_project()
+) {
+  files <- file.path(dir, c(script, extra, "uv.lock"))
+  hashes <- unname(tools::md5sum(files))
+  combined <- tempfile()
+  on.exit(unlink(combined))
+  writeLines(hashes, combined)
+  unname(tools::md5sum(combined))
+}
+
+# The generators whose output is committed, and the extra inputs of each
+generator_inputs <- function() {
+  list(
+    "encoding_table.py" = "generate_fixtures.py",
+    "zarr_encoding_table.py" = "generate_zarr_fixtures.py",
+    "backed_cases.py" = character(),
+    "unwriteable_cases.py" = character(),
+    "view_cases.py" = character(),
+    "categorical_cases.py" = character(),
+    "make_unique_cases.py" = character(),
+    "repr_cases.py" = character()
+  )
+}
+
+# Fails when a generator script (or uv.lock) changed since its committed output
+# was last regenerated with `scripts/regenerate-fixtures.sh`
+expect_generator_current <- function(script) {
+  stored <- jsonlite::fromJSON(fixture_path("generator-hashes.json"))
+  expect_identical(
+    stored[[script]],
+    generator_hash(script, generator_inputs()[[script]]),
+    info = paste0(
+      "`",
+      script,
+      "` or uv.lock changed, run scripts/regenerate-fixtures.sh"
+    )
+  )
+}
+
 # The interpreter of the uv environment, found once per test process because
 # `uv run` costs a few hundred milliseconds on every call (uv still creates and
 # syncs the environment on the first one)

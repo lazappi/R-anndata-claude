@@ -91,10 +91,7 @@ repr_objects <- function() {
 
 # Guards the committed expectations against drifting from what Python gives
 test_that("the committed repr expectations match Python", {
-  skip_if_no_python()
-  fresh <- withr::local_tempfile(fileext = ".json")
-  run_python("repr_cases.py", fresh)
-  expect_equal(readLines(fresh), readLines(fixture_path("repr_cases.json")))
+  expect_generator_current("repr_cases.py")
 })
 
 # format() must reproduce Python's repr for objects covering every Slot,

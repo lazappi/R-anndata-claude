@@ -11,6 +11,26 @@ zarr_adata_cases <- function(variant = "v3") {
   paths[names(paths) %in% adata_fixture_names]
 }
 
+# The cases the AnnData-level write tests use (human decision, ticket
+# foundations/10): the realistic object and edge cases of the Slots. Every
+# per-encoding store is covered in all three directions by test-io-zarr-basic.R
+# and test-io-zarr-compound.R.
+zarr_write_cases <- function(variant = "v3") {
+  cases <- zarr_adata_cases(variant)
+  cases[
+    names(cases) %in%
+      c(
+        "realistic",
+        "anndata_full",
+        "anndata_empty_slots",
+        "anndata_no_x",
+        "anndata_0_obs",
+        "anndata_raw_own_var",
+        "anndata_raw_0_obs"
+      )
+  ]
+}
+
 h5ad_adata_cases <- function(names) {
   stats::setNames(
     fixture_path(file.path("h5ad", paste0(names, ".h5ad"))),
@@ -70,8 +90,8 @@ test_that("Python -> R -> Python: write_zarr matches the Python stores", {
   skip_if_no_python()
   # Python's v2 stores are read and rewritten as v3, which is Structurally
   # equivalent (only the format differs)
-  v3 <- zarr_adata_cases()
-  v2 <- zarr_adata_cases("v2")
+  v3 <- zarr_write_cases()
+  v2 <- zarr_write_cases("v2")[c("realistic", "anndata_raw_own_var")]
   originals <- c(
     stats::setNames(v3, paste0("v3_", names(v3))),
     stats::setNames(v2, paste0("v2_", names(v2)))
@@ -118,7 +138,7 @@ test_that("R -> Python -> R: Python rewrites the stores R writes", {
 
 test_that("cross-format: h5ad to zarr matches Python's conversion", {
   skip_if_no_python()
-  names <- names(zarr_adata_cases())
+  names <- names(zarr_write_cases())
   h5ad <- h5ad_adata_cases(names)
   dir <- withr::local_tempdir()
   written <- file.path(dir, paste0(names, ".zarr"))
@@ -138,7 +158,7 @@ test_that("cross-format: h5ad to zarr matches Python's conversion", {
 test_that("cross-format: zarr to h5ad matches Python's conversion", {
   skip_if_no_python()
   # Python's read_zarr drops a Raw with no observations, so it is left out
-  zarr <- zarr_adata_cases()
+  zarr <- zarr_write_cases()
   zarr <- zarr[names(zarr) != "anndata_raw_0_obs"]
   dir <- withr::local_tempdir()
   written <- file.path(dir, paste0(names(zarr), ".h5ad"))

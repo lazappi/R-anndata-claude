@@ -11,13 +11,7 @@ null_to_na <- function(x) {
 
 # Guards the committed expectations against drifting from what Python gives
 test_that("the committed categorical expectations match Python", {
-  skip_if_no_python()
-  fresh <- withr::local_tempfile(fileext = ".json")
-  run_python("categorical_cases.py", fresh)
-  expect_equal(
-    readLines(fresh),
-    readLines(fixture_path("categorical_cases.json"))
-  )
+  expect_generator_current("categorical_cases.py")
 })
 
 # Python's conversion rules (string columns, fewer unique values than rows,

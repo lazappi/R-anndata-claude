@@ -1,9 +1,6 @@
 # Guards the committed backed operations table against drifting from Python
 test_that("the committed backed operations table matches Python", {
-  skip_if_no_python()
-  fresh <- withr::local_tempfile(fileext = ".json")
-  run_python("backed_cases.py", fresh)
-  expect_equal(readLines(fresh), readLines(fixture_path("backed_cases.json")))
+  expect_generator_current("backed_cases.py")
 })
 
 # The table must keep covering every operation the backed spec lists, so later

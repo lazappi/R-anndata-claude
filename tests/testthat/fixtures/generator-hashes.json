@@ -1,0 +1,10 @@
+{
+  "encoding_table.py": "693606552c4389ded009745835776cf7",
+  "zarr_encoding_table.py": "8234a39c0229d4869ecbe0f7d438d48a",
+  "backed_cases.py": "7dce29c6012f89408cec94a3d7a724f6",
+  "unwriteable_cases.py": "5266ac964fad7664944718ac6a2488d3",
+  "view_cases.py": "018c79319c47db899d91067768e79564",
+  "categorical_cases.py": "58fc2c7d69bf965b1c6608406845dfba",
+  "make_unique_cases.py": "e75e48fd4444bb015e4c57b82b0ca2d8",
+  "repr_cases.py": "bfc5a79d5c6f9a885b13b9c6342056dd"
+}

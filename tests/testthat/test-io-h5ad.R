@@ -565,11 +565,5 @@ test_that("objects reported writeable can be written", {
 
 # Guards the committed Python results against a change of the cases
 test_that("the committed unwriteable expectations match Python", {
-  skip_if_no_python()
-  fresh <- withr::local_tempfile(fileext = ".json")
-  run_python("unwriteable_cases.py", fresh)
-  expect_equal(
-    readLines(fresh),
-    readLines(fixture_path("unwriteable_cases.json"))
-  )
+  expect_generator_current("unwriteable_cases.py")
 })
