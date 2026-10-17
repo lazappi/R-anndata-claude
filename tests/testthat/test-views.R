@@ -778,3 +778,25 @@ test_that("a written View is Structurally equivalent to Python's", {
   expect_all_equivalent(mine, theirs)
   expect_python_equal(mine, theirs)
 })
+
+# Why: rows of the operations table for methods R does not have yet are
+# deferred (human decision, views/04). Each names the sub-project that owns
+# it, which must pass the row when it adds the method. The test keeps the rows
+# in the table and fails once a method appears, as a reminder to test its row
+# and update this list
+test_that("table rows for methods owned by later sub-projects are deferred", {
+  deferred <- list(
+    to_memory = "backed",
+    chunked_X = "backed",
+    chunk_X = "backed",
+    write_csvs = "other-formats",
+    write_loom = "other-formats",
+    write = "views Discovered item (alias of write_h5ad)"
+  )
+  ops <- view_cases()$operations
+  view <- view_of(view_parent())
+  for (name in names(deferred)) {
+    expect_true(name %in% names(ops), info = name)
+    expect_false(is.function(.subset2(view, name)), info = name)
+  }
+})

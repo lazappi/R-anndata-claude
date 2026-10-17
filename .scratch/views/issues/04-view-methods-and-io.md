@@ -1,6 +1,6 @@
 # Views: methods and writing
 
-Status: in-progress
+Status: done
 Type: task
 Blocked by: 03 (and zarr-io/08 for writing zarr)
 
@@ -30,3 +30,7 @@ Every public method on a View follows the operations table (`transpose()` raises
 - `tests/python/rewrite_view.py` writes `adata[obs, var]` with Python's defaults, and a test in `test-views.R` compares R's written View with it for h5ad and zarr (`expect_all_equivalent()` and `expect_python_equal()`)
 - Only an obs and var subset is covered (no View of a View or Raw case)
 - Remaining, see `fix_plan.md`: the table rows for `to_memory`, `write` alias, `write_csvs`, `write_loom`, `chunked_X`, `chunk_X`, which have no R method yet (they belong to other-formats/backed, so a human should say whether to skip them or stub nothing)
+
+2026-10-17 (final run): Done, following the human decision.
+- `test-views.R` lists the deferred rows with their owning sub-project and fails once a method appears (reminder to test the row)
+- `write` is tracked as a Discovered item in `fix_plan.md`
