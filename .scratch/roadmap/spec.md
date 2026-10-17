@@ -45,10 +45,10 @@ A stub spec must be grilled into a full spec before tickets are written for it.
 | 1 | `foundations` | done | Package skeleton, tooling, settings, conditions, Python round-trip harness | none |
 | 2 | `core-object` | done (MVP) | `AnnData` R6 class and in-memory behaviour | foundations |
 | 3 | `h5ad-io` | done (MVP) | Element registry and h5ad read/write for all current encodings except awkward-array | foundations, core-object |
-| 4 | `views` | full | Lazy views with copy-on-write | core-object |
+| 4 | `views` | done (0.0.2) | Lazy views with copy-on-write | core-object |
 | 5 | `concat` | stub | `concat()` | core-object, views |
-| 6 | `zarr-io` | full | `read_zarr()` / `write_zarr()` for zarr v2 and v3 | h5ad-io |
-| 7 | `backed` | stub | Backed mode for h5ad | h5ad-io, views |
+| 6 | `zarr-io` | done (0.0.2) | `read_zarr()` / `write_zarr()` for zarr v2 and v3 | h5ad-io |
+| 7 | `backed` | full | Backed mode for h5ad | h5ad-io, views |
 | 8 | `lazy` | stub | Lazy arrays and lazy reading | h5ad-io, backed |
 | 9 | `legacy-formats` | stub | Reading files from before the current encodings | h5ad-io |
 | 10 | `other-formats` | stub | csv, mtx, text, excel, loom, umi_tools, hdf readers and writers | core-object |

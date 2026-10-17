@@ -1,6 +1,6 @@
 # Writing zarr v2
 
-Status: needs-triage
+Status: wontfix
 Type: task
 Blocked by: 10
 
@@ -18,6 +18,8 @@ If this turns out expensive, stop and ask: the human decided writing v2 may move
 
 - Writing v2 is expensive, so it moves to a follow-up ticket as the spec decided.
   Until then `zarr_write_format = 2` raises a clear classed error when writing, and the setting still warns as Python's does (`zarr.py:244-256`).
+
+- 2026-10-17: `wontfix` for now. Python deprecated writing v2 in 0.13 and removes `zarr_write_format` in 0.14, and reading v2 already works. Revisit if a real need appears.
 
 ## Comments
 

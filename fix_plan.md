@@ -83,6 +83,14 @@ The human owns the order of the Queue.
   - [x] Structural equivalence of a written View with Python writing the same View (`expect_python_equal()`)
   - [x] Table rows with no R method yet: `to_memory`, `write_csvs`, `write_loom`, `chunked_X`, `chunk_X` listed as deferred in `test-views.R` (human decision, see ticket), `write` is under Discovered
 - [x] views/05: Views documentation (`.scratch/views/issues/05-view-docs.md`)
+- [ ] zarr-io/15: zarr rec-array compressors (`.scratch/zarr-io/issues/15-zarr-rec-array-compressors.md`)
+- [ ] backed/01: backed operations table (`.scratch/backed/issues/01-backed-operations-table.md`)
+- [ ] backed/02: backed reading and the file manager (`.scratch/backed/issues/02-backed-file-manager.md`)
+- [ ] backed/03: backed dense X (`.scratch/backed/issues/03-backed-dense.md`)
+- [ ] backed/04: backed sparse X and sparse_dataset() (`.scratch/backed/issues/04-backed-sparse.md`)
+- [ ] backed/05: writing backed objects (`.scratch/backed/issues/05-backed-writing.md`)
+- [ ] backed/06: chunked_X, chunk_X and read_elem_partial (`.scratch/backed/issues/06-backed-chunks-and-partial.md`)
+- [ ] backed/07: backed mode documentation (`.scratch/backed/issues/07-backed-docs.md`)
 
 ## Discovered
 
@@ -100,7 +108,7 @@ The human owns the order of the Queue.
 
 - [x] Coverage was understated because the registry held uninstrumented function copies under covr, fixed with `late_bound()`, now 96.42%
 
-- [ ] Python writes a missing `raw` as a `null` Element in zarr (not in h5ad), and zarr keeps rec-array field dtypes (see zarr-io/03 comments).
+- [x] Python writes a missing `raw` as a `null` Element in zarr (not in h5ad), and zarr keeps rec-array field dtypes (see zarr-io/03 comments).
   zarr-io/05 must write the `null` raw, and the human should decide on rec-array dtype fidelity in zarr (ADR 0005, zarr-io/07)
 
 - [x] Delete the stale unpacked `tests/testthat/fixtures/zarr/` (ignored by git and the build, but unused), the shell denied `rm`
@@ -112,7 +120,7 @@ The human owns the order of the Queue.
 
 - [x] (moved to zarr-io/14) zarr rec-arrays are written unsharded, and `shards = "auto"` is rejected (Python accepts it). Python shards rec-arrays by default, so a human may want parity
 
-- [ ] zarr rec-arrays ignore `compressors` (Python honours it) because the struct reader only decodes zstd, and the writer always uses one chunk (zarr-io/14)
+- [x] (moved to zarr-io/15) zarr rec-arrays ignore `compressors` (Python honours it) because the struct reader only decodes zstd, and the writer always uses one chunk (zarr-io/14)
 
 - [x] `adata$write()` is missing: Python's `write` is a shortcut for `write_h5ad` (`anndata.py:1744`). Add it as an alias and pass its row of the Views operations table.
 
@@ -122,6 +130,5 @@ The human owns the order of the Queue.
 
 Tickets that need triage before they can be queued.
 
-- zarr-io/11: writing zarr v2 (`.scratch/zarr-io/issues/11-zarr-v2-write.md`), moved here as decided
 - zarr-io/13: zip stores (`.scratch/zarr-io/issues/13-zarr-zip-stores.md`)
 - h5ad-io/15: rec-array field dtype fidelity (`.scratch/h5ad-io/issues/15-rec-array-dtype-fidelity.md`), after the MVP
