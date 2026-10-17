@@ -1,6 +1,6 @@
 # Faster test suite, again
 
-Status: in-progress
+Status: needs-info
 Type: task
 Blocked by: none
 
@@ -44,3 +44,12 @@ These cuts keep coverage and are approved:
   - Result: tests 262s wall, whole `scripts/check.sh` 7:03 (before: 6:27), so no measurable gain, probably machine noise. `R CMD check` also builds and checks the package, so the tests are not the only cost.
   - Not done: splitting `test-io-zarr-anndata.R` for worker balance, and a per-file serial timing (the checker's command was denied).
   - Next run: measure the time outside the tests (check steps before and after the test step), then split slow files.
+- 2026-10-17 (third run): Blocked, status `needs-info`. No code changes.
+  - Measured: `scripts/check.sh --quick` (air, lintr, all tests on 4 workers) takes 239s in total, so the tests are about 230s.
+    The full check takes about 390-420s, so about 160-190s is outside the tests (install and build, vignette, examples, `R CMD check` sections, document, lint).
+    The direct `Rscript -e 'devtools::test(...)'` timing command was denied for the checker, so I could not get a finer split.
+  - Consequence: even a test suite near 0s leaves the full check close to 3 minutes, and the tests cannot get below 5 minutes in total without cutting about 90s from the tests too.
+    Splitting `test-io-zarr-anndata.R` only balances workers (the zarr files are 135s, 112s, 56s of the 707s summed over files), it removes no work.
+  - Question: is the 5 minute criterion for the whole `scripts/check.sh` still wanted?
+    Options: (a) relax it to 7 minutes (it passes today at about 6.5), (b) also move `R CMD check` work out of the check (for example `--no-build-vignettes`, `--no-manual`, `_R_CHECK_*` flags in `devtools::check()`), which changes the check script and needs a human decision, (c) cut tests further (loses coverage, not approved).
+  - Recommended: (b), then split `test-io-zarr-anndata.R` and `test-zarr-fixtures.R` for balance.
