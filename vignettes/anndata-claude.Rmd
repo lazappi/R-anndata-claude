@@ -87,3 +87,36 @@ adata.write_h5ad("from-python.h5ad")
 back <- read_h5ad("from-python.h5ad")
 back$obs[["from_python"]]
 ```
+
+## Write and read zarr
+
+`write_zarr()` writes a zarr v3 store (a directory) and `read_zarr()` reads v3 and v2 stores.
+
+```{r zarr}
+zarr_path <- tempfile(fileext = ".zarr")
+write_zarr(adata, zarr_path)
+zarr_roundtrip <- read_zarr(zarr_path)
+zarr_roundtrip
+identical(zarr_roundtrip$obs_names, adata$obs_names)
+```
+
+Use the `compressors` argument to choose the compression (zstd, gzip, blosc or none) and `shards` to set the shard shape.
+Writing zarr v2 is not yet supported.
+
+## Move a zarr store to Python and back
+
+Python anndata reads and writes the same store.
+These chunks need Python so they are shown but not run.
+
+```{python python-zarr, eval = FALSE, python.reticulate = FALSE}
+import anndata as ad
+
+adata = ad.read_zarr("example.zarr")
+adata.obs["from_python"] = True
+adata.write_zarr("from-python.zarr")
+```
+
+```{r zarr-read-back, eval = FALSE}
+back <- read_zarr("from-python.zarr")
+back$obs[["from_python"]]
+```
