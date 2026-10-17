@@ -16,8 +16,9 @@ format.AnnData <- function(x, ...) {
   lines <- character()
   # Written as a code point to keep the source ASCII
   times <- intToUtf8(0xD7)
+  backed <- .subset2(x, "isbacked")
   for (slot in slots) {
-    keys <- slot_keys(x, slot)
+    keys <- slot_keys(x, slot, backed)
     if (length(keys)) {
       lines <- c(
         lines,
@@ -36,7 +37,8 @@ format.AnnData <- function(x, ...) {
         " ",
         times,
         " ",
-        shape[[2]]
+        shape[[2]],
+        if (backed) paste0(" backed at ", quote_key(.subset2(x, "filename")))
       ),
       lines
     ),
@@ -52,7 +54,7 @@ print.AnnData <- function(x, ...) {
 }
 
 # The quoted keys of one Slot, as Python lists them
-slot_keys <- function(x, slot) {
+slot_keys <- function(x, slot, backed = FALSE) {
   if (slot %in% c("obs", "var")) {
     keys <- colnames(.subset2(x, slot))
   } else if (slot == "uns") {
@@ -61,10 +63,12 @@ slot_keys <- function(x, slot) {
     keys <- .subset2(x, slot)$keys()
   }
   keys <- as.character(keys)
-  # X is listed after the named layers, as Python does
+  # X is listed after the named layers, as Python does, except in backed mode
+  # where it comes first
   is_x <- is.na(keys)
-  keys <- c(quote_key(keys[!is_x]), if (any(is_x)) "None (.X)")
-  keys
+  named <- quote_key(keys[!is_x])
+  x_key <- if (any(is_x)) "None (.X)"
+  if (backed) c(x_key, named) else c(named, x_key)
 }
 
 # Python's `repr` of a string: single quotes unless the string has a single

@@ -19,10 +19,20 @@
 #' * `obs_names`, `var_names`: character names
 #' * `n_obs`, `n_vars`, `shape`: dimensions
 #' * `is_view`: whether the object is a View made by `adata[i, j]`
-#' * `isbacked` (always `FALSE`) and `filename` (always `NULL`)
+#' * `isbacked`, `filename` and `file`: whether the object is backed by a file
+#'   (`read_h5ad(backed = )`), the path of that file or `NULL`, and the file
+#'   manager (`file$open()`, `file$close()`, `file$is_open`)
 #'
 #' The dimension and backing fields are read-only and assigning to them raises
 #' an `anndata_read_only_error`.
+#'
+#' @section Backed mode:
+#' `read_h5ad(file, backed = "r")` (or `"r+"`) keeps `X` and `raw$X` on disk and
+#' reads every other Slot into memory.
+#' `print()` shows `backed at '<file>'`.
+#' `adata$file$close()` closes the file but keeps the object backed, and the
+#' next read of `X` opens it again.
+#' The file is closed when the object is garbage collected.
 #'
 #' @section Views:
 #' `adata[i, j]` returns a View that shares data with `adata`, as in Python.
@@ -480,6 +490,12 @@ AnnDataClass <- R6Class(
         check_names_unique(rownames(private$.var), "var", call = call)
       }
       private$.raw <- make_raw(self, raw, call)
+      private$.file <- file_manager_class$new()
+      invisible(self)
+    },
+    # Internal: makes the object backed by the open file of `manager`
+    attach_file = function(manager) {
+      private$.file <- manager
       invisible(self)
     },
     # Internal: records that this object is a View of `parent` (never a View)
@@ -891,19 +907,31 @@ AnnDataClass <- R6Class(
       }
       !is.null(private$.view)
     },
-    #' @field isbacked Always `FALSE` until backed mode is supported.
+    #' @field isbacked Whether the object is backed by a file.
     isbacked = function(value) {
       if (!missing(value)) {
         abort_read_only("isbacked")
       }
-      FALSE
+      !is.null(private$.file$filename)
     },
-    #' @field filename Always `NULL` until backed mode is supported.
+    #' @field filename Path of the backing file, or `NULL` when the object is
+    #'   in memory.
     filename = function(value) {
       if (!missing(value)) {
         abort_read_only("filename")
       }
-      NULL
+      private$.file$filename
+    },
+    #' @field file The backing file manager, with the methods `open()`,
+    #'   `close()`, `has()`, `keys()`, `get()`, `set()` and `remove()` and the
+    #'   fields `is_open`, `filename` and `filemode`.
+    #'   `close()` keeps the object backed, and reading `X` opens the file
+    #'   again.
+    file = function(value) {
+      if (!missing(value)) {
+        abort_read_only("file")
+      }
+      private$.file
     }
   ),
   private = list(
@@ -916,6 +944,7 @@ AnnDataClass <- R6Class(
     .obsp = NULL,
     .varp = NULL,
     .raw = NULL,
+    .file = NULL,
     # NULL for an actual object, otherwise the parent and positions of a View
     .view = NULL,
     # Reloads the lazy aligned mapping `attr` of a View from its parent

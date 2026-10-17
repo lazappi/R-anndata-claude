@@ -480,7 +480,7 @@ test_that("write_h5ad and read_h5ad check their arguments", {
   expect_error(read_h5ad(path), class = "anndata_file_not_found_error")
   expect_error(
     read_h5ad(path, backed = "r"),
-    class = "anndata_not_supported_error"
+    class = "anndata_file_not_found_error"
   )
 })
 

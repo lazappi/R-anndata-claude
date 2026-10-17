@@ -20,8 +20,10 @@
 #' the other.
 #'
 #' @param filename Path of the `.h5ad` file.
-#' @param backed Backed mode, not yet supported so it must be `NULL` or
-#'   `FALSE`.
+#' @param backed `NULL` or `FALSE` to read everything into memory, `"r"` or
+#'   `"r+"` to keep `X` and `raw$X` on disk (read-only or read-write, see
+#'   `adata$file`), and `TRUE` for `"r+"`.
+#'   `as_sparse` has no effect in backed mode.
 #' @param as_sparse Elements stored dense to read as sparse matrices, `"X"`
 #'   and/or `"raw/X"` (`"raw.X"` is accepted too).
 #'   An Element that is already sparse on disk is an error.
@@ -48,6 +50,12 @@
 #' path <- tempfile(fileext = ".h5ad")
 #' write_h5ad(adata, path)
 #' read_h5ad(path)$shape
+#'
+#' # Backed mode keeps X on disk
+#' backed <- read_h5ad(path, backed = "r")
+#' backed$isbacked
+#' backed$file$close()
+#' unlink(path)
 #'
 #' @name h5ad
 NULL
@@ -76,12 +84,7 @@ read_h5ad <- function(
   chunk_size = 6000L
 ) {
   call <- rlang::current_env()
-  if (!is.null(backed) && !isFALSE(backed)) {
-    abort_not_supported(
-      "Backed mode ({.arg backed}) is not yet supported.",
-      call = call
-    )
-  }
+  backed <- check_backed(backed, call)
   if (
     !is.character(as_sparse_fmt) ||
       length(as_sparse_fmt) == 0L ||
@@ -126,9 +129,25 @@ read_h5ad <- function(
       call = call
     )
   }
+  if (!is.null(backed)) {
+    return(read_h5ad_backed(filename, backed, call))
+  }
   store <- rhdf5::H5Fopen(filename, flags = "H5F_ACC_RDONLY")
   on.exit(rhdf5::H5Fclose(store), add = TRUE)
   read_elem(store, "/")
+}
+
+# Python's `read_h5ad_backed`: the file stays open in the object's manager, and
+# is closed again when reading fails
+read_h5ad_backed <- function(filename, mode, call) {
+  manager <- file_manager_class$new(filename, mode, call = call)
+  done <- FALSE
+  on.exit(if (!done) manager$close(), add = TRUE)
+  read_state$backed <- manager
+  on.exit(read_state$backed <- NULL, add = TRUE)
+  adata <- read_elem(manager$handle(), "/")
+  done <- TRUE
+  adata
 }
 
 #' @rdname h5ad

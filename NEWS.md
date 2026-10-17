@@ -1,5 +1,7 @@
 # anndata.claude (development version)
 
+* `read_h5ad(backed = "r")` (or `"r+"`) keeps `X` and `raw$X` on disk, with `adata$isbacked`, `adata$filename`, the file manager `adata$file` (`open()`, `close()`, `is_open`) and `backed at '<file>'` in `print()`.
+
 * rec-arrays in zarr now honour the `compressors` dataset argument (zstd, gzip, blosc or none) and read stores Python compressed with any of them.
 
 # anndata.claude 0.0.2

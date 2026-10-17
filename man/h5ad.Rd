@@ -26,8 +26,10 @@ write_h5ad(
 \arguments{
 \item{filename}{Path of the \code{.h5ad} file.}
 
-\item{backed}{Backed mode, not yet supported so it must be \code{NULL} or
-\code{FALSE}.}
+\item{backed}{\code{NULL} or \code{FALSE} to read everything into memory, \code{"r"} or
+\code{"r+"} to keep \code{X} and \code{raw$X} on disk (read-only or read-write, see
+\code{adata$file}), and \code{TRUE} for \code{"r+"}.
+\code{as_sparse} has no effect in backed mode.}
 
 \item{as_sparse}{Elements stored dense to read as sparse matrices, \code{"X"}
 and/or \code{"raw/X"} (\code{"raw.X"} is accepted too).
@@ -84,5 +86,11 @@ adata <- AnnData(matrix(as.numeric(1:6), nrow = 3))
 path <- tempfile(fileext = ".h5ad")
 write_h5ad(adata, path)
 read_h5ad(path)$shape
+
+# Backed mode keeps X on disk
+backed <- read_h5ad(path, backed = "r")
+backed$isbacked
+backed$file$close()
+unlink(path)
 
 }

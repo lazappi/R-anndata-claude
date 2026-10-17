@@ -74,11 +74,23 @@ Without names, observations and variables are named \code{"0"}, \code{"1"}, ...,
 \item \code{obs_names}, \code{var_names}: character names
 \item \code{n_obs}, \code{n_vars}, \code{shape}: dimensions
 \item \code{is_view}: whether the object is a View made by \code{adata[i, j]}
-\item \code{isbacked} (always \code{FALSE}) and \code{filename} (always \code{NULL})
+\item \code{isbacked}, \code{filename} and \code{file}: whether the object is backed by a file
+(\code{read_h5ad(backed = )}), the path of that file or \code{NULL}, and the file
+manager (\code{file$open()}, \code{file$close()}, \code{file$is_open})
 }
 
 The dimension and backing fields are read-only and assigning to them raises
 an \code{anndata_read_only_error}.
+}
+
+\section{Backed mode}{
+
+\code{read_h5ad(file, backed = "r")} (or \code{"r+"}) keeps \code{X} and \code{raw$X} on disk and
+reads every other Slot into memory.
+\code{print()} shows \verb{backed at '<file>'}.
+\code{adata$file$close()} closes the file but keeps the object backed, and the
+next read of \code{X} opens it again.
+The file is closed when the object is garbage collected.
 }
 
 \section{Views}{

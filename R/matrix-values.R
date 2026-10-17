@@ -58,6 +58,9 @@ as_anndata_matrix <- function(
   what = "value",
   call = rlang::caller_env()
 ) {
+  if (inherits(x, "backed_x")) {
+    return(x)
+  }
   if (methods::is(x, "Matrix")) {
     return(coerce_matrix_class(x, what, call))
   }

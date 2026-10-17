@@ -127,7 +127,7 @@ raw_class <- R6Class(
     #' @field X The raw data matrix, or `NULL`.
     X = function(value) {
       if (missing(value)) {
-        return(private$.X)
+        return(reopen_backed(private$.X))
       }
       private$set_x(value, rlang::caller_env())
     },

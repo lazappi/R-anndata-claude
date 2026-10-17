@@ -86,7 +86,7 @@ The human owns the order of the Queue.
 - [x] views/05: Views documentation (`.scratch/views/issues/05-view-docs.md`)
 - [x] zarr-io/15: zarr rec-array compressors (`.scratch/zarr-io/issues/15-zarr-rec-array-compressors.md`)
 - [x] backed/01: backed operations table (`.scratch/backed/issues/01-backed-operations-table.md`)
-- [ ] backed/02: backed reading and the file manager (`.scratch/backed/issues/02-backed-file-manager.md`)
+- [x] backed/02: backed reading and the file manager (`.scratch/backed/issues/02-backed-file-manager.md`)
 - [ ] backed/03: backed dense X (`.scratch/backed/issues/03-backed-dense.md`)
 - [ ] backed/04: backed sparse X and sparse_dataset() (`.scratch/backed/issues/04-backed-sparse.md`)
 - [ ] backed/05: writing backed objects (`.scratch/backed/issues/05-backed-writing.md`)

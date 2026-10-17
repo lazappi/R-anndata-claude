@@ -75,7 +75,7 @@ aligned_mapping_class <- R6Class(
     get = function(key) {
       key <- check_key(key, rlang::caller_env(), private$is_layers)
       position <- match(key, names(private$store))
-      if (is.na(position)) NULL else private$store[[position]]
+      if (is.na(position)) NULL else reopen_backed(private$store[[position]])
     },
     #' @description Validate `value` and store it under `key`.
     set = function(key, value, call = rlang::caller_env()) {

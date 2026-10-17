@@ -162,6 +162,8 @@ anndata_slot_keys <- c(
 # The options of `read_h5ad()` that reach the readers, set for one read
 read_state <- new.env(parent = emptyenv())
 read_state$as_sparse <- character()
+# The file manager while `read_h5ad(backed = )` reads, otherwise `NULL`
+read_state$backed <- NULL
 
 # Python's `read_dense_as_csr` and `read_dense_as_csc`, in chunks of
 # `chunk_size` rows (CSR) or columns (CSC)
@@ -223,8 +225,19 @@ read_anndata_elem <- function(elem, path, store) {
   slots <- list()
   for (key in intersect(anndata_slot_keys, members)) {
     key_path <- paste0(prefix, key)
-    value <- read_elem(store, key_path)
-    if (key == "X" && substring(key_path, 2L) %in% read_state$as_sparse) {
+    value <- NULL
+    if (key == "X" && !is.null(read_state$backed)) {
+      # In backed mode X and raw X stay on disk
+      value <- backed_x_elem(read_state$backed, key_path, store, call)
+    }
+    if (is.null(value)) {
+      value <- read_elem(store, key_path)
+    }
+    if (
+      key == "X" &&
+        is.null(read_state$backed) &&
+        substring(key_path, 2L) %in% read_state$as_sparse
+    ) {
       value <- dense_as_sparse(value, key_path, call)
     }
     slots[key] <- list(value)
@@ -251,6 +264,9 @@ read_anndata_elem <- function(elem, path, store) {
   }
   for (key in names(tall)) {
     adata$layers[[key]] <- tall[[key]]
+  }
+  if (identical(path, "/") && !is.null(read_state$backed)) {
+    .subset2(adata, "attach_file")(read_state$backed)
   }
   adata
 }

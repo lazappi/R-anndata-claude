@@ -1,7 +1,3 @@
-backed_cases <- function() {
-  jsonlite::fromJSON(fixture_path("backed_cases.json"), simplifyVector = FALSE)
-}
-
 # Guards the committed backed operations table against drifting from Python
 test_that("the committed backed operations table matches Python", {
   skip_if_no_python()
