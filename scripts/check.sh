@@ -12,6 +12,28 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 export _R_CHECK_SYSTEM_CLOCK_=false
+# testthat runs 2 parallel workers by default, use more on machines that have them
+export TESTTHAT_CPUS="${TESTTHAT_CPUS:-4}"
+
+# Fail with a clear message instead of running past the 10-minute limit of an
+# agent's shell command (a hanging test, or a suite that has become too slow).
+# The whole process group is killed, so no R or Python process is left behind.
+if [ -z "${ANNDATA_CHECK_TIMED:-}" ] && [ "${1:-}" != "--coverage" ]; then
+    export ANNDATA_CHECK_TIMED=1
+    exec perl -e '
+        my $limit = shift;
+        my $pid = fork();
+        if (!$pid) { setpgrp(0, 0); exec @ARGV or die "exec: $!"; }
+        $SIG{ALRM} = sub {
+            kill "TERM", -$pid; sleep 3; kill "KILL", -$pid;
+            print STDERR "\nFAILED: timed out after $limit seconds: a test is hanging, or the suite is too slow\n";
+            exit 124;
+        };
+        alarm $limit;
+        waitpid($pid, 0);
+        exit($? & 127 ? 1 : $? >> 8);
+    ' "${ANNDATA_CHECK_TIMEOUT:-570}" "$0" "$@"
+fi
 
 step() { printf '\n==> %s\n' "$1"; }
 fail() { printf '\nFAILED: %s\n' "$1" >&2; exit 1; }

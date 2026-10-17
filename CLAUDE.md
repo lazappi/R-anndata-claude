@@ -43,6 +43,7 @@ Kept brief and current by the loop.
 - `scripts/check.sh` is the full check that must pass before every commit, and `scripts/check.sh --quick <test files>` is for use during development (`--quick` takes test file paths and lints only changed R files)
 - The registry binds named functions late (`late_bound()`), otherwise covr reports registered encodings as uncovered
 - Coverage is not part of the full check, run `scripts/check.sh --coverage` for the report (target at least 90%)
+- `scripts/check.sh` runs tests on 4 workers (`TESTTHAT_CPUS`) and fails with "timed out" after 570s (`ANNDATA_CHECK_TIMEOUT`), killing every child process, so a hanging test or a too-slow suite fails fast instead of outliving the agent's 10-minute command limit
 - The full check fails on any NOTE (`error_on = "note"`) and sets `_R_CHECK_SYSTEM_CLOCK_=false` itself
 - `LICENSE` needs `ORGANIZATION` as well as `COPYRIGHT HOLDER`, otherwise check gives a note
 - Placeholder `@importFrom` lines in `R/anndata.claude-package.R` silence the unused-Imports note, remove each once real code uses that package

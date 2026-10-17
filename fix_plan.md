@@ -126,6 +126,8 @@ The human owns the order of the Queue.
 
 - [x] `adata$write()` is missing: Python's `write` is a shortcut for `write_h5ad` (`anndata.py:1744`). Add it as an alias and pass its row of the Views operations table.
 
+- [ ] The full `scripts/check.sh` takes 490s of its 570s limit (`R CMD check` 6m47s with 4 test workers), so the next tests added will time out. Speed the suite up to under 5 minutes as foundations/09 did (batch Python calls, smaller zarr and View fixtures), without testing less, and record before and after times.
+
 ## Blocked
 
 ## Follow-up

@@ -143,3 +143,9 @@ They override anything above.
 - "No notes" means no notes.
   Never rationalise an `R CMD check` NOTE, WARNING or lint as environmental or acceptable.
   Fix the cause, or mark the item blocked if you cannot.
+- Throwaway scripts, probes and scratch tests go only in `.ralph/oracle/`, which git ignores.
+  Never put them in `tests/testthat/`, `.scratch/` or `R/`, because runs cannot delete files and an untracked leftover stops the loop.
+- A question about what Python does is never for the human.
+  Ask `python-oracle` (it can run any experiment in `tests/python`), and stop for the human only on scope, design or spec questions.
+- If `scripts/check.sh` fails with "timed out", a test is hanging or the suite is too slow.
+  Find the test with `devtools::test(filter = ..., reporter = "location")` on one file at a time, and fix it rather than making the test smaller to hide it.
