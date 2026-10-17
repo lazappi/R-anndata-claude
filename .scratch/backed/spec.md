@@ -18,6 +18,8 @@ Sub-project 7 of the roadmap (`.scratch/roadmap/spec.md`).
 - `read_elem_partial`
 - The setting `min_rows_for_chunked_h5_copy`
 
+- `to_memory()`, `chunked_X()` and `chunk_X()` on Views pass their rows of the Views operations table (`tests/testthat/fixtures/`, see `.scratch/views/spec.md`)
+
 ## Python references
 
 - `src/anndata/_core/file_backing.py`, `src/anndata/_core/sparse_dataset.py`

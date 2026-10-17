@@ -13,6 +13,13 @@ Every public method on a View follows the operations table (`transpose()` raises
 - The method and I/O rows of the operations table pass
 - `scripts/check.sh` passes
 
+## Decisions (human, 2026-10-17)
+
+- The operations table rows for methods R does not have yet are not tested here.
+  List them in the test file as deferred, each naming the sub-project that owns it: `to_memory`, `chunked_X` and `chunk_X` (`backed`), `write_csvs` and `write_loom` (`other-formats`).
+  Those sub-projects must pass the rows when they add the methods.
+- `write` is Python's shortcut for `write_h5ad` (`anndata.py:1744`): it is a separate Discovered item, and its row is tested once it exists.
+
 ## Comments
 
 2026-10-17: Part done, ticket stays `in-progress`.
