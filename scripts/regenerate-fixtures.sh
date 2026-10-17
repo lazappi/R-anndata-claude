@@ -11,6 +11,7 @@ uv run --project "$ROOT/tests/python" python -I "$ROOT/tests/python/make_unique_
 uv run --project "$ROOT/tests/python" python -I "$ROOT/tests/python/categorical_cases.py" "$DEST/categorical_cases.json"
 uv run --project "$ROOT/tests/python" python -I "$ROOT/tests/python/repr_cases.py" "$DEST/repr_cases.json"
 uv run --project "$ROOT/tests/python" python -I "$ROOT/tests/python/unwriteable_cases.py" "$DEST/unwriteable_cases.json"
+uv run --project "$ROOT/tests/python" python -I "$ROOT/tests/python/view_cases.py" "$DEST/view_cases.json"
 # zarr stores are packed into one archive, because R CMD check notes the hidden
 # files (.zarray) and the long paths of a zarr directory tree in a package
 STAGE="$(mktemp -d)"

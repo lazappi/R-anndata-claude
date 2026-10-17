@@ -75,7 +75,7 @@ The human owns the order of the Queue.
 - [x] zarr-io/10: reading zarr v2 (`.scratch/zarr-io/issues/10-zarr-v2-read.md`)
 - [x] zarr-io/12: zarr documentation (`.scratch/zarr-io/issues/12-zarr-docs.md`)
 - [x] zarr-io/14: zarr rec-array field dtypes and sharding (`.scratch/zarr-io/issues/14-zarr-rec-array-fidelity.md`)
-- [ ] views/01: view operations table (`.scratch/views/issues/01-view-operations-table.md`)
+- [x] views/01: view operations table (`.scratch/views/issues/01-view-operations-table.md`)
 - [ ] views/02: Views: creation, access and Views of Views (`.scratch/views/issues/02-view-core.md`)
 - [ ] views/03: Views: copy-on-write (`.scratch/views/issues/03-view-copy-on-write.md`)
 - [ ] views/04: Views: methods and writing (`.scratch/views/issues/04-view-methods-and-io.md`)
