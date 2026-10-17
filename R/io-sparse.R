@@ -146,7 +146,12 @@ read_sparse_elem <- function(elem, path, store) {
 
   data_dtype <- get_dtype(data) %||%
     if (is.logical(data)) "bool" else native_dtype(data)
-  data <- drop_dtype(data)
+  new_sparse_matrix(csr, drop_dtype(data), indices, indptr, shape, data_dtype)
+}
+
+# The Matrix class for parts read from disk: `data`, and `indices` and `indptr`
+# as lists of `values` and `dtype`. Records every dtype that is not a default.
+new_sparse_matrix <- function(csr, data, indices, indptr, shape, data_dtype) {
   if (!is.logical(data)) {
     data <- as.double(data)
   }

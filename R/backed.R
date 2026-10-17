@@ -16,8 +16,8 @@
 #' A `backed_x` stands for X or `raw$X` on disk.
 #' It records where the array is and finds the open file through the manager,
 #' so it survives a close.
-#' A dense array is also a `backed_dense` (`R/backed-dense.R`), a sparse matrix
-#' is a placeholder that supports `dim()` until the sparse class arrives.
+#' A dense array is also a `backed_dense` (`R/backed-dense.R`) and a sparse
+#' matrix a `backed_sparse` (`R/backed-sparse.R`).
 #'
 #' @param filename Path of the backing file.
 #' @param filemode `"r"` or `"r+"`.
@@ -231,17 +231,43 @@ file_manager_class <- R6Class(
 )
 
 # The array X (or `raw$X`) on disk, found again through the manager
-new_backed_x <- function(manager, path, shape, encoding, dtype) {
+new_backed_x <- function(
+  manager,
+  path,
+  shape,
+  encoding,
+  dtype,
+  cache_indptr = TRUE
+) {
+  dense <- identical(encoding, "array")
   structure(
     list(
       manager = manager,
       path = path,
       shape = as.integer(shape),
       encoding = encoding,
-      dtype = dtype
+      dtype = dtype,
+      # Sparse only: the environment that holds `indptr` once it was read
+      cache = if (!dense && cache_indptr) new.env(parent = emptyenv())
     ),
-    class = c(if (identical(encoding, "array")) "backed_dense", "backed_x")
+    class = c(
+      if (dense) "backed_dense" else "backed_sparse",
+      "backed_x"
+    )
   )
+}
+
+# A handle is read-only, as Python's `shape` and `group` have no setter
+#' @export
+#' @noRd
+`$<-.backed_x` <- function(x, name, value) {
+  abort_read_only(name)
+}
+
+#' @export
+#' @noRd
+`[[<-.backed_x` <- function(x, i, value) {
+  abort_read_only(i)
 }
 
 #' @export

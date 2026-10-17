@@ -88,6 +88,9 @@ The human owns the order of the Queue.
 - [x] backed/02: backed reading and the file manager (`.scratch/backed/issues/02-backed-file-manager.md`)
 - [x] backed/03: backed dense X (`.scratch/backed/issues/03-backed-dense.md`)
 - [ ] backed/04: backed sparse X and sparse_dataset() (`.scratch/backed/issues/04-backed-sparse.md`)
+  - [x] `backed_sparse` class, every index form, `sparse_dataset()` reads, Views, dtype records
+  - [ ] `sparse_dataset()$append()` (table rows `append_*` in `sparse_dataset`, in `"r+"` mode, resizing `data`, `indices`, `indptr` and the `shape` attribute, and invalidating the `indptr` cache in `x$cache`)
+  - [ ] h5sparse legacy attributes in `sparse_dataset()` (row `legacy_attributes`) belong to `legacy-formats`
 - [ ] backed/05: writing backed objects (`.scratch/backed/issues/05-backed-writing.md`)
 - [ ] backed/06: chunked_X, chunk_X and read_elem_partial (`.scratch/backed/issues/06-backed-chunks-and-partial.md`)
 - [ ] backed/07: backed mode documentation (`.scratch/backed/issues/07-backed-docs.md`)

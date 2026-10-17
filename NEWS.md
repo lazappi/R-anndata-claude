@@ -1,5 +1,7 @@
 # anndata.claude (development version)
 
+* A backed sparse `X` (CSR or CSC) supports `dim()`, `[` with every matrix index form (reading only the needed parts of `data` and `indices`), `as.matrix()`, `$to_memory()` and views, and `sparse_dataset()` makes the same handle for an open rhdf5 group.
+
 * A backed dense `X` supports `dim()`, `[` with every matrix index form (reading only the selected part of the file), `as.matrix()` and views that read only their subset.
 
 * `read_h5ad(backed = "r")` (or `"r+"`) keeps `X` and `raw$X` on disk, with `adata$isbacked`, `adata$filename`, the file manager `adata$file` (`open()`, `close()`, `is_open`) and `backed at '<file>'` in `print()`.
