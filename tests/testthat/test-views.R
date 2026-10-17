@@ -51,7 +51,14 @@ test_that("the View operations table covers the operations in the spec", {
     ),
     c("strings_to_categoricals", "rename_categories"),
     c("obs_names_make_unique", "var_names_make_unique"),
-    c("write_h5ad", "write_zarr", "write_csvs", "write_loom", "chunked_X"),
+    c(
+      "write",
+      "write_h5ad",
+      "write_zarr",
+      "write_csvs",
+      "write_loom",
+      "chunked_X"
+    ),
     # Views of Views and a changing parent
     c("subset_rows", "view_of_view_parent"),
     paste0(
@@ -756,6 +763,20 @@ test_that("writing a View writes the subset", {
   expect_true(view$is_view)
 })
 
+# Why: the `write` row, Python's `write` is an alias of `write_h5ad`, so a View
+# written through it reads back as the subset the table records
+test_that("write() on a View is an alias of write_h5ad()", {
+  expected <- view_cases()$operations$write$result$written
+  view <- view_of(view_parent())
+  path <- withr::local_tempfile(fileext = ".h5ad")
+  view$write(path)
+  back <- read_h5ad(path)
+  expect_false(back$is_view)
+  expect_equal(back$obs_names, unlist(expected$obs_names))
+  expect_equal(back$X, table_matrix(expected$X))
+  expect_true(view$is_view)
+})
+
 # Why: the Structural equivalence criterion, a View written by R has the same
 # nodes, dtypes and attributes as Python writing the same View of the same
 # parent (one Python process per step, see CLAUDE.md)
@@ -790,8 +811,7 @@ test_that("table rows for methods owned by later sub-projects are deferred", {
     chunked_X = "backed",
     chunk_X = "backed",
     write_csvs = "other-formats",
-    write_loom = "other-formats",
-    write = "views Discovered item (alias of write_h5ad)"
+    write_loom = "other-formats"
   )
   ops <- view_cases()$operations
   view <- view_of(view_parent())

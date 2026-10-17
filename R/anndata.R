@@ -725,6 +725,12 @@ AnnDataClass <- R6Class(
     write_h5ad = function(filename, ...) {
       write_h5ad(self, filename, ...)
     },
+    #' @description Shortcut for `write_h5ad()`, see [write_h5ad()].
+    #' @param filename Path of the file.
+    #' @param ... Further arguments of [write_h5ad()].
+    write = function(filename, ...) {
+      write_h5ad(self, filename, ...)
+    },
     #' @description Writes the object to a zarr store, see [write_zarr()].
     #' @param store Path of the zarr directory store.
     #' @param ... Further arguments of [write_zarr()].

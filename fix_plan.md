@@ -114,7 +114,7 @@ The human owns the order of the Queue.
 
 - [ ] zarr rec-arrays ignore `compressors` (Python honours it) because the struct reader only decodes zstd, and the writer always uses one chunk (zarr-io/14)
 
-- [ ] `adata$write()` is missing: Python's `write` is a shortcut for `write_h5ad` (`anndata.py:1744`). Add it as an alias and pass its row of the Views operations table.
+- [x] `adata$write()` is missing: Python's `write` is a shortcut for `write_h5ad` (`anndata.py:1744`). Add it as an alias and pass its row of the Views operations table.
 
 ## Blocked
 
