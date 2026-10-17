@@ -7,7 +7,7 @@ The human owns the order of the Queue.
 
 ## Queue
 
-- [ ] foundations/10: faster test suite, again (`.scratch/foundations/issues/10-test-speed-again.md`)
+- [ ] foundations/10: faster test suite, again (`.scratch/foundations/issues/10-test-speed-again.md`), blocked (see **Blocked**)
 - [x] foundations/01: package skeleton (`.scratch/foundations/issues/01-package-skeleton.md`)
 - [x] foundations/02: formatting and linting (`.scratch/foundations/issues/02-formatting-and-linting.md`)
 - [x] foundations/03: check script (`.scratch/foundations/issues/03-check-script.md`)
@@ -128,6 +128,8 @@ The human owns the order of the Queue.
 - [x] `adata$write()` is missing: Python's `write` is a shortcut for `write_h5ad` (`anndata.py:1744`). Add it as an alias and pass its row of the Views operations table.
 
 ## Blocked
+
+- foundations/10: faster test suite, again (`.scratch/foundations/issues/10-test-speed-again.md`), `needs-info`: the full check takes 6:27 and the remaining speed-ups need a human decision on coverage (see the ticket's last comment)
 
 ## Follow-up
 

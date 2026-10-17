@@ -1,6 +1,6 @@
 # Faster test suite, again
 
-Status: in-progress
+Status: needs-info
 Type: task
 Blocked by: none
 
