@@ -83,6 +83,9 @@ densify <- function(x) {
 
 # Writes X or raw X, dense when `name` is in `as_dense` and the matrix is sparse
 write_x_elem <- function(group, x, name, dataset_kwargs, call) {
+  if (inherits(x, "backed_dense") && methods::is(group, "H5IdComponent")) {
+    return(write_backed_dense(group, x, dataset_kwargs, call))
+  }
   x <- backed_in_memory(x)
   if (name %in% dataset_kwargs$as_dense && methods::is(x, "sparseMatrix")) {
     x <- densify(x)

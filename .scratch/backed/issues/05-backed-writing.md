@@ -24,7 +24,7 @@ Assigning X in `"r+"` mode, `write()`/`write_h5ad()` on a backed object, `copy(f
   - `view_write_same`: Python writes a corrupt in-place update and fails, R refuses with `anndata_invalid_argument_error`
   - A write to a new file that exists truncates it, Python opens it in mode `"a"` and updates it
   - A backed `raw` written in place is `anndata_not_supported_error` (Python fails with `AttributeError`), written to a new file it works in R (Python fails)
-  - X is read whole into memory when copying to a new file (no `min_rows_for_chunked_h5_copy` chunking yet)
+  - X is read whole into memory when copying to a new file (fixed in part 4 for dense X)
 - Remaining (queue sub-items): X assignment in `"r+"` mode (rows `X_assign_*`, `X_item`, `X_del`, `layers_none_assign`, `write_after_X_assign`), the `filename` setter (rows `filename_*`), chunked copy with `min_rows_for_chunked_h5_copy`, raw rows (`raw_X_assign`, `raw_assign`, `raw_operations`), `write_obs_edit`, `view_*_assign` rows.
 
 2026-10-17, part 2 (status stays `in-progress`):
@@ -40,5 +40,11 @@ Assigning X in `"r+"` mode, `write()`/`write_h5ad()` on a backed object, `copy(f
 - Deviations: the View of a backed object fails before moving anything (Python renames the file first and leaves it corrupt), a failed move raises `anndata_file_not_found_error`.
 - Not done: a backed `raw` X is not converted to memory by `filename <- NULL` (belongs with the raw rows, row `filename_none` has `raw_X`).
 - The full `scripts/check.sh` and the reviewer pass. `filename` is no longer read-only, so it left the read-only loop in `test-anndata-class.R`.
+
+2026-10-18, part 4 (status stays `in-progress`):
+
+- Done: the `min_rows_for_chunked_h5_copy` setting (positive whole number, default 1000) and a chunked copy of a backed dense X to a new h5ad (`R/backed-copy.R`, `write_backed_dense()`), following Python's `_iter_chunks_for_copy`: destination chunks when compressed, otherwise runs of `max(setting, source chunk rows)`. Tests in `test-backed-copy.R` check the row slices against the table's `settings$slices`.
+- Backed sparse X is still read whole when copied (Python's setting applies to dense only), and zarr targets read dense X whole.
+- Remaining: raw rows (`raw_X_assign`, `raw_assign`, `raw_operations`, `filename_none` with raw X) and `write_obs_edit`.
 
 Part 2 note: the full `scripts/check.sh` passed. The reviewer asked for bool/integer item assignment tests and a View-of-assigned-X test (added) and a Python structural comparison of the `X_item` file (not done, the in-place write only changes values, so the next run may add `expect_all_equivalent`).

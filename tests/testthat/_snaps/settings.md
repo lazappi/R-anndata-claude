@@ -12,6 +12,7 @@
         restrict_index_types                           TRUE   Force string indices on creation and when setting obs/var
         zarr_write_format                              3      Zarr format version written (2 is not yet supported)
         auto_shard_zarr_v3                             TRUE   Shard zarr v3 arrays automatically (not yet written)
+        min_rows_for_chunked_h5_copy                   1000   Rows copied at once from a backed dense X
 
 ---
 
@@ -27,4 +28,5 @@
         restrict_index_types                           TRUE   Force string indices on creation and when setting obs/var
         zarr_write_format                              3      Zarr format version written (2 is not yet supported)
         auto_shard_zarr_v3                             TRUE   Shard zarr v3 arrays automatically (not yet written)
+        min_rows_for_chunked_h5_copy                   1000   Rows copied at once from a backed dense X
 

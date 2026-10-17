@@ -6,7 +6,8 @@ defaults <- list(
   write_csr_csc_indices_with_min_possible_dtype = FALSE,
   restrict_index_types = TRUE,
   zarr_write_format = 3L,
-  auto_shard_zarr_v3 = TRUE
+  auto_shard_zarr_v3 = TRUE,
+  min_rows_for_chunked_h5_copy = 1000L
 )
 
 # Defaults must match Python's anndata.settings

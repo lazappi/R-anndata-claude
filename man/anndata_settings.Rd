@@ -73,6 +73,10 @@ automatically, with a target of 1 GB uncompressed per shard.
 An explicit \code{shards} dataset argument overrides it and it is ignored for
 version 2.
 Shard shapes can differ from Python's, and rec-arrays are not sharded.
+\item \code{min_rows_for_chunked_h5_copy} (default \code{1000}): The least number of rows
+read at once when a dense X on disk is copied to a new h5ad file (a
+chunked source dataset raises it to its chunk length).
+Writing to a compressed dataset copies it chunk by chunk instead.
 }
 }
 

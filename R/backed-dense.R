@@ -115,13 +115,18 @@ backed_dense_write_block <- function(x, rows, cols, values) {
   handle <- .subset2(x, "manager")$handle()
   dset <- rhdf5::H5Dopen(handle, .subset2(x, "path"))
   on.exit(rhdf5::H5Dclose(dset), add = TRUE)
+  h5_write_block(dset, rows, cols, values, .subset2(x, "dtype"))
+}
+
+# Writes `values` into the rows and columns of an open HDF5 dataset
+h5_write_block <- function(dset, rows, cols, values, dtype) {
   space <- rhdf5::H5Dget_space(dset)
   on.exit(rhdf5::H5Sclose(space), add = TRUE, after = FALSE)
   rhdf5::H5Sselect_index(space, list(cols, rows))
   mem <- rhdf5::H5Screate_simple(c(length(cols), length(rows)))
   on.exit(rhdf5::H5Sclose(mem), add = TRUE, after = FALSE)
   buffer <- t(unclass(drop_dtype(values)))
-  if (identical(.subset2(x, "dtype"), "bool")) {
+  if (identical(dtype, "bool")) {
     rhdf5::H5Dwrite(
       dset,
       as.raw(buffer),

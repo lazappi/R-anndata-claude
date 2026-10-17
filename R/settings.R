@@ -43,6 +43,10 @@
 #'   An explicit `shards` dataset argument overrides it and it is ignored for
 #'   version 2.
 #'   Shard shapes can differ from Python's, and rec-arrays are not sharded.
+#' * `min_rows_for_chunked_h5_copy` (default `1000`): The least number of rows
+#'   read at once when a dense X on disk is copied to a new h5ad file (a
+#'   chunked source dataset raises it to its chunk length).
+#'   Writing to a compressed dataset copies it chunk by chunk instead.
 #'
 #' @section Omitted settings:
 #' Python's `copy_on_write_X` is deprecated and always on upstream, so it is
@@ -123,6 +127,14 @@ setting_specs <- list(
     valid = setting_flag,
     expected = "`TRUE` or `FALSE`",
     description = "Shard zarr v3 arrays automatically (not yet written)"
+  ),
+  min_rows_for_chunked_h5_copy = list(
+    default = 1000L,
+    valid = function(x) {
+      is.numeric(x) && length(x) == 1L && !is.na(x) && x >= 1 && x == trunc(x)
+    },
+    expected = "a positive whole number",
+    description = "Rows copied at once from a backed dense X"
   )
 )
 
