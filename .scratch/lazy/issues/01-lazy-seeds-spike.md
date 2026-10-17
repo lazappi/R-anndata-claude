@@ -1,6 +1,6 @@
 # Lazy seeds spike
 
-Status: in-progress
+Status: done
 Type: research
 Blocked by: none
 
@@ -33,3 +33,9 @@ Scripts and their output live under `.ralph/oracle/` (git-ignored), and only the
 - The store layer lacks a backend-neutral array shape and chunk shape, which seeds need
 - `scripts/check.sh` passed (docs only change). The reviewer returned FAIL because the own-seed verdicts are incomplete, so the ticket stays `in-progress`
 - Remaining for the next run (also in `fix_plan.md`): (1) find the cause of the zarr block-read error in `probe-own.R` (the failing Rarr call received an index mapping that does not match the direct `array_read()` call, so log the exact `selection` and Rarr `index` that fail) and give verdicts for zarr v3 and v2, (2) probe the own seed for every dtype, bool, the nullable and string columns, the 2^53 error, a CSR/CSC sparse seed and chunk shape, (3) probe `H5SparseMatrixSeed` for the 2^53 case and result types on sparse, and ZarrArray on sparse bool
+
+2026-10-17 (second run): Finished the spike, `.scratch/lazy/seeds-spike.md` is complete and the recommendation (own seeds on the store layer, `DataFrame` with DelayedArray columns plus small categorical and nullable classes) stands.
+- The zarr block-read error was a store-layer bug: `sort()` returns an ALTREP wrapper and Rarr's `is_compact()` takes any ALTREP integer for a range, so `c(3L, 9L)` read as `3:9`. Fixed in `zarr_selection_index()` (`+ 0L`) with a regression test. h5ad was never affected
+- Every dtype, bool, nullable, categorical and string parts, sparse parts and the 2^53 error pass through `array_read()` on h5ad, zarr v3 and v2. An h5ad selection of int64, uint32 or uint64 returns `integer` where zarr returns `double`, so a seed must fix `type()` from the dtype
+- `H5SparseMatrixSeed` reads int64 at 2^62 silently and returns `raw` for uint8. ZarrArray cannot open any sparse group
+- The lazy implementation tickets need a backend-neutral array shape and chunk shape operation in the store layer

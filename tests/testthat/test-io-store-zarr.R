@@ -264,6 +264,20 @@ test_that("selections read the same values as subsetting the whole array", {
   }
 })
 
+test_that("selections that are sorted ALTREP wrappers read the right cells", {
+  # Rarr takes any ALTREP integer for a compact range, so `sort()` results on
+  # integers (which lazy seeds pass) read the whole range unless made plain
+  for (variant in c("v3", "v2")) {
+    store <- zarr_case_store(variant, "array_float64_2d")
+    whole <- array_read(store, "x")
+    cols <- sort(unique(c(3L, 1L, 1L)))
+    expect_true(Rarr:::is.compact(cols))
+    part <- array_read(store, "x", list(NULL, cols))
+    expect_identical(dim(part), c(2L, 2L))
+    expect_equal(as.vector(part), as.vector(whole[, c(1L, 3L)]))
+  }
+})
+
 test_that("invalid selections are rejected", {
   # A wrong rank, decreasing or out of range indices must raise a classed error
   store <- zarr_case_store("v3", "array_float64_2d")

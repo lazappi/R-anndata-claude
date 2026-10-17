@@ -94,11 +94,11 @@ The human owns the order of the Queue.
 - [ ] backed/05: writing backed objects (`.scratch/backed/issues/05-backed-writing.md`)
 - [ ] backed/06: chunked_X, chunk_X and read_elem_partial (`.scratch/backed/issues/06-backed-chunks-and-partial.md`)
 - [ ] backed/07: backed mode documentation (`.scratch/backed/issues/07-backed-docs.md`)
-- [ ] lazy/01: lazy seeds spike (`.scratch/lazy/issues/01-lazy-seeds-spike.md`)
+- [x] lazy/01: lazy seeds spike (`.scratch/lazy/issues/01-lazy-seeds-spike.md`)
   - [x] HDF5Array seeds, ZarrArray and `DataFrame` with DelayedArray columns probed, first draft of `.scratch/lazy/seeds-spike.md`
-  - [ ] Cause of the own-seed zarr block-read error, and verdicts for the own seed on zarr v3 and v2
-  - [ ] Own-seed probes for every dtype, bool, nullable and string columns, the 2^53 error, sparse and chunk shape
-  - [ ] Remaining sparse probes for `H5SparseMatrixSeed` (2^53, result types) and ZarrArray (sparse bool)
+  - [x] Cause of the own-seed zarr block-read error, and verdicts for the own seed on zarr v3 and v2
+  - [x] Own-seed probes for every dtype, bool, nullable and string columns, the 2^53 error, sparse and chunk shape
+  - [x] Remaining sparse probes for `H5SparseMatrixSeed` (2^53, result types) and ZarrArray (sparse bool)
 - [ ] 🛑 Checkpoint (orchestrator): read `.scratch/lazy/seeds-spike.md`, choose the seeds, finish the lazy spec and write its tickets (ask the human only if there is no clear choice)
 
 ## Discovered

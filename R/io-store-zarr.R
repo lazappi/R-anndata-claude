@@ -300,7 +300,15 @@ zarr_selection_index <- function(shape, selection) {
     )
   }
   for (i in seq_along(selection)) {
-    selection[i] <- list(selection[[i]] %||% seq_len(shape[[i]]))
+    # `+ 0L` drops ALTREP wrappers (such as `sort()` makes), which Rarr's
+    # `is.compact()` takes for a compact range
+    selection[i] <- list(
+      if (is.null(selection[[i]])) {
+        seq_len(shape[[i]])
+      } else {
+        as.integer(selection[[i]] + 0L)
+      }
+    )
     bad <- is.unsorted(selection[[i]], strictly = TRUE) ||
       any(selection[[i]] < 1L | selection[[i]] > shape[[i]])
     if (bad) {
