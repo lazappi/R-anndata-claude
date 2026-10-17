@@ -19,7 +19,7 @@ called the wrapper.}
 Developer notes for raising errors and warnings inside the package.
 }
 \details{
-All conditions go through \code{\link[cli:cli_abort]{cli::cli_abort()}} and \code{\link[cli:cli_abort]{cli::cli_warn()}} via the
+All conditions go through \code{\link[cli:cli_abort]{cli::cli_abort()}} and \code{\link[cli:cli_warn]{cli::cli_warn()}} via the
 internal wrappers \code{anndata_abort()} and \code{anndata_warn()}.
 Every condition has class \code{anndata_error} or \code{anndata_warning}, a specific
 subclass named for the situation, and the \code{rlang_error} or \code{rlang_warning}

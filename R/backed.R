@@ -16,8 +16,8 @@
 #' A `backed_x` stands for X or `raw$X` on disk.
 #' It records where the array is and finds the open file through the manager,
 #' so it survives a close.
-#' It is a placeholder that supports `dim()`, until the dense and sparse classes
-#' of the backed sub-project replace it.
+#' A dense array is also a `backed_dense` (`R/backed-dense.R`), a sparse matrix
+#' is a placeholder that supports `dim()` until the sparse class arrives.
 #'
 #' @param filename Path of the backing file.
 #' @param filemode `"r"` or `"r+"`.
@@ -240,7 +240,7 @@ new_backed_x <- function(manager, path, shape, encoding, dtype) {
       encoding = encoding,
       dtype = dtype
     ),
-    class = "backed_x"
+    class = c(if (identical(encoding, "array")) "backed_dense", "backed_x")
   )
 }
 
@@ -306,7 +306,8 @@ backed_x_elem <- function(manager, path, store, call) {
     return(NULL)
   }
   dtype <- backed_dtype(store, data_path)
-  if (length(shape) < 2L || is.na(dtype)) {
+  # Only 2-D arrays stay on disk, higher dimensions are read into memory
+  if (length(shape) != 2L || is.na(dtype)) {
     return(NULL)
   }
   new_backed_x(manager, path, shape, encoding, dtype)

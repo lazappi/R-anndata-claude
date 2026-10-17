@@ -17,7 +17,11 @@ spike_read <- function(name, ...) {
   # native = TRUE fails with "INTEGER() can only be applied to a 'integer'"
   # when combined with bit64conversion = "bit64", so those reads are 1-d only
   # (or need a manual aperm() of the reversed-dim result)
-  native <- !identical(list(...)$bit64conversion, "bit64")
+  # rhdf5 2.57.12 regression: h5read(native = TRUE) segfaults on scalar
+  # (0-d) datasets, native = FALSE works and a scalar has no dims to reverse
+  # (the package never calls h5read())
+  scalar <- startsWith(name, "scalar_")
+  native <- !scalar && !identical(list(...)$bit64conversion, "bit64")
   as_plain(rhdf5::h5read(spike_file(), name, native = native, ...))
 }
 

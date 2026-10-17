@@ -333,7 +333,8 @@ test_that("Rarr cannot write 0-dimensional arrays (gap)", {
         chunk_dim = integer(0),
         zarr_version = format
       ),
-      "dims"
+      # R 4.6 says "'dim' cannot be", older versions "'dims' cannot be"
+      "dims?"
     )
   }
 })

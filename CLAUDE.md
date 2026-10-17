@@ -55,6 +55,8 @@ Kept brief and current by the loop.
 - `DataFrame` rejects `NA` row names via `rownames<-` and `DataFrame(row.names=)`, so set them with `with_frame_names()` (slot assignment), and the index name is kept in `metadata(df)$index_name`
 - Variables only used inside cli `{}` strings trip `object_usage_linter`, so compute values inline or pass them as condition fields
 - `AnnData` is `AnnDataClass` (R6, `R/anndata.R`) wrapped by `AnnData()`: roxygen needs `@noRd` on the class, `@importFrom R6 R6Class` stays in the package file and `.lintr` allows the names `AnnData`, `AnnDataClass` and `X`
+- The project uses roxygen2 8 (`Config/roxygen2/version` in `DESCRIPTION`) and lintr 3.4.0, so keep the Rd files and `DESCRIPTION` that `devtools::document()` writes
+- rhdf5 2.57.12 segfaults in `h5read(native = TRUE)` on any scalar (0-d) dataset, so use `native = FALSE` there (the package never calls `h5read()`)
 - S3 methods for `$`, `[[` and similar need a plain `@export` tag (`@exportS3Method` breaks roxygen), and `R CMD check` needs `devtools::document()` to have registered them in `NAMESPACE`
 - Inside R6 classes with custom `$` methods use `.subset2()` and `private`, not `self$`, and `adata$obsm[["k"]] <- v` assigns the mapping back to the active binding, so it must ignore an identical value
 - `expect_anndata_condition()` unwinds at the condition, so for warnings whose assignment must complete (then check state) use `expect_warning(..., class =)`

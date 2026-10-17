@@ -45,7 +45,7 @@ truncate the backing file.
 A \code{backed_x} stands for X or \code{raw$X} on disk.
 It records where the array is and finds the open file through the manager,
 so it survives a close.
-It is a placeholder that supports \code{dim()}, until the dense and sparse classes
-of the backed sub-project replace it.
+A dense array is also a \code{backed_dense} (\code{R/backed-dense.R}), a sparse matrix
+is a placeholder that supports \code{dim()} until the sparse class arrives.
 }
 \keyword{internal}

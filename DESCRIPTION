@@ -1,6 +1,6 @@
 Package: anndata.claude
 Title: Annotated Data Matrices and Their On-Disk Formats
-Version: 0.0.2.9003
+Version: 0.0.2.9004
 Authors@R:
     person("Luke", "Zappia", , "luke.zappia@gmail.com", role = c("aut", "cre"))
 Description: An R port of Python 'anndata' (reference release 0.13.4) for
@@ -10,7 +10,6 @@ Description: An R port of Python 'anndata' (reference release 0.13.4) for
 License: BSD_3_clause + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.3
 Depends:
     R (>= 4.3)
 Imports:
@@ -38,3 +37,4 @@ Remotes:
 VignetteBuilder: knitr
 Config/testthat/edition: 3
 Config/testthat/parallel: true
+Config/roxygen2/version: 8.1.0

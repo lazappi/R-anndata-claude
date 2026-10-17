@@ -1,36 +1,3 @@
-backed_kinds <- c("dense", "csr", "csc")
-backed_modes <- c("r", "r+")
-
-# The table row of an operation for one kind of X and one mode
-backed_row <- function(operation, kind, mode, table = "operations") {
-  backed_cases()[[table]][[operation]][[kind]][[mode]]
-}
-
-# Python's record of the object's state after an operation, which R mirrors
-expect_backed_state <- function(adata, state) {
-  expect_equal(adata$isbacked, state$isbacked)
-  expect_equal(basename(adata$filename %||% ""), state$filename %||% "")
-  expect_equal(adata$file$is_open, state$file_is_open)
-  expect_equal(adata$file$filemode, state$file_mode)
-}
-
-# The 4 x 3 matrix the table's files hold, from a list of rows
-table_matrix <- function(rows) {
-  do.call(rbind, lapply(rows, unlist))
-}
-
-# Runs `code(case)` for every kind of X and mode, with the table row of
-# `operation` and the backed object, to check R against each row
-for_each_backed <- function(operation, code, ..., table = "operations") {
-  for (kind in backed_kinds) {
-    for (mode in backed_modes) {
-      case <- local_backed(kind, mode, ...)
-      row <- backed_row(operation, kind, mode, table)
-      code(case, row, kind)
-    }
-  }
-}
-
 # Reading X gives a handle on the file and not the values, and the object is
 # backed with the file open in the mode requested (rows read_X, layers_none,
 # X_handle and metadata)

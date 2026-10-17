@@ -1,5 +1,7 @@
 # anndata.claude (development version)
 
+* A backed dense `X` supports `dim()`, `[` with every matrix index form (reading only the selected part of the file), `as.matrix()` and views that read only their subset.
+
 * `read_h5ad(backed = "r")` (or `"r+"`) keeps `X` and `raw$X` on disk, with `adata$isbacked`, `adata$filename`, the file manager `adata$file` (`open()`, `close()`, `is_open`) and `backed at '<file>'` in `print()`.
 
 * rec-arrays in zarr now honour the `compressors` dataset argument (zstd, gzip, blosc or none) and read stores Python compressed with any of them.

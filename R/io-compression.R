@@ -107,12 +107,17 @@ make_dcpl <- function(dataset_kwargs, dims, type) {
   if (identical(compression, "gzip")) {
     rhdf5::H5Pset_deflate(dcpl, dataset_kwargs$compression_opts %||% 4L)
   } else {
-    # `H5Pset_lzf()` crashes on a type with no size, and only reads the size,
-    # so a 16-byte type stands in for variable-length strings
-    rhdf5::H5Pset_lzf(
-      dcpl,
-      h5tid = if (is.null(typesize)) complex_type() else tid
-    )
+    if (utils::packageVersion("rhdf5") >= "2.57.12") {
+      # `h5tid` is deprecated (and ignored) from this version
+      rhdf5::H5Pset_lzf(dcpl)
+    } else {
+      # `H5Pset_lzf()` crashes on a type with no size, and only reads the size,
+      # so a 16-byte type stands in for variable-length strings
+      rhdf5::H5Pset_lzf(
+        dcpl,
+        h5tid = if (is.null(typesize)) complex_type() else tid
+      )
+    }
   }
   dcpl
 }

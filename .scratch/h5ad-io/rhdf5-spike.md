@@ -49,6 +49,7 @@ This is what the tests do, and the resulting file is structurally equivalent to 
 ## Strings
 
 - Variable-length UTF-8 datasets read correctly as `character`, in 1-d, 2-d and 0-d
+- rhdf5 2.57.12 regression: `h5read(native = TRUE)` segfaults on any 0-d (scalar) dataset, `native = FALSE` works (the package never calls `h5read()`)
 - The high-level `h5createDataset(storage.mode = "character")` has no variable-length option, so use the low-level type shown in the summary
 - Attribute strings are written as variable-length UTF-8 scalars when `variableLengthString = TRUE` and `asScalar = TRUE` is set, as h5py does for `encoding-type` and friends
 - Without `variableLengthString` attributes are fixed-length ASCII, which Python reads but is not what it writes

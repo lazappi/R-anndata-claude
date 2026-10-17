@@ -244,8 +244,9 @@ h5_tree_differences <- function(
   sorted_paths = character(),
   attr_types = TRUE
 ) {
-  diffs <- character()
-  note <- function(...) diffs <<- c(diffs, paste0(...))
+  found <- new.env(parent = emptyenv())
+  found$diffs <- character()
+  note <- function(...) found$diffs <- c(found$diffs, paste0(...))
   show <- function(x) jsonlite::toJSON(x, auto_unbox = TRUE, null = "null")
 
   for (path in setdiff(names(a), names(b))) {
@@ -303,7 +304,7 @@ h5_tree_differences <- function(
       }
     }
   }
-  diffs
+  found$diffs
 }
 
 # Expects two HDF5 files or zarr stores (or one of each) to have the same

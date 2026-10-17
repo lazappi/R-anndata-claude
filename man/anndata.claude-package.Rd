@@ -11,5 +11,10 @@ An R port of Python 'anndata' (reference release 0.13.4) for annotated data matr
 \author{
 \strong{Maintainer}: Luke Zappia \email{luke.zappia@gmail.com}
 
+Authors:
+\itemize{
+  \item Luke Zappia \email{luke.zappia@gmail.com}
+}
+
 }
 \keyword{internal}
