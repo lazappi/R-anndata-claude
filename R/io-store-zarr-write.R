@@ -356,7 +356,7 @@ zarr_codecs <- function(dtype, compressor = zarr_default_compressor) {
 # shape is reduced where needed so that it divides an explicit shard shape.
 # The shard shape is the whole array, or the largest block of chunks below the
 # target of 1 GB uncompressed (Python's `array.target_shard_size_bytes`).
-zarr_layout <- function(dims, chunk, shards, dtype) {
+zarr_layout <- function(dims, chunk, shards, dtype, itemsize = NULL) {
   if (is.null(shards) || length(dims) == 0L) {
     return(list(chunk = chunk, shard = NULL))
   }
@@ -364,11 +364,12 @@ zarr_layout <- function(dims, chunk, shards, dtype) {
     shard <- ceiling(pmax(dims, 1) / chunk) * chunk
     # Strings are counted as 8 bytes, as for a Python object array
     target <- 1e9 /
-      (if (identical(dtype, "string")) {
-        8
-      } else {
-        zarr_value_sizes[[dtype]]
-      })
+      (itemsize %||%
+        if (identical(dtype, "string")) {
+          8
+        } else {
+          zarr_value_sizes[[dtype]]
+        })
     for (i in seq_along(shard)) {
       if (prod(shard) > target) {
         room <- floor(target / prod(shard[-i]))
@@ -397,6 +398,9 @@ zarr_shard_arg <- function(dataset_kwargs, dims, call) {
   shards <- dataset_kwargs[["shards"]]
   if (is.null(shards)) {
     return(NULL)
+  }
+  if (identical(shards, "auto")) {
+    return("auto")
   }
   valid <- is.numeric(shards) &&
     length(shards) == length(dims) &&
@@ -496,6 +500,22 @@ zarr_shard_files <- function(dir, chunk, shard) {
   invisible(NULL)
 }
 
+# The `sharding_indexed` codec holding chunks of shape `chunk` coded by `codecs`
+zarr_shard_codecs <- function(codecs, chunk) {
+  list(list(
+    name = "sharding_indexed",
+    configuration = list(
+      chunk_shape = as.list(chunk),
+      codecs = codecs,
+      index_codecs = list(
+        list(name = "bytes", configuration = list(endian = "little")),
+        list(name = "crc32c")
+      ),
+      index_location = "end"
+    )
+  ))
+}
+
 zarr_write_array_meta <- function(
   dir,
   dtype,
@@ -506,18 +526,7 @@ zarr_write_array_meta <- function(
 ) {
   codecs <- zarr_codecs(dtype, compressor)
   if (!is.null(shard)) {
-    codecs <- list(list(
-      name = "sharding_indexed",
-      configuration = list(
-        chunk_shape = as.list(chunk),
-        codecs = codecs,
-        index_codecs = list(
-          list(name = "bytes", configuration = list(endian = "little")),
-          list(name = "crc32c")
-        ),
-        index_location = "end"
-      )
-    ))
+    codecs <- zarr_shard_codecs(codecs, chunk)
     chunk <- shard
   }
   meta <- list(

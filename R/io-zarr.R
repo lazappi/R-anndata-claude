@@ -46,9 +46,10 @@
 #'   scalars ignore it, as in Python.
 #'   `shards` is the shard shape, one whole number for each dimension (it
 #'   applies to arrays of one or more dimensions, and chunks are reduced to
-#'   divide it), or `NULL` for no sharding.
+#'   divide it), `"auto"` to choose the shape, or `NULL` for no sharding.
 #'   Without it, arrays are sharded when the `auto_shard_zarr_v3` setting is
-#'   `TRUE` ([anndata_settings]).
+#'   `TRUE` ([anndata_settings]), except rec-arrays which Python only shards
+#'   when `shards` is given.
 #'   Other arguments raise `anndata_invalid_argument_error`.
 #'
 #' @return `read_zarr()` returns an [AnnData()] and `write_zarr()` returns

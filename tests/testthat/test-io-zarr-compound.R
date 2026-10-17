@@ -1,8 +1,8 @@
 # Tests of the compound encodings on zarr v3 stores (ticket zarr-io/07): the
 # nullable arrays, categorical, dataframe, dict and rec-array.
 # The three round-trip directions run over every fixture of these encodings.
-# rec-array field dtypes are not kept (ADR 0005), so its Python -> R -> Python
-# checks compare values only.
+# rec-array field dtypes are kept in zarr (zarr-io/14), but a Python rewrite
+# changes them (`S` becomes `U`), so the R -> Python -> R check compares values.
 
 skip_if_not_installed("Rarr", "2.1.48")
 
@@ -35,15 +35,13 @@ compound_zarr_cases <- function(variant = "v3") {
   paths[keep & !grepl("^anndata_|int64_big", names(paths))]
 }
 
-# The R value a rec-array has after a write, which stores logical fields as
-# int32 (ADR 0005)
-rec_array_as_written <- function(value) {
+# A rec-array without the On-disk dtype records of its fields, which HDF5
+# does not keep and Python changes (a rewrite turns `S` fields into `U`)
+without_records <- function(value) {
   if (!inherits(value, "anndata_rec_array")) {
     return(value)
   }
-  value[] <- lapply(value, function(field) {
-    if (is.logical(field)) as.integer(field) else field
-  })
+  value[] <- lapply(value, drop_dtype)
   value
 }
 
@@ -80,7 +78,11 @@ test_that("Python -> R: compound Elements read as in h5ad", {
         next
       }
       actual <- read_elem(zarr_open(cases[[case]]), "x")
-      expect_identical(actual, expected, label = paste(variant, case))
+      expect_identical(
+        without_records(actual),
+        expected,
+        label = paste(variant, case)
+      )
       checked <- checked + 1L
     }
   }
@@ -96,20 +98,8 @@ test_that("Python -> R -> Python: compound Elements written by R match", {
     function(path) write_compound_like(read_elem(zarr_open(path), "x"), dir),
     character(1)
   )
-  # Rec-array field dtypes are exempt (ADR 0005), their values are checked by
-  # reading the written store back in R
-  expect_all_equivalent(
-    unname(written),
-    unname(originals),
-    rec_array_paths = "/x"
-  )
-  for (case in grep("^rec_array", names(originals), value = TRUE)) {
-    expect_identical(
-      read_elem(zarr_open(written[[case]]), "x"),
-      rec_array_as_written(read_elem(zarr_open(originals[[case]]), "x")),
-      label = case
-    )
-  }
+  # zarr keeps rec-array field dtypes, so there is no rec-array exemption
+  expect_all_equivalent(unname(written), unname(originals))
 })
 
 # Python rejects nothing here, but R must refuse 64-bit values it cannot hold
@@ -134,8 +124,8 @@ test_that("R -> Python -> R: Python reads and rewrites what R wrote", {
   for (i in seq_along(values)) {
     actual <- read_elem(zarr_open(rewritten[[i]]), "x")
     expect_identical(
-      actual,
-      rec_array_as_written(values[[i]]),
+      without_records(actual),
+      without_records(values[[i]]),
       label = names(values)[[i]]
     )
   }

@@ -157,7 +157,7 @@ h5_null_write <- function(store, key) {
   invisible(NULL)
 }
 
-h5_table_write <- function(store, key, frame) {
+h5_table_write <- function(store, key, frame, dataset_kwargs, call) {
   # `level = 0` stops rhdf5 compressing, and a chunk is required to write
   rhdf5::h5writeDataset(frame, store, key, level = 0L, chunk = nrow(frame))
   invisible(NULL)

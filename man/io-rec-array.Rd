@@ -50,8 +50,14 @@ Python's \code{anndata} decodes fixed-length strings as ASCII and fails to read
 any other text, so a string field with non-ASCII text also raises
 \code{anndata_io_registry_error} rather than write a file Python cannot read
 (zarr stores strings as UTF-32, so it has no such limit).
+zarr keeps field dtypes (zarr-io/14): a field read from zarr carries an
+On-disk dtype record, unless it has the R type, and writing restores it, so
+the paragraphs above describe HDF5 only.
+Writing to zarr also keeps \code{logical} fields as bool and accepts a rec-array
+with no rows.
 Non-ASCII text is read without problems.
-Rec-arrays are never compressed, so \code{dataset_kwargs} has no effect on them.
+Rec-arrays are never compressed (zarr uses zstd), so \code{dataset_kwargs} has no
+effect on them except \code{shards} in zarr.
 Integers of 2^53 or more raise \code{anndata_dtype_overflow_error} on read.
 }
 \keyword{internal}

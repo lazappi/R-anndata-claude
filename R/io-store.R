@@ -28,6 +28,7 @@
 #'   `value`.
 #' @param selection A selection, see the description.
 #' @param call The call reported by errors.
+#' @param dataset_kwargs A list of dataset creation options.
 #' @param frame A data frame of numeric, logical and character columns.
 #'
 #' @name io-store
@@ -126,8 +127,14 @@ string_read <- function(store, path, call = rlang::caller_env()) {
 null_write <- function(store, key) store_backend(store)$null_write(store, key)
 
 #' @rdname io-store
-table_write <- function(store, key, frame) {
-  store_backend(store)$table_write(store, key, frame)
+table_write <- function(
+  store,
+  key,
+  frame,
+  dataset_kwargs = list(),
+  call = rlang::caller_env()
+) {
+  store_backend(store)$table_write(store, key, frame, dataset_kwargs, call)
 }
 
 #' @rdname io-store

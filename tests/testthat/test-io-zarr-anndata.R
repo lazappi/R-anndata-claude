@@ -86,13 +86,8 @@ test_that("Python -> R -> Python: write_zarr matches the Python stores", {
     },
     character(1)
   )
-  # The realistic objects hold a rec-array whose field dtypes are exempt
-  # (ADR 0005)
-  expect_all_equivalent(
-    unname(written),
-    unname(originals),
-    rec_array_paths = "/uns/O_recarray"
-  )
+  # The realistic objects hold a rec-array, whose field dtypes zarr keeps
+  expect_all_equivalent(unname(written), unname(originals))
   expect_python_equal(unname(written), unname(originals))
 })
 
@@ -131,6 +126,8 @@ test_that("cross-format: h5ad to zarr matches Python's conversion", {
     write_zarr(read_h5ad(h5ad[[i]]), written[[i]])
   }
   converted <- python_rewrite_h5ad(unname(h5ad), ext = ".zarr")
+  # The exemption stays because R reads the rec-array from HDF5, which has lost
+  # the field dtypes (ADR 0005), while Python converts the original dtypes
   expect_all_equivalent(
     written,
     converted,
@@ -149,6 +146,7 @@ test_that("cross-format: zarr to h5ad matches Python's conversion", {
     write_h5ad(read_zarr(zarr[[i]]), written[[i]])
   }
   converted <- python_rewrite_h5ad(unname(zarr), ext = ".h5ad")
+  # The exemption stays because the file R writes is HDF5 (ADR 0005)
   expect_all_equivalent(
     written,
     converted,
@@ -441,7 +439,7 @@ test_that("an invalid shards argument is rejected", {
   # The shard shape needs one whole number per dimension
   adata <- AnnData(matrix(1, 2, 2))
   path <- withr::local_tempfile(fileext = ".zarr")
-  for (shards in list(c(2, 2, 2), c(0, 2), c(1.5, 2), "auto")) {
+  for (shards in list(c(2, 2, 2), c(0, 2), c(1.5, 2), "big")) {
     expect_anndata_condition(
       write_zarr(adata, path, shards = shards),
       "anndata_invalid_argument_error"

@@ -45,9 +45,10 @@ as in Python.
 scalars ignore it, as in Python.
 \code{shards} is the shard shape, one whole number for each dimension (it
 applies to arrays of one or more dimensions, and chunks are reduced to
-divide it), or \code{NULL} for no sharding.
+divide it), \code{"auto"} to choose the shape, or \code{NULL} for no sharding.
 Without it, arrays are sharded when the \code{auto_shard_zarr_v3} setting is
-\code{TRUE} (\link{anndata_settings}).
+\code{TRUE} (\link{anndata_settings}), except rec-arrays which Python only shards
+when \code{shards} is given.
 Other arguments raise \code{anndata_invalid_argument_error}.}
 }
 \value{

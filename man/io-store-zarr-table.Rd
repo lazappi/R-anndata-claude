@@ -8,9 +8,16 @@
 
 \item{key, path}{Name or path of the array.}
 
-\item{frame}{A \code{data.frame} of integer, double and character columns.}
+\item{frame}{A \code{data.frame} of numeric, logical and character columns.}
 
 \item{call}{The call reported by errors.}
+
+\item{dataset_kwargs}{A list of dataset creation options.}
+
+\item{column, name}{A column of \code{frame} and its name.}
+
+\item{values, type, size}{Strings of a field, its data type and its width in
+bytes.}
 }
 \description{
 The \code{table_read} and \code{table_write} operations of \link{io-store} for zarr v3,
@@ -24,7 +31,16 @@ Python writes the fields in order, one record after another with no padding,
 little-endian, with strings as \code{fixed_length_utf32} (zero padded) or
 \code{null_terminated_bytes}, and compresses each chunk with zstd.
 Reading handles those codecs, and the chunk grid of any size.
-Writing follows ADR 0005: int32, float64 and \code{fixed_length_utf32} fields in
-one chunk, which Python reads with the same field names, order and values.
+Unlike HDF5, zarr keeps the field dtypes (zarr-io/14, ADR 0005 applies to
+HDF5 only).
+Reading records the dtype of each column that is not the R type, as for plain
+arrays: the numeric name (\code{"uint8"}, \code{"float32"}, ...) and for strings
+\code{"<type>:<length_bytes>"} unless it is the \code{fixed_length_utf32} width that
+writing would choose.
+Writing restores the records, and sizes fields without one as Python does
+(int32, float64, bool, and \code{fixed_length_utf32} of four times the longest
+UTF-8 byte length).
+Records are one chunk, sharded only when \code{shards} is given because Python's
+automatic sharding of rec-arrays is disabled.
 }
 \keyword{internal}

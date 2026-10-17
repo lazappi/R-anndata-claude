@@ -50,7 +50,13 @@ array_read(store, path, selection = NULL, call = rlang::caller_env())
 
 null_write(store, key)
 
-table_write(store, key, frame)
+table_write(
+  store,
+  key,
+  frame,
+  dataset_kwargs = list(),
+  call = rlang::caller_env()
+)
 
 table_read(store, path, call = rlang::caller_env())
 
@@ -79,6 +85,8 @@ scalars and \code{dtype = "int64"} writes an int64 array.}
 \item{call}{The call reported by errors.}
 
 \item{frame}{A data frame of numeric, logical and character columns.}
+
+\item{dataset_kwargs}{A list of dataset creation options.}
 }
 \description{
 The backend-neutral layer between the encodings and a storage format.

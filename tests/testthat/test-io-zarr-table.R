@@ -74,7 +74,10 @@ test_that("a struct array of several chunks is read, with a missing chunk", {
   expect_identical(
     table_read(store, "x"),
     structure(
-      list(a = c(1L, 2L, 0L, 0L, 5L), s = c("ab", "c", "", "", "xyz")),
+      list(
+        a = c(1L, 2L, 0L, 0L, 5L),
+        s = set_dtype(c("ab", "c", "", "", "xyz"), "null_terminated_bytes:3")
+      ),
       class = "data.frame",
       row.names = 1:5
     )
@@ -134,6 +137,176 @@ test_that("struct fields of every numeric width are read", {
   )
   zarr_write_json(meta, file)
   result <- table_read(store, "x")
-  expect_identical(result$lo, c(65534L, 7L))
-  expect_identical(result$hi, c(-1L, 0L))
+  expect_identical(drop_dtype(result$lo), c(65534L, 7L))
+  expect_identical(get_dtype(result$lo), "uint16")
+  expect_identical(drop_dtype(result$hi), c(-1L, 0L))
+  expect_identical(get_dtype(result$hi), "int16")
+})
+
+# The field types of a written array, from its metadata
+struct_field_types <- function(path) {
+  meta <- jsonlite::fromJSON(
+    file.path(path, "x", "zarr.json"),
+    simplifyVector = FALSE
+  )
+  vapply(
+    meta$data_type$configuration$fields,
+    function(field) {
+      type <- field$data_type
+      if (is.character(type)) {
+        type
+      } else {
+        paste0(type$name, ":", type$configuration$length_bytes)
+      }
+    },
+    character(1)
+  )
+}
+
+# Writes `value` as `x` of a new store, returning the store path
+write_struct <- function(value, ..., env = parent.frame()) {
+  path <- tempfile(fileext = ".zarr")
+  withr::defer(unlink(path, recursive = TRUE), envir = env)
+  write_elem(zarr_create(path), "x", value, dataset_kwargs = list(...))
+  path
+}
+
+# R-built values get the field types Python writes for the equivalent values
+# (zarr-io/14): int32, float64, bool and UTF-32 sized by the longest UTF-8 byte
+# length counted as characters
+test_that("R-built rec-array fields get the types Python would write", {
+  value <- new_rec_array(data.frame(
+    i = 1:2,
+    d = c(1.5, NA),
+    l = c(TRUE, FALSE),
+    s = c("ab", "yé")
+  ))
+  path <- write_struct(value)
+  expect_identical(
+    struct_field_types(path),
+    c("int32", "float64", "bool", "fixed_length_utf32:12")
+  )
+  expect_identical(read_elem(zarr_open(path), "x")$l, c(TRUE, FALSE))
+})
+
+# Field dtypes need a record on the R value to survive a read and a write
+test_that("rec-array field dtypes round trip through R", {
+  v3 <- zarr_variant_paths("v3")
+  value <- read_elem(zarr_open(v3[["rec_array_widths"]]), "x")
+  expect_identical(
+    vapply(value, function(field) get_dtype(field) %||% "", character(1)),
+    c(
+      u1 = "uint8",
+      i2 = "int16",
+      u4 = "uint32",
+      i8 = "int64",
+      f4 = "float32",
+      b = ""
+    )
+  )
+  written <- write_struct(value)
+  expect_identical(
+    struct_field_types(written),
+    c("uint8", "int16", "uint32", "int64", "float32", "bool")
+  )
+  expect_identical(read_elem(zarr_open(written), "x"), value)
+  basic <- read_elem(zarr_open(v3[["rec_array_basic"]]), "x")
+  expect_identical(get_dtype(basic$fixed), "null_terminated_bytes:3")
+  expect_identical(
+    struct_field_types(write_struct(basic)),
+    c("int32", "float64", "null_terminated_bytes:3", "fixed_length_utf32:12")
+  )
+})
+
+# A record must never wrap or truncate values
+test_that("a value outside its recorded field dtype raises", {
+  value <- new_rec_array(data.frame(a = 1L))
+  value$a <- set_dtype(300L, "uint8")
+  expect_anndata_condition(
+    write_struct(value),
+    "anndata_dtype_overflow_error"
+  )
+})
+
+# Python writes empty numeric rec-arrays, and so must zarr (HDF5 cannot)
+test_that("a rec-array with no records round trips in zarr", {
+  value <- new_rec_array(data.frame(a = integer(), s = character()))
+  path <- write_struct(value)
+  expect_false(dir.exists(file.path(path, "x", "c")))
+  expect_identical(read_elem(zarr_open(path), "x"), value)
+})
+
+# Python does not shard rec-arrays by default, but honours `shards`
+test_that("rec-arrays are sharded only when shards is given", {
+  value <- new_rec_array(data.frame(a = 1:5, s = letters[1:5]))
+  is_sharded <- function(path) {
+    meta <- jsonlite::fromJSON(file.path(path, "x", "zarr.json"))
+    "sharding_indexed" %in% meta$codecs$name
+  }
+  expect_false(is_sharded(write_struct(value)))
+  for (shards in list("auto", 5)) {
+    path <- write_struct(value, shards = shards)
+    expect_true(is_sharded(path))
+    expect_identical(read_elem(zarr_open(path), "x"), value)
+  }
+  expect_false(is_sharded(write_struct(value, shards = NULL)))
+})
+
+# Python must read the sharded stores R writes with the same fields and values
+test_that("Python reads sharded rec-arrays written by R", {
+  skip_if_no_python()
+  v3 <- zarr_variant_paths("v3")
+  cases <- v3[c("rec_array_basic", "rec_array_widths")]
+  # The stores are removed when the test ends, not when the function returns
+  test_env <- environment()
+  written <- vapply(
+    cases,
+    function(path) {
+      write_struct(
+        read_elem(zarr_open(path), "x"),
+        shards = "auto",
+        env = test_env
+      )
+    },
+    character(1)
+  )
+  expect_all_equivalent(unname(written), unname(cases))
+})
+
+# The reader must cut a shard into inner chunks and treat a missing one as
+# zeros (`zarr_shard_files()` writes the index as Python does)
+test_that("a shard of several inner chunks with a missing one is read", {
+  store <- hand_built_struct(
+    list(
+      `0` = data.frame(a = 1:2, s = c("ab", "c")),
+      `2` = data.frame(a = c(5L, 0L), s = c("xyz", ""))
+    ),
+    rows = 5L,
+    chunk_rows = 2L
+  )
+  dir <- file.path(store$root, "x")
+  file <- file.path(dir, "zarr.json")
+  meta <- jsonlite::fromJSON(file, simplifyVector = FALSE)
+  meta$codecs <- zarr_shard_codecs(meta$codecs, 2L)
+  meta$chunk_grid$configuration$chunk_shape <- list(6L)
+  zarr_write_json(meta, file)
+  zarr_shard_files(dir, 2L, 6L)
+  expect_identical(list.files(file.path(dir, "c")), "0")
+  result <- table_read(store, "x")
+  expect_identical(drop_dtype(result$a), c(1L, 2L, 0L, 0L, 5L))
+  expect_identical(drop_dtype(result$s), c("ab", "c", "", "", "xyz"))
+})
+
+# A shard index at the start is not read, so it must raise and not misread
+test_that("a shard index at the start raises", {
+  value <- new_rec_array(data.frame(a = 1:3))
+  path <- write_struct(value, shards = "auto")
+  file <- file.path(path, "x", "zarr.json")
+  meta <- jsonlite::fromJSON(file, simplifyVector = FALSE)
+  meta$codecs[[1L]]$configuration$index_location <- "start"
+  zarr_write_json(meta, file)
+  expect_anndata_condition(
+    read_elem(zarr_open(path), "x"),
+    "anndata_not_supported_error"
+  )
 })

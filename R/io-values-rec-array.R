@@ -25,8 +25,14 @@
 #' any other text, so a string field with non-ASCII text also raises
 #' `anndata_io_registry_error` rather than write a file Python cannot read
 #' (zarr stores strings as UTF-32, so it has no such limit).
+#' zarr keeps field dtypes (zarr-io/14): a field read from zarr carries an
+#' On-disk dtype record, unless it has the R type, and writing restores it, so
+#' the paragraphs above describe HDF5 only.
+#' Writing to zarr also keeps `logical` fields as bool and accepts a rec-array
+#' with no rows.
 #' Non-ASCII text is read without problems.
-#' Rec-arrays are never compressed, so `dataset_kwargs` has no effect on them.
+#' Rec-arrays are never compressed (zarr uses zstd), so `dataset_kwargs` has no
+#' effect on them except `shards` in zarr.
 #' Integers of 2^53 or more raise `anndata_dtype_overflow_error` on read.
 #'
 #' @param x A `data.frame`.
@@ -56,14 +62,19 @@ new_rec_array <- function(x) {
 }
 
 # The field as an int32, float64 or character vector, the types rhdf5 writes
-rec_array_field <- function(field, name, path, call, ascii_only = TRUE) {
+rec_array_field <- function(field, name, path, call, zarr = FALSE) {
+  # zarr keeps the On-disk dtype record and bool fields, HDF5 can write neither
+  record <- if (zarr) get_dtype(field)
   field <- drop_dtype(field)
   if (is.factor(field)) {
     field <- as.character(field)
-  } else if (is.raw(field) || is.logical(field)) {
+  } else if (is.raw(field) || (is.logical(field) && !zarr)) {
     field <- as.integer(field)
   }
-  supported <- is.integer(field) || is.double(field) || is.character(field)
+  supported <- is.integer(field) ||
+    is.double(field) ||
+    is.character(field) ||
+    is.logical(field)
   if (!supported) {
     abort_unwritable(
       path,
@@ -84,9 +95,7 @@ rec_array_field <- function(field, name, path, call, ascii_only = TRUE) {
     )
   }
   # anndata decodes fixed-length strings as ASCII, so it cannot read others
-  if (
-    ascii_only && is.character(field) && anyNA(iconv(field, "UTF-8", "ASCII"))
-  ) {
+  if (!zarr && is.character(field) && anyNA(iconv(field, "UTF-8", "ASCII"))) {
     abort_unwritable(
       path,
       paste0(
@@ -102,7 +111,8 @@ rec_array_field <- function(field, name, path, call, ascii_only = TRUE) {
     # `NA_real_` and `NaN` are both written as a plain NaN
     field[is.na(field)] <- NaN
   }
-  as.vector(field)
+  field <- as.vector(field)
+  if (is.null(record)) field else set_dtype(field, record)
 }
 
 #' @rdname io-rec-array
@@ -112,18 +122,13 @@ write_rec_array <- function(store, key, value, dataset_kwargs, path) {
   if (anyDuplicated(fields) > 0L || anyNA(fields) || any(fields == "")) {
     abort_unwritable(path, "its field names must be unique and not empty", call)
   }
-  if (length(fields) == 0L || nrow(value) == 0L) {
+  # rhdf5 cannot write an empty compound, zarr can
+  zarr <- inherits(store, "zarr_node")
+  if (length(fields) == 0L || (nrow(value) == 0L && !zarr)) {
     abort_unwritable(path, "it has no fields or no rows", call)
   }
   columns <- lapply(seq_along(fields), function(i) {
-    # zarr stores strings as UTF-32, so only HDF5 is limited to ASCII
-    rec_array_field(
-      .subset2(value, i),
-      fields[[i]],
-      path,
-      call,
-      ascii_only = !inherits(store, "zarr_node")
-    )
+    rec_array_field(.subset2(value, i), fields[[i]], path, call, zarr = zarr)
   })
   names(columns) <- fields
   frame <- structure(
@@ -131,7 +136,7 @@ write_rec_array <- function(store, key, value, dataset_kwargs, path) {
     class = "data.frame",
     row.names = seq_len(nrow(value))
   )
-  table_write(store, key, frame)
+  table_write(store, key, frame, dataset_kwargs, call)
   invisible(NULL)
 }
 
@@ -142,7 +147,9 @@ rec_array_read_field <- function(field) {
   } else if (is.raw(field)) {
     as.integer(field)
   } else {
-    as.vector(field)
+    record <- get_dtype(field)
+    field <- as.vector(field)
+    if (is.null(record)) field else set_dtype(field, record)
   }
 }
 

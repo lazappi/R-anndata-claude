@@ -10,13 +10,26 @@
 #' little-endian, with strings as `fixed_length_utf32` (zero padded) or
 #' `null_terminated_bytes`, and compresses each chunk with zstd.
 #' Reading handles those codecs, and the chunk grid of any size.
-#' Writing follows ADR 0005: int32, float64 and `fixed_length_utf32` fields in
-#' one chunk, which Python reads with the same field names, order and values.
+#' Unlike HDF5, zarr keeps the field dtypes (zarr-io/14, ADR 0005 applies to
+#' HDF5 only).
+#' Reading records the dtype of each column that is not the R type, as for plain
+#' arrays: the numeric name (`"uint8"`, `"float32"`, ...) and for strings
+#' `"<type>:<length_bytes>"` unless it is the `fixed_length_utf32` width that
+#' writing would choose.
+#' Writing restores the records, and sizes fields without one as Python does
+#' (int32, float64, bool, and `fixed_length_utf32` of four times the longest
+#' UTF-8 byte length).
+#' Records are one chunk, sharded only when `shards` is given because Python's
+#' automatic sharding of rec-arrays is disabled.
 #'
 #' @param store A zarr group node.
 #' @param key,path Name or path of the array.
-#' @param frame A `data.frame` of integer, double and character columns.
+#' @param frame A `data.frame` of numeric, logical and character columns.
 #' @param call The call reported by errors.
+#' @param dataset_kwargs A list of dataset creation options.
+#' @param column,name A column of `frame` and its name.
+#' @param values,type,size Strings of a field, its data type and its width in
+#'   bytes.
 #'
 #' @name io-store-zarr-table
 #' @keywords internal
@@ -175,6 +188,9 @@ zarr_struct_bytes <- function(array, itemsize, path, call) {
     return(as.raw(unlist(chunks))[seq_len(array$shape * itemsize)])
   }
   codecs <- vapply(meta$codecs, function(codec) codec$name, character(1))
+  if (identical(codecs, "sharding_indexed")) {
+    return(zarr_sharded_struct_bytes(array, itemsize, path, call))
+  }
   if (!all(codecs %in% c("bytes", "zstd"))) {
     abort_not_supported(
       "Cannot read {.path {path}}, it uses the codecs {codecs}.",
@@ -206,6 +222,68 @@ zarr_struct_bytes <- function(array, itemsize, path, call) {
   as.raw(unlist(chunks))[seq_len(rows * itemsize)]
 }
 
+# The bytes of a struct array under the `sharding_indexed` codec: each shard
+# file holds its inner chunks and an index of their offsets and sizes (8-byte
+# little-endian integers, all 255 for a missing chunk) and a CRC-32C
+zarr_sharded_struct_bytes <- function(array, itemsize, path, call) {
+  config <- array$meta$codecs[[1L]]$configuration
+  inner_codecs <- vapply(
+    config$codecs,
+    function(codec) codec$name,
+    character(1)
+  )
+  if (!all(inner_codecs %in% c("bytes", "zstd"))) {
+    abort_not_supported(
+      "Cannot read {.path {path}}, it uses the codecs {inner_codecs}.",
+      path = path
+    )
+  }
+  rows <- array$shape
+  shard_rows <- array$meta$chunk_grid$configuration$chunk_shape[[1L]]
+  inner_rows <- config$chunk_shape[[1L]]
+  per_shard <- shard_rows %/% inner_rows
+  inner_size <- inner_rows * itemsize
+  if (identical(config$index_location, "start")) {
+    abort_not_supported(
+      "Cannot read {.path {path}}, its shard index is at the start.",
+      path = path
+    )
+  }
+  dir <- zarr_dir(array$node)
+  decode <- function(blob) {
+    if (!"zstd" %in% inner_codecs) {
+      return(blob)
+    }
+    file <- tempfile("zarr-inner")
+    on.exit(unlink(file), add = TRUE)
+    writeBin(blob, file)
+    zarr_unzstd(file, inner_size)
+  }
+  shards <- lapply(seq_len(ceiling(rows / shard_rows)) - 1L, function(i) {
+    file <- file.path(dir, "c", i)
+    if (!file.exists(file)) {
+      return(raw(per_shard * inner_size))
+    }
+    bytes <- readBin(file, "raw", file.size(file))
+    index_size <- 16L * per_shard
+    index <- bytes[length(bytes) - 4L - rev(seq_len(index_size)) + 1L]
+    entries <- matrix(index, nrow = 8L)
+    values <- colSums(matrix(as.double(entries), nrow = 8L) * 256^(0:7))
+    missing <- colSums(entries == as.raw(255)) == 8L
+    offsets <- values[seq(1L, 2L * per_shard, by = 2L)]
+    sizes <- values[seq(2L, 2L * per_shard, by = 2L)]
+    lost <- missing[seq(1L, 2L * per_shard, by = 2L)]
+    unlist(lapply(seq_len(per_shard), function(j) {
+      if (lost[[j]]) {
+        raw(inner_size)
+      } else {
+        decode(bytes[offsets[[j]] + seq_len(sizes[[j]])])
+      }
+    }))
+  })
+  as.raw(unlist(shards))[seq_len(rows * itemsize)]
+}
+
 # One field from its bytes, a matrix with a column per record
 zarr_field_values <- function(bytes, field, path, call) {
   type <- field$type
@@ -216,26 +294,34 @@ zarr_field_values <- function(bytes, field, path, call) {
       readBin(as.vector(bytes), "integer", rows * size %/% 4L, size = 4L),
       ncol = rows
     )
-    return(vapply(
-      seq_len(rows),
-      function(i) intToUtf8(points[points[, i] != 0L, i]),
-      character(1)
+    return(zarr_string_record(
+      vapply(
+        seq_len(rows),
+        function(i) intToUtf8(points[points[, i] != 0L, i]),
+        character(1)
+      ),
+      type,
+      size
     ))
   }
   if (type == "null_terminated_bytes") {
-    return(vapply(
-      seq_len(rows),
-      function(i) {
-        text <- bytes[, i]
-        zeros <- which(text == as.raw(0))
-        if (length(zeros) > 0L) {
-          text <- text[seq_len(zeros[[1L]] - 1L)]
-        }
-        out <- rawToChar(text)
-        Encoding(out) <- "UTF-8"
-        out
-      },
-      character(1)
+    return(zarr_string_record(
+      vapply(
+        seq_len(rows),
+        function(i) {
+          text <- bytes[, i]
+          zeros <- which(text == as.raw(0))
+          if (length(zeros) > 0L) {
+            text <- text[seq_len(zeros[[1L]] - 1L)]
+          }
+          out <- rawToChar(text)
+          Encoding(out) <- "UTF-8"
+          out
+        },
+        character(1)
+      ),
+      type,
+      size
     ))
   }
   kind <- zarr_field_kinds[[type]]
@@ -243,7 +329,10 @@ zarr_field_values <- function(bytes, field, path, call) {
     return(bytes[1L, ] != as.raw(0))
   }
   if (kind == "float") {
-    return(readBin(as.vector(bytes), "double", rows, size = size))
+    return(record_dtype(
+      readBin(as.vector(bytes), "double", rows, size = size),
+      type
+    ))
   }
   weights <- 256^(seq_len(size) - 1L)
   values <- colSums(matrix(as.double(bytes), nrow = size) * weights)
@@ -263,7 +352,27 @@ zarr_field_values <- function(bytes, field, path, call) {
   if (kind == "integer" && !any(values <= -2^31)) {
     values <- as.integer(values)
   }
-  values
+  record_dtype(values, type)
+}
+
+# The bytes a string field needs per record when written without a record:
+# Python sizes it by the longest UTF-8 byte length, counted in characters for
+# `fixed_length_utf32`
+zarr_string_length <- function(values, type) {
+  longest <- max(1L, nchar(values, "bytes"))
+  if (type == "fixed_length_utf32") 4L * longest else longest
+}
+
+# The string field `values` of the given type and width, recorded as
+# `"<type>:<width>"` when that is not what writing would choose (zarr-io/14)
+zarr_string_record <- function(values, type, size) {
+  if (
+    identical(type, "fixed_length_utf32") &&
+      identical(size, zarr_string_length(values, type))
+  ) {
+    return(values)
+  }
+  set_dtype(values, paste0(type, ":", size))
 }
 
 zarr_table_read <- function(store, path, call) {
@@ -299,31 +408,48 @@ zarr_table_read <- function(store, path, call) {
 
 # The bytes of a column as a matrix with a column per record, and its struct
 # field description
-zarr_field_bytes <- function(column, name) {
+zarr_field_bytes <- function(column, name, path, call) {
+  record <- get_dtype(column)
+  column <- drop_dtype(column)
   if (is.character(column)) {
-    width <- max(1L, nchar(column, "chars"))
-    points <- matrix(0L, width, length(column))
-    for (i in seq_along(column)) {
-      codes <- utf8ToInt(enc2utf8(column[[i]]))
-      points[seq_along(codes), i] <- codes
-    }
-    bytes <- writeBin(as.vector(points), raw(), size = 4L, endian = "little")
-    size <- 4L * width
-    type <- list(
-      name = "fixed_length_utf32",
-      configuration = list(length_bytes = size)
+    parts <- strsplit(record %||% "", ":", fixed = TRUE)[[1L]]
+    kind <- if (length(parts) == 2L) parts[[1L]] else "fixed_length_utf32"
+    # A recorded width is widened when the values no longer fit
+    size <- max(
+      if (length(parts) == 2L) as.integer(parts[[2L]]) else 0L,
+      zarr_string_length(column, kind)
     )
-    fill <- "0"
-  } else if (is.integer(column)) {
-    bytes <- zarr_encode_values(column, "int32")
-    size <- 4L
-    type <- "int32"
-    fill <- 0L
+    if (kind == "fixed_length_utf32") {
+      points <- matrix(0L, size %/% 4L, length(column))
+      for (i in seq_along(column)) {
+        codes <- utf8ToInt(enc2utf8(column[[i]]))
+        points[seq_along(codes), i] <- codes
+      }
+      bytes <- writeBin(as.vector(points), raw(), size = 4L, endian = "little")
+      fill <- "0"
+    } else {
+      bytes <- as.raw(unlist(lapply(column, function(text) {
+        text <- charToRaw(enc2utf8(text))
+        c(text, raw(size - length(text)))
+      })))
+      fill <- "MA=="
+    }
+    type <- list(name = kind, configuration = list(length_bytes = size))
   } else {
-    bytes <- zarr_encode_values(column, "float64")
-    size <- 8L
-    type <- "float64"
-    fill <- 0
+    type <- if (is.logical(column)) {
+      "bool"
+    } else {
+      record %||% native_dtype(column)
+    }
+    check_dtype_fits(column, type, path, call)
+    bytes <- zarr_encode_values(column, type)
+    size <- zarr_value_sizes[[type]]
+    fill <- switch(
+      zarr_field_kinds[[type]],
+      bool = FALSE,
+      float = 0,
+      0L
+    )
   }
   list(
     bytes = matrix(bytes, nrow = size),
@@ -332,14 +458,34 @@ zarr_field_bytes <- function(column, name) {
   )
 }
 
-zarr_table_write <- function(store, key, frame) {
+zarr_table_write <- function(store, key, frame, dataset_kwargs, call) {
   zarr_require_v3(store)
   dir <- zarr_key_dir(store, key)
   rows <- nrow(frame)
-  parts <- Map(zarr_field_bytes, frame, names(frame))
+  path <- paste0(store$path, "/", key)
+  parts <- Map(zarr_field_bytes, frame, names(frame), path, list(call))
   payload <- as.vector(do.call(rbind, lapply(parts, function(p) p$bytes)))
   fill <- lapply(parts, function(p) p$fill)
   names(fill) <- names(frame)
+  itemsize <- sum(vapply(parts, function(p) nrow(p$bytes), integer(1)))
+  # Python writes one chunk of the whole array (or of one record when empty)
+  # and does not shard rec-arrays unless asked (the automatic sharding is
+  # commented out in `write_recarray_zarr`, so `auto_shard_zarr_v3` is ignored)
+  chunk <- max(rows, 1L)
+  shards <- if ("shards" %in% names(dataset_kwargs)) {
+    zarr_shard_arg(dataset_kwargs, rows, call)
+  }
+  layout <- if (is.numeric(shards)) {
+    list(chunk = chunk, shard = ceiling(shards / chunk) * chunk)
+  } else {
+    zarr_layout(rows, chunk, shards, "struct", itemsize)
+  }
+  # The reader only decodes zstd, so `compressors` has no effect on rec-arrays
+  compressor <- zarr_default_compressor
+  codecs <- zarr_codecs("int32", compressor)
+  if (!is.null(layout$shard)) {
+    codecs <- zarr_shard_codecs(codecs, layout$chunk)
+  }
   meta <- list(
     shape = list(rows),
     data_type = list(
@@ -348,21 +494,30 @@ zarr_table_write <- function(store, key, frame) {
     ),
     chunk_grid = list(
       name = "regular",
-      configuration = list(chunk_shape = list(rows))
+      configuration = list(chunk_shape = list(layout$shard %||% chunk))
     ),
     chunk_key_encoding = list(
       name = "default",
       configuration = list(separator = "/")
     ),
     fill_value = fill,
-    codecs = zarr_codecs("int32"),
+    codecs = codecs,
     attributes = empty_object(),
     zarr_format = 3L,
     node_type = "array",
     storage_transformers = list()
   )
-  dir.create(file.path(dir, "c"), recursive = TRUE, showWarnings = FALSE)
+  dir.create(dir, recursive = TRUE, showWarnings = FALSE)
   zarr_write_json(meta, file.path(dir, "zarr.json"))
-  writeBin(zarr_zstd(payload), file.path(dir, "c", "0"))
+  if (rows > 0L) {
+    dir.create(file.path(dir, "c"), showWarnings = FALSE)
+    writeBin(
+      zarr_compress(payload, compressor, "uint8"),
+      file.path(dir, "c", "0")
+    )
+    if (!is.null(layout$shard)) {
+      zarr_shard_files(dir, layout$chunk, layout$shard)
+    }
+  }
   invisible(NULL)
 }
