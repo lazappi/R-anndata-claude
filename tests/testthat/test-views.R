@@ -708,3 +708,50 @@ test_that("an extracted value does not affect the View", {
   expect_true(view$is_view)
   expect_equal(view$X[1, 1], 0)
 })
+
+# Why: the transpose and T rows, Python refuses to transpose a View (also a View
+# of a View) and leaves it a View, while a copy can be transposed
+test_that("transposing a View raises Python's error", {
+  ops <- view_cases()$operations
+  expect_equal(ops$transpose$error$type, "ValueError")
+  expect_equal(ops$T$error$type, "ValueError")
+  view <- view_of(view_parent())
+  expect_error(view$transpose(), class = "anndata_view_transpose_error")
+  expect_error(t(view), class = "anndata_view_transpose_error")
+  expect_error(view[1, ]$transpose(), class = "anndata_view_transpose_error")
+  expect_true(view$is_view)
+  expect_equal(view$copy()$transpose()$shape, c(2L, 2L))
+})
+
+# Why: the write_h5ad and write_zarr rows, a View is written as its subset and
+# the file reads back with the values Python records for the same View
+test_that("writing a View writes the subset", {
+  ops <- view_cases()$operations
+  view <- view_of(view_parent())
+  for (format in c("h5ad", "zarr")) {
+    path <- withr::local_tempfile(fileext = paste0(".", format))
+    if (format == "h5ad") {
+      view$write_h5ad(path)
+      back <- read_h5ad(path)
+    } else {
+      view$write_zarr(path)
+      back <- read_zarr(path)
+    }
+    expected <- ops[[paste0("write_", format)]]$result$written
+    expect_false(back$is_view)
+    expect_equal(back$obs_names, unlist(expected$obs_names))
+    expect_equal(back$var_names, unlist(expected$var_names))
+    expect_equal(back$X, table_matrix(expected$X))
+    expect_equal(
+      back$layers[["counts"]],
+      table_matrix(expected$layers$counts)
+    )
+    expect_equal(back$obsm[["pca"]], table_matrix(expected$obsm$pca))
+    expect_equal(
+      levels(back$obs$cat),
+      unique(unlist(expected$obs$columns$cat$values))
+    )
+    expect_equal(back$raw$X, table_matrix(expected$raw$X))
+  }
+  expect_true(view$is_view)
+})

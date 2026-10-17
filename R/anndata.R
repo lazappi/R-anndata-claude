@@ -736,7 +736,19 @@ AnnDataClass <- R6Class(
     #' @description A new `AnnData` with observations and variables swapped.
     #'   X and layers are transposed, obsm and varm and obsp and varp swap
     #'   places, `uns` is kept and the Raw is dropped.
+    #'   A View cannot be transposed (call `copy()` first).
     transpose = function() {
+      if (!is.null(private$.view)) {
+        anndata_abort(
+          c(
+            "You're trying to transpose a View of an {.cls AnnData}, which is
+            not implemented.",
+            "i" = "Call {.code $copy()} before transposing."
+          ),
+          "anndata_view_transpose_error",
+          call = rlang::caller_env()
+        )
+      }
       layers <- lapply(as.list(self$layers), matrix_transpose)
       AnnData(
         obs = private$.var,
