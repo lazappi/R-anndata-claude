@@ -81,10 +81,12 @@ aligned_mapping_class <- R6Class(
     set = function(key, value, call = rlang::caller_env()) {
       key <- check_key(key, call, private$is_layers)
       if (is.null(value)) {
-        private$drop(key)
+        private$drop(key, call)
         return(invisible(self))
       }
-      private$put(key, private$validate(value, key, call))
+      # Validated before `put()` turns a View into an actual object
+      value <- private$validate(value, key, call)
+      private$put(key, value, call)
       invisible(self)
     },
     # Internal: replaces the contents with already valid values (a View
@@ -95,8 +97,9 @@ aligned_mapping_class <- R6Class(
     },
     #' @description Remove `key`, if present.
     remove = function(key) {
-      key <- check_key(key, rlang::caller_env(), private$is_layers)
-      private$drop(key)
+      call <- rlang::caller_env()
+      key <- check_key(key, call, private$is_layers)
+      private$drop(key, call)
       invisible(self)
     },
     #' @description Remove every key. In layers `keep_x` decides whether X
@@ -217,14 +220,23 @@ aligned_mapping_class <- R6Class(
     is_layers = FALSE,
     # A mapping of a View turns the View into an independent object before it
     # changes (the Raw's varm has a Raw as parent, which is never a View)
-    touch = function() {
+    # `kind` and `key` make Python's warning (`"set"`, `"remove"`) and nothing
+    # is said for whole-mapping changes (`key = NULL`)
+    touch = function(kind = "set", key = NULL, call = rlang::caller_env()) {
       if (inherits(private$parent, "AnnData")) {
-        private$parent$ensure_actual()
+        what <- if (!is.null(key)) {
+          if (is.na(key)) {
+            ".X"
+          } else {
+            paste0(".", private$attrname, "['", key, "']")
+          }
+        }
+        private$parent$ensure_actual(what, kind, call)
       }
     },
     # Keys are matched with `match()` because `NA` (X) is not a valid `[[` name
-    put = function(key, value) {
-      private$touch()
+    put = function(key, value, call) {
+      private$touch("set", key, call)
       position <- match(key, names(private$store))
       if (is.na(position)) {
         private$store <- c(private$store, list(value))
@@ -233,10 +245,10 @@ aligned_mapping_class <- R6Class(
         private$store[[position]] <- value
       }
     },
-    drop = function(key) {
-      private$touch()
+    drop = function(key, call) {
       position <- match(key, names(private$store))
       if (!is.na(position)) {
+        private$touch("remove", key, call)
         private$store <- private$store[-position]
       }
     },

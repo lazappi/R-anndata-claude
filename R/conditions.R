@@ -136,6 +136,33 @@ warn_implicit_modification <- function(
   )
 }
 
+#' Warn that a View is initialised as an actual object, with the messages of
+#' Python's `view_update` and `_SetItemMixin` (`what` is Python's name for the
+#' Slot, such as `.X` or `.layers['key']`).
+#' @noRd
+warn_view_modified <- function(
+  what,
+  kind = c("modify", "set", "remove"),
+  call = rlang::caller_env()
+) {
+  action <- switch(
+    match.arg(kind),
+    modify = "Trying to modify attribute",
+    set = "Setting element",
+    remove = "Removing element"
+  )
+  warn_implicit_modification(
+    # Braces in a key must not be interpolated by cli
+    gsub(
+      "([{}])",
+      "\\1\\1",
+      paste0(action, " `", what, "` of view, initializing view as actual.")
+    ),
+    what = what,
+    call = call
+  )
+}
+
 #' Warn that a method is deprecated, as Python's `@deprecated` does
 #' (a `FutureWarning`, so the class also has `anndata_future_warning`).
 #' @noRd

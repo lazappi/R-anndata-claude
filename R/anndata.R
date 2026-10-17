@@ -480,12 +480,22 @@ AnnDataClass <- R6Class(
       private$.view
     },
     # Internal: turns a View into an independent object, keeping its contents
-    ensure_actual = function() {
+    # `what` names the Slot for Python's warning, and `NULL` is silent
+    ensure_actual = function(
+      what = NULL,
+      kind = "modify",
+      call = rlang::caller_env()
+    ) {
       if (!is.null(private$.view)) {
         for (attr in c("layers", "obsm", "varm", "obsp", "varp")) {
           private$refresh(attr)
         }
         private$.view <- NULL
+        # After the change of state, so a handler that stops on the warning
+        # still leaves an independent object
+        if (!is.null(what)) {
+          warn_view_modified(what, kind, call)
+        }
       }
       invisible(self)
     },
@@ -543,9 +553,15 @@ AnnDataClass <- R6Class(
       if (!is.null(df)) {
         return(invisible(categorise_frame(df, call)))
       }
-      self$ensure_actual()
-      private$.obs <- categorise_frame(private$.obs, call)
-      private$.var <- categorise_frame(private$.var, call)
+      # A View only becomes an independent object when a column changes
+      for (attr in c("obs", "var")) {
+        field <- paste0(".", attr)
+        converted <- categorise_frame(private[[field]], call)
+        if (!identical(converted, private[[field]])) {
+          self$ensure_actual(paste0(".", attr), "modify", call)
+          private[[field]] <- converted
+        }
+      }
       invisible(self)
     },
     #' @description Renames the levels of a factor column of `obs` (or `var`
@@ -561,7 +577,11 @@ AnnDataClass <- R6Class(
         categories,
         rlang::caller_env()
       )
-      self$ensure_actual()
+      self$ensure_actual(
+        paste0(".", renamed$attr),
+        "modify",
+        rlang::caller_env()
+      )
       private[[paste0(".", renamed$attr)]] <- renamed$frame
       private$.uns <- rename_uns_rec_arrays(
         private$.uns,
@@ -880,8 +900,8 @@ AnnDataClass <- R6Class(
     # Python accepts only an AnnData. Assigning the Raw itself is what
     # `adata$raw$var$col <- v` does after the Raw changed.
     set_raw = function(value, call) {
-      self$ensure_actual()
       if (is.null(value)) {
+        self$ensure_actual()
         private$.raw <- NULL
       } else if (!identical(value, private$.raw)) {
         if (!inherits(value, "AnnData")) {
@@ -890,6 +910,7 @@ AnnDataClass <- R6Class(
             call
           )
         }
+        self$ensure_actual()
         private$.raw <- raw_class$new(
           self,
           value$X,
@@ -909,7 +930,7 @@ AnnDataClass <- R6Class(
         return(mapping)
       }
       if (!identical(value, mapping)) {
-        self$ensure_actual()
+        # `replace()` validates, then turns a View into an actual object
         mapping$replace(value, call = call)
       }
       invisible(NULL)
@@ -917,15 +938,15 @@ AnnDataClass <- R6Class(
     # Replaces obs or var, which takes its names from the value (Python resets
     # them to "0", "1", ... when the value has none) and passes them on
     set_frame = function(attr, value, call) {
-      self$ensure_actual()
       field <- paste0(".", attr)
       n <- nrow(private[[field]])
-      private[[field]] <- as_annotation_frame(value, attr, n, "shape", call)
+      frame <- as_annotation_frame(value, attr, n, "shape", call)
+      self$ensure_actual(field, "modify", call)
+      private[[field]] <- frame
       private$rename_mapped_frames(attr)
     },
     # Sets obs_names or var_names, and a plain vector has no index name
     set_names = function(attr, value, call) {
-      self$ensure_actual()
       field <- paste0(".", attr)
       frame <- private[[field]]
       if (is.factor(value)) {
@@ -945,6 +966,8 @@ AnnDataClass <- R6Class(
           call = call
         )
       }
+      # Python sets the names of a View silently
+      self$ensure_actual()
       frame <- with_frame_names(frame, as.character(unname(value)))
       private[[field]] <- with_index_name(frame, NULL)
       private$rename_mapped_frames(attr)
@@ -957,24 +980,25 @@ AnnDataClass <- R6Class(
       invisible(NULL)
     },
     set_uns = function(value, call) {
-      self$ensure_actual()
       keys <- names(value)
       named <- !is.null(keys) && !anyNA(keys) && all(nzchar(keys))
       valid <- is.list(value) && !is.object(value) && (named || !length(value))
       if (!valid) {
         abort_invalid_argument("{.field uns} must be a named list.", call)
       }
+      self$ensure_actual("._uns", "modify", call)
       private$.uns <- value
       invisible(NULL)
     },
     # Validates X and stores it first in the layers storage under the `NA` key
     set_x = function(value, call) {
-      self$ensure_actual()
       if (is.null(value)) {
+        self$ensure_actual(".X", "set", call)
         private$.layers$remove(NA_character_)
         return(invisible(NULL))
       }
       value <- coerce_x_shape(value, self$shape, call)
+      # The mapping validates, then warns as a View becomes actual (key `.X`)
       private$.layers$set(NA_character_, value, call = call)
       invisible(NULL)
     }

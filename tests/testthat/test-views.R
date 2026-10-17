@@ -368,6 +368,336 @@ test_that("lazy reading handles sparse and missing X and bad indices", {
   expect_true(view$is_view)
 })
 
+# Everything about the parent a modification must leave alone
+parent_state <- function(parent) {
+  list(
+    X = parent$X,
+    obs = parent$obs,
+    var = parent$var,
+    uns = parent$uns,
+    layers = as.list(parent$layers),
+    obsm = as.list(parent$obsm),
+    varm = as.list(parent$varm),
+    obsp = as.list(parent$obsp),
+    varp = as.list(parent$varp),
+    raw_X = parent$raw$X,
+    raw_var = parent$raw$var,
+    obs_names = parent$obs_names,
+    var_names = parent$var_names
+  )
+}
+
+implicit_class <- "anndata_implicit_modification_warning"
+
+# Runs `change(view)` on a fresh View. With `message` it must give Python's
+# warning, with `NULL` it must not warn. Then the View must be an independent
+# object and the parent unchanged, as in the `is_view_after` and
+# `parent_changed` columns of the table. Returns the changed View.
+expect_copy_on_write <- function(change, message = NULL, parent = NULL) {
+  parent <- parent %||% view_parent()
+  view <- view_of(parent)
+  expect_true(view$is_view)
+  if (is.null(message)) {
+    expect_no_warning(change(view))
+  } else {
+    cnd <- expect_warning(change(view), class = implicit_class)
+    expect_match(conditionMessage(cnd), message, fixed = TRUE)
+  }
+  expect_false(view$is_view)
+  expect_equal(parent_state(parent), parent_state(view_parent()))
+  invisible(view)
+}
+
+set_msg <- function(what) {
+  paste0("Setting element `", what, "` of view, initializing view as actual.")
+}
+modify_msg <- function(what) {
+  paste0(
+    "Trying to modify attribute `",
+    what,
+    "` of view, initializing view as actual."
+  )
+}
+
+# Why: the X rows of the table (X_assign, X_assign_none, X_del, X_item), each
+# of which warns and detaches the View with the parent unchanged
+test_that("assigning X through a View copies on write", {
+  ops <- view_cases()$operations
+  expect_equal(ops$X_assign$warnings[[1]]$message, set_msg(".X"))
+  view <- expect_copy_on_write(
+    function(v) v$X <- matrix(7, 2, 2),
+    ops$X_assign$warnings[[1]]$message
+  )
+  expect_equal(view$X, matrix(7, 2, 2))
+  view <- expect_copy_on_write(function(v) v$X <- NULL, set_msg(".X"))
+  expect_null(view$X)
+  # Python warns "Trying to modify attribute `.X`" for `view.X[0, 0] = -1`, but
+  # in R an item assignment is an assignment of X (documented deviation)
+  view <- expect_copy_on_write(function(v) v$X[1, 1] <- -1, set_msg(".X"))
+  expect_equal(view$X[1, 1], -1)
+  expect_equal(view$X[2, 2], 8)
+})
+
+# Why: X_assign_wrong_shape and the View of a View rows, where Python raises
+# before changing anything, so the View must stay a View
+test_that("a failed assignment leaves a View a View", {
+  parent <- view_parent()
+  view <- view_of(parent)
+  expect_error(suppressWarnings(view$X <- matrix(0, 3, 3)))
+  expect_error(view$obsm[["new"]] <- matrix(0, 3, 2))
+  expect_error(view$obs_names <- c("p", "q", "r"))
+  expect_error(view$obs <- data.frame(z = 1:3))
+  expect_error(view$rename_categories("cat", "A"))
+  expect_true(view$is_view)
+  # A View of a View has one row, so every two-row value is the wrong shape
+  small <- view[1, ]
+  expect_error(suppressWarnings(small$X <- matrix(7, 2, 2)))
+  expect_error(small$obs_names <- c("p", "q"))
+  expect_error(small$obsm[["new"]] <- matrix(1, 2, 2))
+  expect_error(small$obsp[["new"]] <- matrix(1, 2, 2))
+  expect_error(small$obs$new <- c(1, 2))
+  expect_true(small$is_view)
+})
+
+# Why: layers_set, layers_item, layers_del and layers_assign rows
+test_that("changing layers through a View copies on write", {
+  ops <- view_cases()$operations
+  view <- expect_copy_on_write(
+    function(v) v$layers[["new"]] <- matrix(1, 2, 2),
+    ops$layers_set$warnings[[1]]$message
+  )
+  expect_equal(view$layers[["new"]], matrix(1, 2, 2))
+  # Python's message for an item assignment says "modify attribute", R sees an
+  # assignment of the key (documented deviation)
+  view <- expect_copy_on_write(
+    function(v) v$layers[["counts"]][1, 1] <- -1,
+    set_msg(".layers['counts']")
+  )
+  expect_equal(view$layers[["counts"]][1, 1], -1)
+  view <- expect_copy_on_write(
+    function(v) v$layers[["counts"]] <- NULL,
+    ops$layers_del$warnings[[1]]$message
+  )
+  expect_null(view$layers[["counts"]])
+  expect_equal(view$layers[["sparse"]][1, 1], 1)
+  # Assigning the whole mapping warns about X only, not about the View
+  parent <- view_parent()
+  view <- view_of(parent)
+  expect_warning(
+    view$layers <- list(only = matrix(1, 2, 2)),
+    class = "anndata_future_warning"
+  )
+  expect_false(view$is_view)
+  expect_equal(view$layers$keys(), c("only", NA))
+  expect_equal(parent_state(parent), parent_state(view_parent()))
+})
+
+# Why: the obs and var rows. Python is silent for assigning the whole frame and
+# for deleting a column, which R cannot tell from a nested assignment, so R
+# always warns as Python does for a column (documented deviation)
+test_that("changing obs and var through a View copies on write", {
+  ops <- view_cases()$operations
+  expect_equal(ops$obs_col_set$warnings[[1]]$message, modify_msg(".obs"))
+  view <- expect_copy_on_write(
+    function(v) v$obs$new <- c(1, 2),
+    modify_msg(".obs")
+  )
+  expect_equal(view$obs$new, c(1, 2))
+  view <- expect_copy_on_write(
+    function(v) v$obs$num[1] <- -1,
+    modify_msg(".obs")
+  )
+  expect_equal(view$obs$num, c(-1, 3))
+  view <- expect_copy_on_write(
+    function(v) v$obs$num <- NULL,
+    modify_msg(".obs")
+  )
+  expect_false("num" %in% colnames(view$obs))
+  view <- expect_copy_on_write(
+    function(v) {
+      v$obs <- data.frame(z = c(1, 2), row.names = v$obs_names)
+    },
+    modify_msg(".obs")
+  )
+  expect_equal(colnames(view$obs), "z")
+
+  expect_equal(ops$var_col_set$warnings[[1]]$message, modify_msg(".var"))
+  view <- expect_copy_on_write(
+    function(v) v$var$new <- c(1, 2),
+    modify_msg(".var")
+  )
+  expect_equal(view$var$new, c(1, 2))
+  view <- expect_copy_on_write(
+    function(v) v$var$gene <- NULL,
+    modify_msg(".var")
+  )
+  expect_equal(ncol(view$var), 0L)
+  view <- expect_copy_on_write(
+    function(v) {
+      v$var <- data.frame(z = c(1, 2), row.names = v$var_names)
+    },
+    modify_msg(".var")
+  )
+  expect_equal(colnames(view$var), "z")
+})
+
+# Why: the aligned mapping rows (obsm_*, varm_*, obsp_*, varp_*) for setting,
+# item modification, deleting and assigning the mapping
+test_that("changing aligned mappings through a View copies on write", {
+  ops <- view_cases()$operations
+  for (attr in c("obsm", "varm", "obsp", "varp")) {
+    row <- ops[[paste0(attr, "_set")]]
+    expect_equal(
+      row$warnings[[1]]$message,
+      set_msg(paste0(".", attr, "['new']"))
+    )
+    view <- expect_copy_on_write(
+      function(v) v[[attr]][["new"]] <- matrix(1, 2, 2),
+      row$warnings[[1]]$message
+    )
+    expect_equal(view[[attr]][["new"]], matrix(1, 2, 2))
+  }
+  # Deleting a key
+  key <- c(obsm = "pca", varm = "pcs", obsp = "conn", varp = "corr")
+  for (attr in names(key)) {
+    row <- ops[[paste0(attr, "_del")]]
+    view <- expect_copy_on_write(
+      function(v) v[[attr]][[key[[attr]]]] <- NULL,
+      row$warnings[[1]]$message
+    )
+    expect_null(view[[attr]][[key[[attr]]]])
+  }
+  # Item assignment (the message says "modify attribute" in Python)
+  view <- expect_copy_on_write(
+    function(v) v$obsm[["pca"]][1, 1] <- -1,
+    set_msg(".obsm['pca']")
+  )
+  expect_equal(view$obsm[["pca"]][1, 1], -1)
+  # Python assigns a whole mapping silently
+  view <- expect_copy_on_write(
+    function(v) v$obsm <- list(only = matrix(1, 2, 2))
+  )
+  expect_equal(view$obsm$keys(), "only")
+  # Other Slots of the View are loaded from the parent before it detaches
+  expect_equal(view$varm[["pcs"]], table_matrix(view_cases()$view$varm$pcs))
+})
+
+# Why: the uns rows. Python's `uns_assign` and `uns_del` do not warn, and
+# `uns_nested` changes the parent, which R values cannot do (documented
+# deviation), so R warns for any change of uns and never shares it
+test_that("changing uns through a View copies on write", {
+  ops <- view_cases()$operations
+  expect_equal(ops$uns_set$warnings[[1]]$message, modify_msg("._uns"))
+  view <- expect_copy_on_write(
+    function(v) v$uns[["new"]] <- 5,
+    modify_msg("._uns")
+  )
+  expect_equal(view$uns$new, 5)
+  view <- expect_copy_on_write(
+    function(v) v$uns[["u"]] <- 2,
+    modify_msg("._uns")
+  )
+  expect_equal(view$uns$u, 2)
+  view <- expect_copy_on_write(
+    function(v) v$uns$nested$k <- 9,
+    modify_msg("._uns")
+  )
+  expect_equal(view$uns$nested$k, 9)
+  view <- expect_copy_on_write(
+    function(v) v$uns[["u"]] <- NULL,
+    modify_msg("._uns")
+  )
+  expect_null(view$uns$u)
+  view <- expect_copy_on_write(
+    function(v) v$uns <- list(only = 1),
+    modify_msg("._uns")
+  )
+  expect_equal(view$uns, list(only = 1))
+})
+
+# Why: raw and names rows, which Python changes silently and detaches
+test_that("changing raw and names through a View copies silently", {
+  view <- expect_copy_on_write(function(v) v$raw <- v)
+  expect_equal(view$raw$X, view$X)
+  view <- expect_copy_on_write(function(v) v$raw <- NULL)
+  expect_null(view$raw)
+  view <- expect_copy_on_write(function(v) v$obs_names <- c("p", "q"))
+  expect_equal(view$obs_names, c("p", "q"))
+  expect_equal(rownames(view$obsm[["pca"]]), NULL)
+  view <- expect_copy_on_write(function(v) v$var_names <- c("p", "q"))
+  expect_equal(view$var_names, c("p", "q"))
+  view <- expect_copy_on_write(function(v) {
+    v$obs_names <- c("p", "p")
+    v$obs_names_make_unique()
+  })
+  expect_equal(view$obs_names, c("p", "p-1"))
+  view <- expect_copy_on_write(function(v) {
+    v$var_names <- c("p", "p")
+    v$var_names_make_unique()
+  })
+  expect_equal(view$var_names, c("p", "p-1"))
+})
+
+# Why: the raw rows of Python (no warning, stays a View, parent's raw
+# unchanged), because the View's Raw is its own object
+test_that("modifying the Raw of a View leaves the View and the parent alone", {
+  parent <- view_parent()
+  view <- view_of(parent)
+  expect_no_warning({
+    view$raw$X[1, 1] <- -1
+    view$raw$var$c <- c(1, 2, 3)
+    view$raw$varm[["k"]] <- matrix(1, 3, 2)
+  })
+  expect_true(view$is_view)
+  expect_equal(view$raw$X[1, 1], -1)
+  expect_equal(colnames(view$raw$var), c("gene", "c"))
+  expect_equal(parent_state(parent), parent_state(view_parent()))
+})
+
+# Why: strings_to_categoricals and rename_categories rows. Python only detaches
+# when something changes
+test_that("methods that change a View copy on write", {
+  parent <- view_parent()
+  parent$obs$s <- c("x", "y", "x", "x")
+  fresh <- view_parent()
+  fresh$obs$s <- c("x", "y", "x", "x")
+  view <- view_of(parent)
+  expect_warning(
+    view$strings_to_categoricals(),
+    modify_msg(".obs"),
+    fixed = TRUE,
+    class = implicit_class
+  )
+  expect_false(view$is_view)
+  expect_s3_class(view$obs$s, "factor")
+  expect_type(parent$obs$s, "character")
+  expect_equal(parent_state(parent), parent_state(fresh))
+
+  # Nothing to convert, so nothing warns and the View stays a View
+  plain <- view_of(view_parent())
+  expect_no_warning(plain$strings_to_categoricals())
+  expect_true(plain$is_view)
+
+  view <- expect_copy_on_write(
+    function(v) v$rename_categories("cat", c("A", "C")),
+    modify_msg(".obs")
+  )
+  expect_equal(levels(view$obs$cat), c("A", "C"))
+})
+
+# Why: the parent must stay independent of a detached View in both directions
+test_that("a detached View no longer follows its parent", {
+  parent <- view_parent()
+  view <- view_of(parent)
+  suppressWarnings(view$obs$num <- c(5, 6))
+  parent$X <- matrix(0, 4, 3)
+  parent$obsm[["pca"]] <- matrix(0, 4, 2)
+  expect_equal(view$X, matrix(c(0, 2, 6, 8), 2, byrow = TRUE))
+  expect_equal(view$obsm[["pca"]], matrix(c(0, 1, 4, 5), 2, byrow = TRUE))
+  view$X[1, 1] <- 100
+  expect_equal(parent$X[1, 1], 0)
+})
+
 # Why: the documented deviation, an extracted value is a plain R value so
 # changing it does not change the View (Python's `x = view.X; x[0, 0] = 1` does)
 test_that("an extracted value does not affect the View", {

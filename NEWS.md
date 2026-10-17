@@ -7,7 +7,7 @@
 * rec-arrays in zarr keep their field dtypes (integer widths, float32, bool, fixed-length strings), may have no rows or hold non-ASCII text, and are sharded when `shards` is given.
 * `read_zarr()` and `read_elem()` also read zarr v2 stores, including consolidated metadata, blosc compression and rec-arrays.
 * `adata[i, j]` returns a View that shares X, layers and the aligned mappings with its parent (as in Python), has `is_view` `TRUE` and prints with a `View of ` prefix.
-  Views of Views refer to the original parent, and modifying a View makes it an independent object.
+  Views of Views refer to the original parent, and modifying a View makes it an independent object and leaves the parent unchanged, with Python's `anndata_implicit_modification_warning` messages (R cannot tell `view$obs$col <- x` from `view$obs <- x`, so these always warn).
 
 # anndata.claude 0.0.1
 
