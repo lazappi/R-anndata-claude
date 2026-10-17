@@ -7,7 +7,7 @@ The human owns the order of the Queue.
 
 ## Queue
 
-- [ ] foundations/10: faster test suite, again (`.scratch/foundations/issues/10-test-speed-again.md`), target relaxed to 7 minutes (see Decisions)
+- [x] foundations/10: faster test suite, again (`.scratch/foundations/issues/10-test-speed-again.md`), target relaxed to 7 minutes (see Decisions)
 - [x] foundations/01: package skeleton (`.scratch/foundations/issues/01-package-skeleton.md`)
 - [x] foundations/02: formatting and linting (`.scratch/foundations/issues/02-formatting-and-linting.md`)
 - [x] foundations/03: check script (`.scratch/foundations/issues/03-check-script.md`)

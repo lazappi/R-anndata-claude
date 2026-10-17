@@ -1,6 +1,6 @@
 # Faster test suite, again
 
-Status: ready-for-agent
+Status: done
 Type: task
 Blocked by: none
 
@@ -55,3 +55,6 @@ These cuts keep coverage and are approved:
   - Question: is the 5 minute criterion for the whole `scripts/check.sh` still wanted?
     Options: (a) relax it to 7 minutes (it passes today at about 6.5), (b) also move `R CMD check` work out of the check (for example `--no-build-vignettes`, `--no-manual`, `_R_CHECK_*` flags in `devtools::check()`), which changes the check script and needs a human decision, (c) cut tests further (loses coverage, not approved).
   - Recommended: (b), then split `test-io-zarr-anndata.R` and `test-zarr-fixtures.R` for balance.
+- 2026-10-17 (fourth run): Done under the relaxed 7 minute target.
+  - Split `test-io-zarr-anndata.R` (the six Python round-trip and cross-format tests moved to `test-io-zarr-anndata-python.R`) and moved the zarr determinism test to `test-zarr-fixtures-determinism.R`. No test content changed.
+  - Full `scripts/check.sh` passes in 6m09s (0 errors, warnings and notes), against 6m27 to 7m03 after the earlier runs and about 8m10s at the start.
