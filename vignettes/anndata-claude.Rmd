@@ -84,6 +84,39 @@ identical(roundtrip$obs_names, adata$obs_names)
 
 Use `compression = "gzip"` to compress datasets, and `as_sparse` in `read_h5ad()` to read a dense `X` as a sparse matrix.
 
+## Backed mode
+
+`read_h5ad(backed = "r")` keeps `X` (and `raw$X`) on disk and reads only the parts that are indexed.
+Everything else is read into memory.
+Use `backed = "r+"` to write changes to `X` back to the file.
+
+```{r backed}
+backed <- read_h5ad(path, backed = "r")
+backed$isbacked
+backed$filename
+backed$X[1:2, c(1, 3)]
+```
+
+`chunked_X()` visits the rows of `X` in chunks and `chunk_X()` returns random or chosen rows.
+
+```{r chunks}
+chunks <- backed$chunked_X(2)
+length(chunks)
+chunks[[2]]$start
+backed$chunk_X(I(3))
+```
+
+`to_memory()` loads the whole object and `write_h5ad()` or `copy(filename)` write a backed object to a new file.
+Assigning `X` ends backed mode, and the file is left unchanged.
+
+```{r backed-memory}
+in_memory <- backed$to_memory()
+in_memory$isbacked
+backed$file$close()
+```
+
+`sparse_dataset()` makes a handle on a sparse matrix in an open rhdf5 group, which also has `$append()` to add rows or columns on disk.
+
 ## Move a file to Python and back
 
 The file written above can be read by Python anndata directly.
