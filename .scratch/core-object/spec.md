@@ -119,9 +119,7 @@ Assignment validates and coerces as in Python, and invalid values raise classed 
 
 ## Subsetting
 
-`adata[i, j]` returns a new `AnnData`.
-In the MVP this is an independent copy.
-When `views` lands it will return a View with copy-on-write, so nothing outside this sub-project may depend on subsets being copies.
+`adata[i, j]` returns a View of the `AnnData`, with copy-on-write (see `.scratch/views/spec.md`).
 
 - `i` subsets observations and `j` subsets variables, and either may be missing (`adata[i, ]`, `adata[, j]`).
   `adata[i]` subsets observations only.

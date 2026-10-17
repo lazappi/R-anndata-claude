@@ -1,6 +1,6 @@
 # Writing zarr v2
 
-Status: needs-info
+Status: needs-triage
 Type: task
 Blocked by: 10
 
@@ -13,6 +13,11 @@ If this turns out expensive, stop and ask: the human decided writing v2 may move
 
 - All three round-trip directions pass for every v2 fixture
 - `scripts/check.sh` passes
+
+## Decisions (human, 2026-10-16, applied 2026-10-17)
+
+- Writing v2 is expensive, so it moves to a follow-up ticket as the spec decided.
+  Until then `zarr_write_format = 2` raises a clear classed error when writing, and the setting still warns as Python's does (`zarr.py:244-256`).
 
 ## Comments
 

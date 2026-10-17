@@ -74,6 +74,12 @@ The human owns the order of the Queue.
 - [x] zarr-io/09: writing sharded zarr v3 (`.scratch/zarr-io/issues/09-zarr-shard-writing.md`)
 - [x] zarr-io/10: reading zarr v2 (`.scratch/zarr-io/issues/10-zarr-v2-read.md`)
 - [x] zarr-io/12: zarr documentation (`.scratch/zarr-io/issues/12-zarr-docs.md`)
+- [ ] zarr-io/14: zarr rec-array field dtypes and sharding (`.scratch/zarr-io/issues/14-zarr-rec-array-fidelity.md`)
+- [ ] views/01: view operations table (`.scratch/views/issues/01-view-operations-table.md`)
+- [ ] views/02: Views: creation, access and Views of Views (`.scratch/views/issues/02-view-core.md`)
+- [ ] views/03: Views: copy-on-write (`.scratch/views/issues/03-view-copy-on-write.md`)
+- [ ] views/04: Views: methods and writing (`.scratch/views/issues/04-view-methods-and-io.md`)
+- [ ] views/05: Views documentation (`.scratch/views/issues/05-view-docs.md`)
 
 ## Discovered
 
@@ -99,17 +105,16 @@ The human owns the order of the Queue.
 - [x] Writing a large int64 (or complex) array to zarr through the split-parts writer hangs: a 2^19 x 3 int64 matrix never finished in `zarr_write_read()` (zarr-io/05 shrank the test with the `anndata.zarr_chunk_limit` option instead of finding the cause). Find and fix the slow path, then add a test that writes a 2^19 x 3 int64 matrix in seconds.
   Cause was the read, not the write: Rarr warns once per out-of-range value and the muffling handler made it take minutes. `zarr_numeric_read()` now reads int64, uint64 and uint32 from 16-bit parts always.
 
-- [ ] zarr-io/11 must emit Python's `DeprecationWarning` when `zarr_write_format = 2` is used for writing (`zarr.py:244-256`)
+- [x] zarr-io/11 must emit Python's `DeprecationWarning` when `zarr_write_format = 2` is used for writing (`zarr.py:244-256`)
 
-- [ ] zarr rec-arrays are written unsharded, and `shards = "auto"` is rejected (Python accepts it). Python shards rec-arrays by default, so a human may want parity
+- [x] (moved to zarr-io/14) zarr rec-arrays are written unsharded, and `shards = "auto"` is rejected (Python accepts it). Python shards rec-arrays by default, so a human may want parity
 
 ## Blocked
-
-- [ ] zarr-io/11: writing zarr v2 (`.scratch/zarr-io/issues/11-zarr-v2-write.md`), the ticket says to stop and ask if expensive, see its comment for the question and recommendation
 
 ## Follow-up
 
 Tickets that need triage before they can be queued.
 
+- zarr-io/11: writing zarr v2 (`.scratch/zarr-io/issues/11-zarr-v2-write.md`), moved here as decided
 - zarr-io/13: zip stores (`.scratch/zarr-io/issues/13-zarr-zip-stores.md`)
 - h5ad-io/15: rec-array field dtype fidelity (`.scratch/h5ad-io/issues/15-rec-array-dtype-fidelity.md`), after the MVP
