@@ -1,5 +1,7 @@
 # anndata.claude (development version)
 
+* A backed `raw` cannot be replaced, `filename <- NULL` loads a backed `raw$X` into memory and setting `raw` on a backed object raises Python's error.
+
 * A backed object can be written with `write()` and `write_h5ad()` (to a new file or in place), copied with `copy(filename)` and loaded with `to_memory()`.
 
 * Writing a backed dense `X` to a new h5ad file copies it in blocks of at least `anndata_settings$min_rows_for_chunked_h5_copy` rows (default 1000) instead of reading it whole.

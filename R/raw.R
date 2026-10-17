@@ -98,6 +98,12 @@ raw_class <- R6Class(
         call = call
       )
     },
+    #' @description Reads a backed `X` into memory (used when the parent
+    #'   leaves backed mode).
+    load_x = function() {
+      private$.X <- backed_in_memory(private$.X)
+      invisible(self)
+    },
     #' @description A Raw with independent contents and the same parent.
     copy = function() {
       raw_class$new(
@@ -193,6 +199,17 @@ raw_class <- R6Class(
     set_x = function(value, call) {
       if (is.null(value)) {
         abort_invalid_argument("{.field raw$X} cannot be {.code NULL}.", call)
+      }
+      # Python's `Raw.X` has no setter, and R only needs one for nested
+      # assignment, which hands back the same placeholder
+      if (inherits(private$.X, "backed_x")) {
+        if (!identical(value, private$.X)) {
+          abort_not_supported(
+            "{.field raw$X} of a backed {.cls AnnData} cannot be replaced.",
+            call = call
+          )
+        }
+        return(invisible(NULL))
       }
       value <- as_anndata_matrix(value, what = "raw$X", call = call)
       if (!identical(as.integer(dim(value)), self$shape)) {

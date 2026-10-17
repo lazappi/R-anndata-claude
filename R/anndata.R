@@ -1020,6 +1020,14 @@ AnnDataClass <- R6Class(
             call
           )
         }
+        # Python's Raw cannot take an X when the parent is backed
+        if (self$isbacked && !is.null(value$X)) {
+          abort_invalid_argument(
+            "Cannot specify {.field raw} with an X if the {.cls AnnData} is
+             backed.",
+            call
+          )
+        }
         self$ensure_actual()
         private$.raw <- raw_class$new(
           self,
@@ -1128,6 +1136,10 @@ AnnDataClass <- R6Class(
               backed_in_memory(x),
               call = call
             )
+          }
+          # Python loses a backed raw X here (it is None afterwards), R keeps it
+          if (!is.null(private$.raw)) {
+            private$.raw$load_x()
           }
           private$.file$to_memory_mode()
         }

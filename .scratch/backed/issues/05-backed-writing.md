@@ -1,6 +1,6 @@
 # Writing backed objects
 
-Status: in-progress
+Status: done
 Type: task
 Blocked by: 03, 04
 
@@ -46,5 +46,11 @@ Assigning X in `"r+"` mode, `write()`/`write_h5ad()` on a backed object, `copy(f
 - Done: the `min_rows_for_chunked_h5_copy` setting (positive whole number, default 1000) and a chunked copy of a backed dense X to a new h5ad (`R/backed-copy.R`, `write_backed_dense()`), following Python's `_iter_chunks_for_copy`: destination chunks when compressed, otherwise runs of `max(setting, source chunk rows)`. Tests in `test-backed-copy.R` check the row slices against the table's `settings$slices`.
 - Backed sparse X is still read whole when copied (Python's setting applies to dense only), and zarr targets read dense X whole.
 - Remaining: raw rows (`raw_X_assign`, `raw_assign`, `raw_operations`, `filename_none` with raw X) and `write_obs_edit`.
+
+2026-10-18, part 5 (status `done`):
+
+- Done: raw rows and `write_obs_edit`, tests in `test-backed-raw.R`. `raw$X <- v` on a backed raw is `anndata_not_supported_error` (Python has no setter, R keeps one for nested assignment, which hands back the same placeholder), `adata$raw <- adata` on a backed object is `anndata_invalid_argument_error` (Python's "Cannot specify X if adata is backed"), `filename <- NULL` reads a backed raw X into memory (`Raw$load_x()`).
+- Deviation: Python's raw X is `None` after `filename <- NULL`, R keeps the values.
+- All acceptance criteria met, full check passes.
 
 Part 2 note: the full `scripts/check.sh` passed. The reviewer asked for bool/integer item assignment tests and a View-of-assigned-X test (added) and a Python structural comparison of the `X_item` file (not done, the in-place write only changes values, so the next run may add `expect_all_equivalent`).
