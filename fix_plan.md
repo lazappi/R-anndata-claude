@@ -91,6 +91,8 @@ The human owns the order of the Queue.
 - [ ] backed/05: writing backed objects (`.scratch/backed/issues/05-backed-writing.md`)
 - [ ] backed/06: chunked_X, chunk_X and read_elem_partial (`.scratch/backed/issues/06-backed-chunks-and-partial.md`)
 - [ ] backed/07: backed mode documentation (`.scratch/backed/issues/07-backed-docs.md`)
+- [ ] lazy/01: lazy seeds spike (`.scratch/lazy/issues/01-lazy-seeds-spike.md`)
+- [ ] 🛑 Checkpoint (orchestrator): read `.scratch/lazy/seeds-spike.md`, choose the seeds, finish the lazy spec and write its tickets (ask the human only if there is no clear choice)
 
 ## Discovered
 
