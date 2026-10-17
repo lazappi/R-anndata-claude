@@ -137,8 +137,15 @@ test_that("regenerated zarr fixtures are deterministic and committed", {
 
   first <- withr::local_tempdir()
   second <- withr::local_tempdir()
-  run_python("generate_zarr_fixtures.py", first)
-  run_python("generate_zarr_fixtures.py", second)
+  # Each generation takes about 50s, so the two run side by side
+  results <- parallel::mclapply(
+    list(first, second),
+    function(dir) run_python_raw("generate_zarr_fixtures.py", dir),
+    mc.cores = 2L
+  )
+  for (result in results) {
+    expect_identical(result$status, 0L, info = result$stderr)
+  }
 
   manifest <- zarr_fixture_manifest()
   expect_equal(

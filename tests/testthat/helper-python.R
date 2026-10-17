@@ -146,7 +146,12 @@ h5_tree_cache <- new.env(parent = emptyenv())
 # Each tree is used (and dropped) by the next `h5_tree()` of that path, so the
 # files must not change in between
 prefetch_h5_trees <- function(files) {
-  files <- unique(as.character(files))
+  # A path listed n times is used n times, because a fixture is often compared
+  # with several files
+  files <- as.character(files)
+  uses <- table(files)
+  files <- unique(files)
+  uses <- stats::setNames(as.integer(uses[files]), files)
   # A zarr store is a directory and is described by zarr_tree.py in the same
   # shape, so HDF5 files and zarr stores can be compared with each other
   is_store <- dir.exists(files)
@@ -155,16 +160,42 @@ prefetch_h5_trees <- function(files) {
     if (length(group) == 0L) {
       next
     }
-    # One file prints its own list of nodes and several print one list per file
-    trees <- jsonlite::fromJSON(
-      paste(run_python(script, group), collapse = ""),
-      simplifyVector = FALSE
+    # Big batches are split over two Python processes that run side by side
+    # (R CMD check allows no more), as reading a store takes about 0.4s
+    n_parts <- min(2L, ceiling(length(group) / 8L))
+    parts <- split(group, rep_len(seq_len(n_parts), length(group)))
+    results <- parallel::mclapply(
+      parts,
+      function(part) run_python_raw(script, part),
+      mc.cores = n_parts
     )
-    if (length(group) == 1L) {
-      trees <- list(trees)
+    trees <- list()
+    for (i in seq_along(parts)) {
+      if (!identical(results[[i]]$status, 0L)) {
+        testthat::fail(paste0(
+          "Python script `",
+          script,
+          "` failed:\n",
+          results[[i]]$stderr
+        ))
+        next
+      }
+      # One file prints its own list of nodes, several print a list per file
+      part_trees <- jsonlite::fromJSON(
+        paste(results[[i]]$stdout, collapse = ""),
+        simplifyVector = FALSE
+      )
+      if (length(parts[[i]]) == 1L) {
+        part_trees <- list(part_trees)
+      }
+      trees[match(parts[[i]], group)] <- part_trees
     }
     for (i in seq_along(group)) {
-      assign(group[[i]], name_h5_nodes(trees[[i]]), envir = h5_tree_cache)
+      assign(
+        group[[i]],
+        list(tree = name_h5_nodes(trees[[i]]), uses = uses[[group[[i]]]]),
+        envir = h5_tree_cache
+      )
     }
   }
   invisible()
@@ -173,9 +204,14 @@ prefetch_h5_trees <- function(files) {
 # Reads the h5_tree.py description of a file as a list of nodes keyed by path
 h5_tree <- function(file) {
   if (exists(file, envir = h5_tree_cache, inherits = FALSE)) {
-    tree <- get(file, envir = h5_tree_cache, inherits = FALSE)
-    rm(list = file, envir = h5_tree_cache)
-    return(tree)
+    entry <- get(file, envir = h5_tree_cache, inherits = FALSE)
+    if (entry$uses > 1L) {
+      entry$uses <- entry$uses - 1L
+      assign(file, entry, envir = h5_tree_cache)
+    } else {
+      rm(list = file, envir = h5_tree_cache)
+    }
+    return(entry$tree)
   }
   prefetch_h5_trees(file)
   h5_tree(file)

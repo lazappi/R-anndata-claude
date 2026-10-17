@@ -28,6 +28,7 @@ Suggests:
     bit64,
     covr,
     knitr,
+    parallel,
     rhdf5filters,
     rmarkdown,
     testthat (>= 3.0.0),
