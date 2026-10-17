@@ -80,7 +80,7 @@ The human owns the order of the Queue.
 - [x] views/03: Views: copy-on-write (`.scratch/views/issues/03-view-copy-on-write.md`)
 - [ ] views/04: Views: methods and writing (`.scratch/views/issues/04-view-methods-and-io.md`)
   - [x] `transpose()`/`t()` of a View raise Python's error, writing a View to h5ad and zarr reads back as the table says
-  - [ ] Structural equivalence of a written View with Python writing the same View (`expect_python_equal()`)
+  - [x] Structural equivalence of a written View with Python writing the same View (`expect_python_equal()`)
   - [ ] Table rows with no R method yet: `to_memory`, `write`, `write_csvs`, `write_loom`, `chunked_X`, `chunk_X` (human decision, see ticket)
 - [ ] views/05: Views documentation (`.scratch/views/issues/05-view-docs.md`)
 

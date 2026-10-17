@@ -755,3 +755,26 @@ test_that("writing a View writes the subset", {
   }
   expect_true(view$is_view)
 })
+
+# Why: the Structural equivalence criterion, a View written by R has the same
+# nodes, dtypes and attributes as Python writing the same View of the same
+# parent (one Python process per step, see CLAUDE.md)
+test_that("a written View is Structurally equivalent to Python's", {
+  parent <- view_parent()
+  view <- view_of(parent)
+  dir <- withr::local_tempdir()
+  formats <- c("h5ad", "zarr")
+  parents <- file.path(dir, paste0("parent.", formats))
+  mine <- file.path(dir, paste0("mine.", formats))
+  theirs <- file.path(dir, paste0("theirs.", formats))
+  parent$write_h5ad(parents[[1]])
+  parent$write_zarr(parents[[2]])
+  view$write_h5ad(mine[[1]])
+  view$write_zarr(mine[[2]])
+  run_python(
+    "rewrite_view.py",
+    c("0,2", "0,2", as.vector(rbind(parents, theirs)))
+  )
+  expect_all_equivalent(mine, theirs)
+  expect_python_equal(mine, theirs)
+})
