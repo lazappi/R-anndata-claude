@@ -1,6 +1,6 @@
 # Lazy seeds spike
 
-Status: ready-for-agent
+Status: in-progress
 Type: research
 Blocked by: none
 
@@ -25,3 +25,11 @@ Scripts and their output live under `.ralph/oracle/` (git-ignored), and only the
 - `scripts/check.sh` passes
 
 ## Comments
+
+2026-10-17: Wrote `.scratch/lazy/seeds-spike.md` (HDF5Array seeds, ZarrArray, own seeds, `DataFrame` with DelayedArray columns).
+- ZarrArray 1.1.7 was not installed, and `BiocManager::install("ZarrArray")` installed it into the user library for the spike (it is not a package dependency)
+- Recommendation is own seeds on the store layer (dtype records, 2^53 rule, bool, sparse zarr, one path with backed), and a `DataFrame` with DelayedArray columns plus small categorical and nullable classes for `obs`/`var`
+- Unresolved: an own seed over a zarr v3 store raised Rarr's `subscript out of bounds` on a block read although the same selections pass in `array_read()` directly. The checkpoint or the first implementation ticket must find the cause
+- The store layer lacks a backend-neutral array shape and chunk shape, which seeds need
+- `scripts/check.sh` passed (docs only change). The reviewer returned FAIL because the own-seed verdicts are incomplete, so the ticket stays `in-progress`
+- Remaining for the next run (also in `fix_plan.md`): (1) find the cause of the zarr block-read error in `probe-own.R` (the failing Rarr call received an index mapping that does not match the direct `array_read()` call, so log the exact `selection` and Rarr `index` that fail) and give verdicts for zarr v3 and v2, (2) probe the own seed for every dtype, bool, the nullable and string columns, the 2^53 error, a CSR/CSC sparse seed and chunk shape, (3) probe `H5SparseMatrixSeed` for the 2^53 case and result types on sparse, and ZarrArray on sparse bool

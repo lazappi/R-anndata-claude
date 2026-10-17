@@ -95,6 +95,10 @@ The human owns the order of the Queue.
 - [ ] backed/06: chunked_X, chunk_X and read_elem_partial (`.scratch/backed/issues/06-backed-chunks-and-partial.md`)
 - [ ] backed/07: backed mode documentation (`.scratch/backed/issues/07-backed-docs.md`)
 - [ ] lazy/01: lazy seeds spike (`.scratch/lazy/issues/01-lazy-seeds-spike.md`)
+  - [x] HDF5Array seeds, ZarrArray and `DataFrame` with DelayedArray columns probed, first draft of `.scratch/lazy/seeds-spike.md`
+  - [ ] Cause of the own-seed zarr block-read error, and verdicts for the own seed on zarr v3 and v2
+  - [ ] Own-seed probes for every dtype, bool, nullable and string columns, the 2^53 error, sparse and chunk shape
+  - [ ] Remaining sparse probes for `H5SparseMatrixSeed` (2^53, result types) and ZarrArray (sparse bool)
 - [ ] 🛑 Checkpoint (orchestrator): read `.scratch/lazy/seeds-spike.md`, choose the seeds, finish the lazy spec and write its tickets (ask the human only if there is no clear choice)
 
 ## Discovered
@@ -128,6 +132,10 @@ The human owns the order of the Queue.
 - [x] (moved to zarr-io/15) zarr rec-arrays ignore `compressors` (Python honours it) because the struct reader only decodes zstd, and the writer always uses one chunk (zarr-io/14)
 
 - [x] `adata$write()` is missing: Python's `write` is a shortcut for `write_h5ad` (`anndata.py:1744`). Add it as an alias and pass its row of the Views operations table.
+
+- [ ] Deadlock for the human: backed/04's last sub-item (h5sparse legacy attributes) belongs to the stub `legacy-formats` sub-project, so backed/04 cannot become `done` and blocks backed/05, 06 and 07 (all `Blocked by: 04`).
+  Either move that sub-item out of backed/04 (for example into a legacy-formats ticket) and let 04 finish, or remove 04 from the `Blocked by:` lines of 05 and 06.
+  The run on 2026-10-17 skipped to lazy/01 for this reason.
 
 ## Blocked
 
