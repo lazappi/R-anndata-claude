@@ -115,6 +115,8 @@ wrappers.
 In Python \verb{x = view.X; x[0, 0] = 1} modifies the View, but in R
 \verb{x <- view$X; x[1, 1] <- 1} only changes \code{x} and the View is unaffected.
 Assign through the View (\code{view$X[1, 1] <- 1}) to modify it.
+For a View of a backed object this makes the View independent with a
+warning, where Python silently changes nothing.
 }
 
 \section{Deprecated methods}{

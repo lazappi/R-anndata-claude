@@ -108,6 +108,82 @@ backed_dense_read <- function(x, rows, cols, call) {
   values
 }
 
+# Writes `values` (rows by columns, sorted unique positions) into the array on
+# disk. rhdf5 takes the buffer in R order, so it is transposed to put the
+# values in HDF5's row-major order.
+backed_dense_write_block <- function(x, rows, cols, values) {
+  handle <- .subset2(x, "manager")$handle()
+  dset <- rhdf5::H5Dopen(handle, .subset2(x, "path"))
+  on.exit(rhdf5::H5Dclose(dset), add = TRUE)
+  space <- rhdf5::H5Dget_space(dset)
+  on.exit(rhdf5::H5Sclose(space), add = TRUE, after = FALSE)
+  rhdf5::H5Sselect_index(space, list(cols, rows))
+  mem <- rhdf5::H5Screate_simple(c(length(cols), length(rows)))
+  on.exit(rhdf5::H5Sclose(mem), add = TRUE, after = FALSE)
+  buffer <- t(unclass(drop_dtype(values)))
+  if (identical(.subset2(x, "dtype"), "bool")) {
+    rhdf5::H5Dwrite(
+      dset,
+      as.raw(buffer),
+      h5type = bool_type(),
+      h5spaceFile = space,
+      h5spaceMem = mem
+    )
+  } else {
+    rhdf5::H5Dwrite(dset, buffer, h5spaceFile = space, h5spaceMem = mem)
+  }
+  invisible(NULL)
+}
+
+# `adata$X[i, j] <- value` in mode "r+" writes into the file, as h5py's item
+# assignment does, and returns the handle, so that assigning it back to `X`
+# changes nothing. Repeated and unsorted positions follow base matrices, so
+# the last one wins.
+#' @export
+#' @noRd
+`[<-.backed_dense` <- function(x, i, j, ..., value) {
+  call <- rlang::caller_env()
+  manager <- .subset2(x, "manager")
+  if (...length() > 0L) {
+    abort_index("A backed array is indexed by rows and columns only.", call)
+  }
+  if (!identical(manager$filemode, "r+")) {
+    anndata_abort(
+      "Cannot write to a backed array, the file was opened read-only.",
+      "anndata_read_only_error",
+      call = call
+    )
+  }
+  if (nargs() < 4L) {
+    abort_index(
+      "A backed array is assigned by rows and columns, as in {.code x[i, j]}.",
+      call
+    )
+  }
+  shape <- .subset2(x, "shape")
+  rows <- if (missing(i)) {
+    seq_len(shape[[1L]])
+  } else {
+    backed_positions(i, shape[[1L]], call)
+  }
+  cols <- if (missing(j)) {
+    seq_len(shape[[2L]])
+  } else {
+    backed_positions(j, shape[[2L]], call)
+  }
+  if (length(rows) == 0L || length(cols) == 0L) {
+    return(invisible(x))
+  }
+  unique_rows <- sort(unique(rows))
+  unique_cols <- sort(unique(cols))
+  # Assign in memory over the part of the array the positions touch, then
+  # write that part back
+  block <- unclass(backed_dense_block(x, unique_rows, unique_cols, call))
+  block[match(rows, unique_rows), match(cols, unique_cols)] <- value
+  backed_dense_write_block(x, unique_rows, unique_cols, block)
+  invisible(x)
+}
+
 #' @export
 #' @noRd
 as.matrix.backed_dense <- function(x, ...) {

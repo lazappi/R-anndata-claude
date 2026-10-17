@@ -77,6 +77,11 @@ aligned_mapping_class <- R6Class(
       position <- match(key, names(private$store))
       if (is.na(position)) NULL else reopen_backed(private$store[[position]])
     },
+    # Internal: like `get()`, but a closed backing file stays closed
+    peek = function(key) {
+      position <- match(key, names(private$store))
+      if (is.na(position)) NULL else private$store[[position]]
+    },
     #' @description Validate `value` and store it under `key`.
     set = function(key, value, call = rlang::caller_env()) {
       key <- check_key(key, call, private$is_layers)

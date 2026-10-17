@@ -94,7 +94,7 @@ The human owns the order of the Queue.
   - [x] (moved to `legacy-formats`) h5sparse legacy attributes in `sparse_dataset()` (row `legacy_attributes`)
 - [ ] backed/05: writing backed objects (`.scratch/backed/issues/05-backed-writing.md`)
   - [x] `write()`/`write_h5ad()` of backed objects, `copy(filename)`, `to_memory()` and Views of backed objects
-  - [ ] Assigning X in `"r+"` mode (rows `X_assign_*`, `X_item`, `X_del`, `layers_none_assign`, `write_after_X_assign`, `view_*_assign`)
+  - [x] Assigning X in `"r+"` mode (rows `X_assign_*`, `X_item`, `X_del`, `layers_none_assign`, `write_after_X_assign`, `view_*_assign`)
   - [ ] The `filename` setter (rows `filename_*`)
   - [ ] Chunked copy with `min_rows_for_chunked_h5_copy`
   - [ ] Raw rows (`raw_X_assign`, `raw_assign`, `raw_operations`) and `write_obs_edit`

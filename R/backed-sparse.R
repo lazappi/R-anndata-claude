@@ -364,6 +364,15 @@ backed_sparse_append <- function(x, value, call) {
   invisible(NULL)
 }
 
+# Python's sparse handles have no item assignment (`TypeError`)
+#' @export
+#' @noRd
+`[<-.backed_sparse` <- function(x, i, j, ..., value) {
+  abort_not_supported(
+    "A backed sparse matrix does not support item assignment."
+  )
+}
+
 #' Handle on a sparse matrix on disk
 #'
 #' Makes a handle on a `csr_matrix` or `csc_matrix` Element that is open in an

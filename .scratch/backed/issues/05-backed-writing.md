@@ -26,3 +26,12 @@ Assigning X in `"r+"` mode, `write()`/`write_h5ad()` on a backed object, `copy(f
   - A backed `raw` written in place is `anndata_not_supported_error` (Python fails with `AttributeError`), written to a new file it works in R (Python fails)
   - X is read whole into memory when copying to a new file (no `min_rows_for_chunked_h5_copy` chunking yet)
 - Remaining (queue sub-items): X assignment in `"r+"` mode (rows `X_assign_*`, `X_item`, `X_del`, `layers_none_assign`, `write_after_X_assign`), the `filename` setter (rows `filename_*`), chunked copy with `min_rows_for_chunked_h5_copy`, raw rows (`raw_X_assign`, `raw_assign`, `raw_operations`), `write_obs_edit`, `view_*_assign` rows.
+
+2026-10-17, part 2 (status stays `in-progress`):
+
+- Done: X assignment and the `view_*_assign` rows, tests in `test-backed-assign.R`.
+- `isbacked` is now "has a filename and X is not in memory" (Python's `Layers.isbacked`), so assigning X (or `layers[[NA]]`) keeps the file but ends backed mode, and `write()` then asks for a filename. `X <- NULL` on a backed object is a no-op, and on an assigned X it restores the placeholder from the file.
+- `adata$X[i, j] <- v` writes into the file for dense X in `"r+"` (`[<-.backed_dense`, any R index form, read-modify-write of the touched block), `anndata_read_only_error` in `"r"`, `anndata_not_supported_error` for sparse.
+- A View of a backed object now warns then raises the "pass a filename" error on any change except replacing X (Python's `_copy` of a backed object), and the View stays a View.
+- Deviation: `view$X[1, 1] <- 5` makes the View actual with a warning, Python silently changes nothing (documented in the `AnnData()` help).
+- The full `scripts/check.sh` passes. The reviewer asked for bool/integer item assignment tests and a View-of-assigned-X test (added) and a Python structural comparison of the `X_item` file (not done, the in-place write only changes values, so the next run may add `expect_all_equivalent`).

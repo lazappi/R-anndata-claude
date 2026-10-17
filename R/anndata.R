@@ -55,6 +55,8 @@
 #' In Python `x = view.X; x[0, 0] = 1` modifies the View, but in R
 #' `x <- view$X; x[1, 1] <- 1` only changes `x` and the View is unaffected.
 #' Assign through the View (`view$X[1, 1] <- 1`) to modify it.
+#' For a View of a backed object this makes the View independent with a
+#' warning, where Python silently changes nothing.
 #'
 #' @section Deprecated methods:
 #' `r lifecycle::badge("deprecated")`
@@ -516,6 +518,19 @@ AnnDataClass <- R6Class(
       call = rlang::caller_env()
     ) {
       if (!is.null(private$.view)) {
+        # Python copies the View to make it actual, which a backed parent
+        # refuses unless X is replaced (so the copy needs no file)
+        if (private$.view$parent$isbacked && !identical(what, ".X")) {
+          if (!is.null(what)) {
+            warn_view_modified(what, kind, call)
+          }
+          abort_invalid_argument(
+            "To copy an {.cls AnnData} object in backed mode, pass a
+             {.arg filename}: {.code .copy(filename = \"myfilename.h5ad\")}.
+             To load the object into memory, use {.code $to_memory()}.",
+            call
+          )
+        }
         for (attr in c("layers", "obsm", "varm", "obsp", "varp")) {
           private$refresh(attr)
         }
@@ -940,7 +955,9 @@ AnnDataClass <- R6Class(
       if (!missing(value)) {
         abort_read_only("isbacked")
       }
-      !is.null(private$.file$filename)
+      # As Python, assigning X to a backed object keeps the file but ends
+      # backed mode, because X is no longer read from the file
+      !is.null(private$.file$filename) && private$x_on_disk()
     },
     #' @field filename Path of the backing file, or `NULL` when the object is
     #'   in memory.
@@ -1094,10 +1111,34 @@ AnnDataClass <- R6Class(
       }
       invisible(NULL)
     },
+    # Whether X is read from the backing file (or absent), not held in memory
+    x_on_disk = function() {
+      # `.subset2()` because a key named `peek` would hide the method, and a
+      # closed file must stay closed
+      x <- .subset2(private$.layers, "peek")(NA_character_)
+      is.null(x) || inherits(x, "backed_x")
+    },
+    # Python reads X from the file again once the X in memory is removed
+    restore_backed_x = function(call) {
+      manager <- private$.file
+      if (is.null(manager$filename) || !manager$has("X")) {
+        return(invisible(NULL))
+      }
+      x <- backed_x_elem(manager, "X", manager$handle(), call)
+      if (!is.null(x)) {
+        private$.layers$set(NA_character_, x, call = call)
+      }
+      invisible(NULL)
+    },
     set_x = function(value, call) {
       if (is.null(value)) {
+        # Python's backed X is not in the layers, so there is nothing to remove
+        if (self$isbacked) {
+          return(invisible(NULL))
+        }
         self$ensure_actual(".X", "set", call)
         private$.layers$remove(NA_character_)
+        private$restore_backed_x(call)
         return(invisible(NULL))
       }
       value <- coerce_x_shape(value, self$shape, call)
