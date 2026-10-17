@@ -7,6 +7,7 @@ The human owns the order of the Queue.
 
 ## Queue
 
+- [ ] foundations/10: faster test suite, again (`.scratch/foundations/issues/10-test-speed-again.md`)
 - [x] foundations/01: package skeleton (`.scratch/foundations/issues/01-package-skeleton.md`)
 - [x] foundations/02: formatting and linting (`.scratch/foundations/issues/02-formatting-and-linting.md`)
 - [x] foundations/03: check script (`.scratch/foundations/issues/03-check-script.md`)
@@ -125,8 +126,6 @@ The human owns the order of the Queue.
 - [x] (moved to zarr-io/15) zarr rec-arrays ignore `compressors` (Python honours it) because the struct reader only decodes zstd, and the writer always uses one chunk (zarr-io/14)
 
 - [x] `adata$write()` is missing: Python's `write` is a shortcut for `write_h5ad` (`anndata.py:1744`). Add it as an alias and pass its row of the Views operations table.
-
-- [ ] The full `scripts/check.sh` takes 490s of its 570s limit (`R CMD check` 6m47s with 4 test workers), so the next tests added will time out. Speed the suite up to under 5 minutes as foundations/09 did (batch Python calls, smaller zarr and View fixtures), without testing less, and record before and after times.
 
 ## Blocked
 
