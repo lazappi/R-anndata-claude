@@ -1,6 +1,6 @@
 # Faster test suite, again
 
-Status: needs-info
+Status: ready-for-agent
 Type: task
 Blocked by: none
 
@@ -14,6 +14,16 @@ Speed the suite up as foundations/09 did, without testing less: measure first (i
 - No test is removed, skipped or weakened, and the number of expectations does not go down
 - `scripts/check.sh` takes less than 5 minutes, with before and after times in the ticket
 - `scripts/check.sh` passes
+
+## Decisions (human, 2026-10-17)
+
+These cuts keep coverage and are approved:
+
+- The fixture determinism test generates once and compares with the committed fixtures (a change in output still shows as a mismatch), instead of generating twice
+- Freshness tests compare a hash of the generator script and `tests/python/uv.lock` stored with the generated table or fixtures, instead of re-running Python on every check.
+  `scripts/regenerate-fixtures.sh` still regenerates everything and refreshes the hashes.
+- The `write_zarr` AnnData-level tests use the realistic object plus a few edge cases, not every per-encoding store, which `test-io-zarr-basic.R` and `test-io-zarr-compound.R` already cover in all three directions
+- Split slow test files so the 4 workers stay balanced
 
 ## Comments
 
