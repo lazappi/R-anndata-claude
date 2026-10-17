@@ -73,12 +73,23 @@ Without names, observations and variables are named \code{"0"}, \code{"1"}, ...,
 \item \code{obs}, \code{var}: annotation \code{S4Vectors::DataFrame}s
 \item \code{obs_names}, \code{var_names}: character names
 \item \code{n_obs}, \code{n_vars}, \code{shape}: dimensions
-\item \code{is_view} (always \code{FALSE}), \code{isbacked} (always \code{FALSE}) and \code{filename}
-(always \code{NULL})
+\item \code{is_view}: whether the object is a View made by \code{adata[i, j]}
+\item \code{isbacked} (always \code{FALSE}) and \code{filename} (always \code{NULL})
 }
 
 The dimension and backing fields are read-only and assigning to them raises
 an \code{anndata_read_only_error}.
+}
+
+\section{Views}{
+
+\code{adata[i, j]} returns a View that shares data with \code{adata}, as in Python.
+X, \code{layers}, \code{obsm}, \code{varm}, \code{obsp} and \code{varp} are read from the parent on
+every access, so a View shows later changes to the parent's X.
+\code{obs}, \code{var}, \code{uns} and \code{raw} are snapshots taken when the View is created.
+A View of a View refers to the original parent.
+Modifying a View turns it into an independent object and leaves the parent
+unchanged.
 }
 
 \section{Deprecated methods}{

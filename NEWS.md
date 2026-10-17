@@ -6,6 +6,8 @@
   Arrays are sharded like Python's by default, and the `shards` dataset argument sets the shard shape or `NULL` for none.
 * rec-arrays in zarr keep their field dtypes (integer widths, float32, bool, fixed-length strings), may have no rows or hold non-ASCII text, and are sharded when `shards` is given.
 * `read_zarr()` and `read_elem()` also read zarr v2 stores, including consolidated metadata, blosc compression and rec-arrays.
+* `adata[i, j]` returns a View that shares X, layers and the aligned mappings with its parent (as in Python), has `is_view` `TRUE` and prints with a `View of ` prefix.
+  Views of Views refer to the original parent, and modifying a View makes it an independent object.
 
 # anndata.claude 0.0.1
 
@@ -31,4 +33,4 @@ First milestone: the MVP of an R port of Python anndata 0.13.4, with h5ad files 
 
 * rec-array field dtypes are not preserved, and rec-arrays with non-ASCII text, compression or no rows cannot be written (ADR 0005).
 * Unsorted sparse indices are sorted on read (ADR 0006).
-* Legacy h5ad formats, views, backed mode, zarr, concatenation and lazy arrays are not yet supported.
+* Legacy h5ad formats, backed mode, zarr, concatenation and lazy arrays are not yet supported.

@@ -122,26 +122,32 @@ subset_value <- function(x, idx, pairwise = FALSE) {
   matrix_subset(x, idx, if (pairwise) idx)
 }
 
+# The contents of the aligned mapping `attr` of `adata` restricted to `oidx` and
+# `vidx` (`NULL` keeps an axis), as a named list
+subset_aligned <- function(adata, attr, oidx = NULL, vidx = NULL) {
+  mapping <- as.list(adata[[attr]])
+  if (attr == "layers") {
+    return(lapply(mapping, function(x) matrix_subset(x, oidx, vidx)))
+  }
+  idx <- if (startsWith(attr, "obs")) oidx else vidx
+  pairwise <- endsWith(attr, "p")
+  lapply(mapping, subset_value, idx = idx, pairwise = pairwise)
+}
+
 # Independent copy of `adata` restricted to observations `oidx` and variables
 # `vidx` (`NULL` keeps an axis), with `raw` as given to `AnnData()`
 subset_slots <- function(adata, oidx = NULL, vidx = NULL, raw = NULL) {
-  by_axis <- function(mapping, idx, pairwise = FALSE) {
-    lapply(as.list(mapping), subset_value, idx = idx, pairwise = pairwise)
-  }
-  layers <- lapply(
-    as.list(adata$layers),
-    function(x) matrix_subset(x, oidx, vidx)
-  )
+  layers <- subset_aligned(adata, "layers", oidx, vidx)
   # Repeated names are expected when indices repeat
   suppressWarnings(
     AnnData(
       obs = subset_frame(adata$obs, oidx),
       var = subset_frame(adata$var, vidx),
       uns = adata$uns,
-      obsm = by_axis(adata$obsm, oidx),
-      varm = by_axis(adata$varm, vidx),
-      obsp = by_axis(adata$obsp, oidx, TRUE),
-      varp = by_axis(adata$varp, vidx, TRUE),
+      obsm = subset_aligned(adata, "obsm", oidx, vidx),
+      varm = subset_aligned(adata, "varm", oidx, vidx),
+      obsp = subset_aligned(adata, "obsp", oidx, vidx),
+      varp = subset_aligned(adata, "varp", oidx, vidx),
       layers = layers,
       raw = raw,
       shape = if (!length(layers)) {
@@ -206,6 +212,21 @@ subset_anndata <- function(adata, oidx = NULL, vidx = NULL) {
   new
 }
 
+# A View of `adata` at observations `oidx` and variables `vidx`. A View of a
+# View is made from the original parent with composed positions (Python
+# `_resolve_idxs`), so a View's parent is never a View.
+subset_view <- function(adata, oidx, vidx) {
+  info <- .subset2(adata, "view_info")()
+  if (!is.null(info)) {
+    adata <- info$parent
+    oidx <- info$oidx[oidx]
+    vidx <- info$vidx[vidx]
+  }
+  view <- subset_anndata(adata, oidx, vidx)
+  .subset2(view, "mark_view")(adata, oidx, vidx)
+  view
+}
+
 #' @export
 #' @noRd
 `[.AnnData` <- function(x, i, j) {
@@ -214,5 +235,5 @@ subset_anndata <- function(adata, oidx = NULL, vidx = NULL) {
   cols <- if (missing(j) || nargs() < 3L) NULL else j
   oidx <- normalize_index(rows, .subset2(x, "obs_names"), "obs", call)
   vidx <- normalize_index(cols, .subset2(x, "var_names"), "var", call)
-  subset_anndata(x, oidx, vidx)
+  subset_view(x, oidx, vidx)
 }

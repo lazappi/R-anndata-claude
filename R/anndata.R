@@ -18,11 +18,20 @@
 #' * `obs`, `var`: annotation `S4Vectors::DataFrame`s
 #' * `obs_names`, `var_names`: character names
 #' * `n_obs`, `n_vars`, `shape`: dimensions
-#' * `is_view` (always `FALSE`), `isbacked` (always `FALSE`) and `filename`
-#'   (always `NULL`)
+#' * `is_view`: whether the object is a View made by `adata[i, j]`
+#' * `isbacked` (always `FALSE`) and `filename` (always `NULL`)
 #'
 #' The dimension and backing fields are read-only and assigning to them raises
 #' an `anndata_read_only_error`.
+#'
+#' @section Views:
+#' `adata[i, j]` returns a View that shares data with `adata`, as in Python.
+#' X, `layers`, `obsm`, `varm`, `obsp` and `varp` are read from the parent on
+#' every access, so a View shows later changes to the parent's X.
+#' `obs`, `var`, `uns` and `raw` are snapshots taken when the View is created.
+#' A View of a View refers to the original parent.
+#' Modifying a View turns it into an independent object and leaves the parent
+#' unchanged.
 #'
 #' @section Deprecated methods:
 #' `r lifecycle::badge("deprecated")`
@@ -460,6 +469,26 @@ AnnDataClass <- R6Class(
       private$.raw <- make_raw(self, raw, call)
       invisible(self)
     },
+    # Internal: records that this object is a View of `parent` (never a View)
+    # at the positions `oidx` and `vidx`
+    mark_view = function(parent, oidx, vidx) {
+      private$.view <- list(parent = parent, oidx = oidx, vidx = vidx)
+      invisible(self)
+    },
+    # Internal: the parent and positions of a View, or `NULL`
+    view_info = function() {
+      private$.view
+    },
+    # Internal: turns a View into an independent object, keeping its contents
+    ensure_actual = function() {
+      if (!is.null(private$.view)) {
+        for (attr in c("layers", "obsm", "varm", "obsp", "varp")) {
+          private$refresh(attr)
+        }
+        private$.view <- NULL
+      }
+      invisible(self)
+    },
     #' @description A deep copy that is independent of this object.
     #' @param filename Must be `NULL` until backed mode is supported.
     copy = function(filename = NULL) {
@@ -514,6 +543,7 @@ AnnDataClass <- R6Class(
       if (!is.null(df)) {
         return(invisible(categorise_frame(df, call)))
       }
+      self$ensure_actual()
       private$.obs <- categorise_frame(private$.obs, call)
       private$.var <- categorise_frame(private$.var, call)
       invisible(self)
@@ -531,6 +561,7 @@ AnnDataClass <- R6Class(
         categories,
         rlang::caller_env()
       )
+      self$ensure_actual()
       private[[paste0(".", renamed$attr)]] <- renamed$frame
       private$.uns <- rename_uns_rec_arrays(
         private$.uns,
@@ -625,7 +656,7 @@ AnnDataClass <- R6Class(
         ),
         rlang::caller_env()
       )
-      private$.obsm$keys()
+      self$obsm$keys()
     },
     #' @description `r lifecycle::badge("deprecated")`
     #'
@@ -639,7 +670,7 @@ AnnDataClass <- R6Class(
         ),
         rlang::caller_env()
       )
-      private$.varm$keys()
+      self$varm$keys()
     },
     #' @description `r lifecycle::badge("deprecated")`
     #'
@@ -686,15 +717,15 @@ AnnDataClass <- R6Class(
     #'   X and layers are transposed, obsm and varm and obsp and varp swap
     #'   places, `uns` is kept and the Raw is dropped.
     transpose = function() {
-      layers <- lapply(as.list(private$.layers), matrix_transpose)
+      layers <- lapply(as.list(self$layers), matrix_transpose)
       AnnData(
         obs = private$.var,
         var = private$.obs,
         uns = private$.uns,
-        obsm = as.list(private$.varm),
-        varm = as.list(private$.obsm),
-        obsp = as.list(private$.varp),
-        varp = as.list(private$.obsp),
+        obsm = as.list(self$varm),
+        varm = as.list(self$obsm),
+        obsp = as.list(self$varp),
+        varp = as.list(self$obsp),
         layers = layers,
         shape = if (!length(layers)) rev(self$shape)
       )
@@ -705,7 +736,13 @@ AnnDataClass <- R6Class(
     #'   key. Assigning `NULL` removes it.
     X = function(value) {
       if (missing(value)) {
-        return(private$.layers$get(NA_character_))
+        view <- private$.view
+        if (is.null(view)) {
+          return(private$.layers$get(NA_character_))
+        }
+        # A View reads X through the parent on every access
+        x <- view$parent$X
+        return(if (!is.null(x)) matrix_subset(x, view$oidx, view$vidx))
       }
       private$set_x(value, rlang::caller_env())
     },
@@ -796,12 +833,12 @@ AnnDataClass <- R6Class(
       }
       c(nrow(private$.obs), nrow(private$.var))
     },
-    #' @field is_view Always `FALSE` until views are supported.
+    #' @field is_view Whether the object is a View, see `[`.
     is_view = function(value) {
       if (!missing(value)) {
         abort_read_only("is_view")
       }
-      FALSE
+      !is.null(private$.view)
     },
     #' @field isbacked Always `FALSE` until backed mode is supported.
     isbacked = function(value) {
@@ -828,9 +865,22 @@ AnnDataClass <- R6Class(
     .obsp = NULL,
     .varp = NULL,
     .raw = NULL,
+    # NULL for an actual object, otherwise the parent and positions of a View
+    .view = NULL,
+    # Reloads the lazy aligned mapping `attr` of a View from its parent
+    refresh = function(attr) {
+      view <- private$.view
+      if (!is.null(view)) {
+        contents <- subset_aligned(view$parent, attr, view$oidx, view$vidx)
+        # `.subset2()` because a key named `load` would hide the method
+        .subset2(private[[paste0(".", attr)]], "load")(contents)
+      }
+      invisible(NULL)
+    },
     # Python accepts only an AnnData. Assigning the Raw itself is what
     # `adata$raw$var$col <- v` does after the Raw changed.
     set_raw = function(value, call) {
+      self$ensure_actual()
       if (is.null(value)) {
         private$.raw <- NULL
       } else if (!identical(value, private$.raw)) {
@@ -855,9 +905,11 @@ AnnDataClass <- R6Class(
     aligned = function(attr, value, get, call) {
       mapping <- private[[paste0(".", attr)]]
       if (get) {
+        private$refresh(attr)
         return(mapping)
       }
       if (!identical(value, mapping)) {
+        self$ensure_actual()
         mapping$replace(value, call = call)
       }
       invisible(NULL)
@@ -865,6 +917,7 @@ AnnDataClass <- R6Class(
     # Replaces obs or var, which takes its names from the value (Python resets
     # them to "0", "1", ... when the value has none) and passes them on
     set_frame = function(attr, value, call) {
+      self$ensure_actual()
       field <- paste0(".", attr)
       n <- nrow(private[[field]])
       private[[field]] <- as_annotation_frame(value, attr, n, "shape", call)
@@ -872,6 +925,7 @@ AnnDataClass <- R6Class(
     },
     # Sets obs_names or var_names, and a plain vector has no index name
     set_names = function(attr, value, call) {
+      self$ensure_actual()
       field <- paste0(".", attr)
       frame <- private[[field]]
       if (is.factor(value)) {
@@ -903,6 +957,7 @@ AnnDataClass <- R6Class(
       invisible(NULL)
     },
     set_uns = function(value, call) {
+      self$ensure_actual()
       keys <- names(value)
       named <- !is.null(keys) && !anyNA(keys) && all(nzchar(keys))
       valid <- is.list(value) && !is.object(value) && (named || !length(value))
@@ -914,6 +969,7 @@ AnnDataClass <- R6Class(
     },
     # Validates X and stores it first in the layers storage under the `NA` key
     set_x = function(value, call) {
+      self$ensure_actual()
       if (is.null(value)) {
         private$.layers$remove(NA_character_)
         return(invisible(NULL))

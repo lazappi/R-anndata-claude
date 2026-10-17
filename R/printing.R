@@ -28,6 +28,7 @@ format.AnnData <- function(x, ...) {
   paste(
     c(
       paste0(
+        if (.subset2(x, "is_view")) "View of ",
         "AnnData object with n_obs ",
         times,
         " n_vars = ",

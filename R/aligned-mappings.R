@@ -87,6 +87,12 @@ aligned_mapping_class <- R6Class(
       private$put(key, private$validate(value, key, call))
       invisible(self)
     },
+    # Internal: replaces the contents with already valid values (a View
+    # reloading from its parent)
+    load = function(contents) {
+      private$store <- contents
+      invisible(self)
+    },
     #' @description Remove `key`, if present.
     remove = function(key) {
       key <- check_key(key, rlang::caller_env(), private$is_layers)
@@ -98,6 +104,7 @@ aligned_mapping_class <- R6Class(
     #' @param keep_x `TRUE`, `FALSE` or `NULL`.
     clear = function(keep_x = NULL, call = rlang::caller_env()) {
       if (!private$is_layers) {
+        private$touch()
         private$store <- list()
         return(invisible(self))
       }
@@ -117,6 +124,7 @@ aligned_mapping_class <- R6Class(
           call
         )
       }
+      private$touch()
       x <- private$store[is.na(names(private$store))]
       private$store <- if (keep_x) x else list()
       invisible(self)
@@ -155,6 +163,7 @@ aligned_mapping_class <- R6Class(
       for (i in seq_along(store)) {
         store[[i]] <- private$validate(store[[i]], names(store)[[i]], call)
       }
+      private$touch()
       if (layers && anyNA(names(private$store)) && !anyNA(keys)) {
         warn_future(
           "Assigning to {.field layers} without an {.code NA} key currently
@@ -206,8 +215,16 @@ aligned_mapping_class <- R6Class(
     attrname = NULL,
     store = NULL,
     is_layers = FALSE,
+    # A mapping of a View turns the View into an independent object before it
+    # changes (the Raw's varm has a Raw as parent, which is never a View)
+    touch = function() {
+      if (inherits(private$parent, "AnnData")) {
+        private$parent$ensure_actual()
+      }
+    },
     # Keys are matched with `match()` because `NA` (X) is not a valid `[[` name
     put = function(key, value) {
+      private$touch()
       position <- match(key, names(private$store))
       if (is.na(position)) {
         private$store <- c(private$store, list(value))
@@ -217,6 +234,7 @@ aligned_mapping_class <- R6Class(
       }
     },
     drop = function(key) {
+      private$touch()
       position <- match(key, names(private$store))
       if (!is.na(position)) {
         private$store <- private$store[-position]
