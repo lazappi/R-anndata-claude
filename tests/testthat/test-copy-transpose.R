@@ -46,12 +46,12 @@ test_that("copy() keeps every Slot", {
   expect_null(AnnData(shape = c(2, 2))$copy()$raw)
 })
 
-# Backed mode is not supported yet, so a filename must error
-test_that("copy() with a filename is not supported", {
-  expect_anndata_condition(
-    copy_adata()$copy(filename = "x.h5ad"),
-    "anndata_not_supported_error"
-  )
+# Python ignores `filename` unless the object is backed, so nothing is written
+test_that("copy() of an object in memory ignores the filename", {
+  path <- file.path(withr::local_tempdir(), "x.h5ad")
+  a <- copy_adata()
+  expect_identical(a$copy(filename = path)$X, a$X)
+  expect_false(file.exists(path))
 })
 
 # transpose swaps the axes and their Slots, drops raw and keeps uns

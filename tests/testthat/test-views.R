@@ -713,6 +713,23 @@ test_that("an extracted value does not affect the View", {
   expect_equal(view$X[1, 1], 0)
 })
 
+# Why: the to_memory row (added by backed/05), a View becomes an independent
+# object with the View's values and the parent is untouched
+test_that("to_memory() of a View gives an independent object", {
+  expected <- view_cases()$operations$to_memory$result$to_memory
+  parent <- view_parent()
+  view <- view_of(parent)
+  memory <- view$to_memory()
+  expect_false(memory$is_view)
+  expect_true(view$is_view)
+  expect_equal(memory$X, table_matrix(expected$X))
+  expect_equal(memory$obs_names, unlist(expected$obs_names))
+  expect_equal(
+    unname(memory$layers[["counts"]]),
+    unname(view$layers[["counts"]])
+  )
+})
+
 # Why: the transpose and T rows, Python refuses to transpose a View (also a View
 # of a View) and leaves it a View, while a copy can be transposed
 test_that("transposing a View raises Python's error", {
@@ -804,7 +821,6 @@ test_that("a written View is Structurally equivalent to Python's", {
 # and update this list
 test_that("table rows for methods owned by later sub-projects are deferred", {
   deferred <- list(
-    to_memory = "backed",
     chunked_X = "backed",
     chunk_X = "backed",
     write_csvs = "other-formats",

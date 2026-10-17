@@ -83,6 +83,7 @@ densify <- function(x) {
 
 # Writes X or raw X, dense when `name` is in `as_dense` and the matrix is sparse
 write_x_elem <- function(group, x, name, dataset_kwargs, call) {
+  x <- backed_in_memory(x)
   if (name %in% dataset_kwargs$as_dense && methods::is(x, "sparseMatrix")) {
     x <- densify(x)
   }
@@ -105,8 +106,20 @@ write_anndata <- function(store, key, value, dataset_kwargs, path) {
   on.exit(node_close(group), add = TRUE)
   set_elem_attr(group, "encoding-type", "anndata")
   set_elem_attr(group, "encoding-version", "0.1.0")
+  write_anndata_members(group, value, dataset_kwargs, call)
+  invisible(NULL)
+}
 
-  if (!is.null(value$X)) {
+# Writes the members of an `anndata` group. `write_x = FALSE` leaves X as it is
+# on disk, which is how a backed object is updated in place.
+write_anndata_members <- function(
+  group,
+  value,
+  dataset_kwargs,
+  call,
+  write_x = TRUE
+) {
+  if (write_x && !is.null(value$X)) {
     write_x_elem(group, value$X, "X", dataset_kwargs, call)
   }
   # Only X takes the `chunks` argument

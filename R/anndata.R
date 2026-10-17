@@ -529,19 +529,45 @@ AnnDataClass <- R6Class(
       invisible(self)
     },
     #' @description A deep copy that is independent of this object.
-    #' @param filename Must be `NULL` until backed mode is supported.
+    #'   A backed object is copied to `filename`, which it requires, and the
+    #'   copy is backed by that file in the mode of the original.
+    #' @param filename Path of the file of a backed object's copy, otherwise
+    #'   ignored.
     copy = function(filename = NULL) {
-      if (!is.null(filename)) {
-        abort_not_supported(
-          "Copying to a {.arg filename} is not yet supported.",
-          call = rlang::caller_env()
-        )
+      if (self$isbacked) {
+        call <- rlang::caller_env()
+        if (is.null(filename)) {
+          abort_invalid_argument(
+            "To copy an {.cls AnnData} object in backed mode, pass a
+             {.arg filename}: {.code .copy(filename = \"myfilename.h5ad\")}.
+             To load the object into memory, use {.code $to_memory()}.",
+            call
+          )
+        }
+        mode <- private$.file$filemode
+        write_h5ad(self, filename)
+        return(read_h5ad(filename, backed = mode))
+      }
+      self$to_memory(copy = TRUE)
+    },
+    #' @description A new object with every on-disk array read into memory.
+    #'   The original stays backed.
+    #' @param copy Whether arrays that are already in memory are copied
+    #'   (always the case, as R copies on modification).
+    to_memory = function(copy = FALSE) {
+      # Python reads a closed file's arrays without opening it again
+      if (!private$.file$is_open) {
+        on.exit(private$.file$close(), add = TRUE)
       }
       raw <- private$.raw
       subset_slots(
         self,
         raw = if (!is.null(raw)) {
-          list(X = raw$X, var = raw$var, varm = as.list(raw$varm))
+          list(
+            X = backed_in_memory(raw$X),
+            var = raw$var,
+            varm = as.list(raw$varm)
+          )
         }
       )
     },
@@ -738,14 +764,16 @@ AnnDataClass <- R6Class(
     #' @description Writes the object to an `.h5ad` file, see [write_h5ad()].
     #' @param filename Path of the file.
     #' @param ... Further arguments of [write_h5ad()].
+    #'   A backed object that is not a View writes to its backing file when
+    #'   `filename` is missing, and is backed by `filename` afterwards.
     write_h5ad = function(filename, ...) {
-      write_h5ad(self, filename, ...)
+      private$write_backed(if (missing(filename)) NULL else filename, ...)
     },
     #' @description Shortcut for `write_h5ad()`, see [write_h5ad()].
     #' @param filename Path of the file.
     #' @param ... Further arguments of [write_h5ad()].
     write = function(filename, ...) {
-      write_h5ad(self, filename, ...)
+      private$write_backed(if (missing(filename)) NULL else filename, ...)
     },
     #' @description Writes the object to a zarr store, see [write_zarr()].
     #' @param store Path of the zarr directory store.
@@ -1051,6 +1079,21 @@ AnnDataClass <- R6Class(
       invisible(NULL)
     },
     # Validates X and stores it first in the layers storage under the `NA` key
+    # Python's `AnnData.write_h5ad`: the backing file is the default filename,
+    # and a backed object that is not a View is backed by the file it wrote
+    write_backed = function(filename, ..., call = rlang::caller_env(2L)) {
+      if (is.null(filename)) {
+        if (!self$isbacked) {
+          abort_invalid_argument("Provide a {.arg filename}!", call)
+        }
+        filename <- self$filename
+      }
+      write_h5ad(self, filename, ...)
+      if (self$isbacked && !self$is_view) {
+        private$.file$set_filename(path.expand(filename))
+      }
+      invisible(NULL)
+    },
     set_x = function(value, call) {
       if (is.null(value)) {
         self$ensure_actual(".X", "set", call)

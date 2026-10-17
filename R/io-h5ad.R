@@ -200,9 +200,54 @@ write_h5ad <- function(
       raw$var <- categorise_frame(raw$var, call)
     }
   }
+  # A View reads its X from the backed object it was made from
+  source <- if (adata$is_view) .subset2(adata, "view_info")()$parent else adata
+  if (source$isbacked && same_path(filename, source$filename)) {
+    if (adata$is_view) {
+      abort_invalid_argument(
+        "Cannot write a View to the file that backs it.",
+        call
+      )
+    }
+    write_h5ad_in_place(adata, filename, dataset_kwargs, call)
+    return(invisible(NULL))
+  }
   store <- rhdf5::H5Fcreate(filename, flags = "H5F_ACC_TRUNC")
   on.exit(rhdf5::H5Fclose(store), add = TRUE)
   write_elem(store, "/", adata, dataset_kwargs, call = call)
+  if (source$isbacked) {
+    # Python closes the backing file, and X is read again when needed
+    source$file$close()
+  }
+  invisible(NULL)
+}
+
+# Python's update of a backed object in its own file: every member is written
+# again except X, which is already on disk (unless it becomes dense)
+write_h5ad_in_place <- function(adata, filename, dataset_kwargs, call) {
+  raw <- adata$raw
+  if (inherits(raw$X, "backed_x")) {
+    abort_not_supported(
+      "Writing an object whose {.field raw} is backed into its own file.",
+      call = call
+    )
+  }
+  x <- adata$X
+  densify_x <- "X" %in% dataset_kwargs$as_dense && inherits(x, "backed_sparse")
+  write_x <- !is.null(x) && (!inherits(x, "backed_x") || densify_x)
+  if (write_x) {
+    # Read before the file is closed
+    x <- backed_in_memory(x)
+  }
+  adata$file$close()
+  store <- rhdf5::H5Fopen(filename, flags = "H5F_ACC_RDWR")
+  on.exit(rhdf5::H5Fclose(store), add = TRUE)
+  group <- group_root(store)
+  on.exit(node_close(group), add = TRUE, after = FALSE)
+  if (write_x) {
+    write_x_elem(group, x, "X", dataset_kwargs, call)
+  }
+  write_anndata_members(group, adata, dataset_kwargs, call, write_x = FALSE)
   invisible(NULL)
 }
 

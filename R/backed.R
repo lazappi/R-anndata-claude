@@ -127,6 +127,14 @@ file_manager_class <- R6Class(
       private$.file <- NULL
       invisible(self)
     },
+    #' @description Closes the file and points the manager at another file,
+    #'   which opens when the object is next read (Python's `filename` setter).
+    #' @param filename Path of the new backing file.
+    set_filename = function(filename) {
+      self$close()
+      private$.filename <- filename
+      invisible(self)
+    },
     #' @description The open file, which is opened again after a `close()`.
     handle = function() {
       if (!self$is_open) {
@@ -342,6 +350,25 @@ backed_x_elem <- function(manager, path, store, call) {
     return(NULL)
   }
   new_backed_x(manager, path, shape, encoding, dtype)
+}
+
+# The values of a `backed_x` read into memory, anything else is returned as is
+backed_in_memory <- function(x) {
+  if (inherits(x, "backed_dense")) {
+    return(as.matrix(x))
+  }
+  if (inherits(x, "backed_sparse")) {
+    return(backed_sparse_to_memory(x))
+  }
+  x
+}
+
+# Whether two paths name the same file, which need not exist
+same_path <- function(a, b) {
+  identical(
+    normalizePath(a, mustWork = FALSE),
+    normalizePath(b, mustWork = FALSE)
+  )
 }
 
 # Opens the file again when X is read after a `close()`, as Python does

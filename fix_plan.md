@@ -93,6 +93,11 @@ The human owns the order of the Queue.
   - [x] `sparse_dataset()$append()` (table rows `append_*` in `sparse_dataset`, in `"r+"` mode, resizing `data`, `indices`, `indptr` and the `shape` attribute, and invalidating the `indptr` cache in `x$cache`)
   - [x] (moved to `legacy-formats`) h5sparse legacy attributes in `sparse_dataset()` (row `legacy_attributes`)
 - [ ] backed/05: writing backed objects (`.scratch/backed/issues/05-backed-writing.md`)
+  - [x] `write()`/`write_h5ad()` of backed objects, `copy(filename)`, `to_memory()` and Views of backed objects
+  - [ ] Assigning X in `"r+"` mode (rows `X_assign_*`, `X_item`, `X_del`, `layers_none_assign`, `write_after_X_assign`, `view_*_assign`)
+  - [ ] The `filename` setter (rows `filename_*`)
+  - [ ] Chunked copy with `min_rows_for_chunked_h5_copy`
+  - [ ] Raw rows (`raw_X_assign`, `raw_assign`, `raw_operations`) and `write_obs_edit`
 - [ ] backed/06: chunked_X, chunk_X and read_elem_partial (`.scratch/backed/issues/06-backed-chunks-and-partial.md`)
 - [ ] backed/07: backed mode documentation (`.scratch/backed/issues/07-backed-docs.md`)
 - [x] lazy/01: lazy seeds spike (`.scratch/lazy/issues/01-lazy-seeds-spike.md`)
