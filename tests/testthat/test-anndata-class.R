@@ -201,8 +201,7 @@ test_that("fixed read-only fields have their Python values", {
     "n_vars",
     "shape",
     "is_view",
-    "isbacked",
-    "filename"
+    "isbacked"
   )) {
     expect_anndata_condition(
       adata[[field]] <- 1L,

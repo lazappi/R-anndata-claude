@@ -135,6 +135,13 @@ file_manager_class <- R6Class(
       private$.filename <- filename
       invisible(self)
     },
+    #' @description Closes the file and forgets its name, so the object is in
+    #'   memory again (Python's `_to_memory_mode`).
+    to_memory_mode = function() {
+      self$close()
+      private$.filename <- NULL
+      invisible(self)
+    },
     #' @description The open file, which is opened again after a `close()`.
     handle = function() {
       if (!self$is_open) {

@@ -34,4 +34,11 @@ Assigning X in `"r+"` mode, `write()`/`write_h5ad()` on a backed object, `copy(f
 - `adata$X[i, j] <- v` writes into the file for dense X in `"r+"` (`[<-.backed_dense`, any R index form, read-modify-write of the touched block), `anndata_read_only_error` in `"r"`, `anndata_not_supported_error` for sparse.
 - A View of a backed object now warns then raises the "pass a filename" error on any change except replacing X (Python's `_copy` of a backed object), and the View stays a View.
 - Deviation: `view$X[1, 1] <- 5` makes the View actual with a warning, Python silently changes nothing (documented in the `AnnData()` help).
-- The full `scripts/check.sh` passes. The reviewer asked for bool/integer item assignment tests and a View-of-assigned-X test (added) and a Python structural comparison of the `X_item` file (not done, the in-place write only changes values, so the next run may add `expect_all_equivalent`).
+2026-10-18, part 3 (status stays `in-progress`):
+
+- Done: the `filename` setter (`private$set_filename()`, `file_manager$to_memory_mode()`), tests in `test-backed-filename.R`: `NULL` (reads X into memory), same path (no-op), new path in memory (writes with X dense, opens `"r+"`), new path when backed (updates the file, renames, reopens `"r+"`), failed move, X assigned first, View of a backed object.
+- Deviations: the View of a backed object fails before moving anything (Python renames the file first and leaves it corrupt), a failed move raises `anndata_file_not_found_error`.
+- Not done: a backed `raw` X is not converted to memory by `filename <- NULL` (belongs with the raw rows, row `filename_none` has `raw_X`).
+- The full `scripts/check.sh` and the reviewer pass. `filename` is no longer read-only, so it left the read-only loop in `test-anndata-class.R`.
+
+Part 2 note: the full `scripts/check.sh` passed. The reviewer asked for bool/integer item assignment tests and a View-of-assigned-X test (added) and a Python structural comparison of the `X_item` file (not done, the in-place write only changes values, so the next run may add `expect_all_equivalent`).

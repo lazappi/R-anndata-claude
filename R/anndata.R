@@ -961,11 +961,16 @@ AnnDataClass <- R6Class(
     },
     #' @field filename Path of the backing file, or `NULL` when the object is
     #'   in memory.
+    #'   Assigning a path to an object in memory writes it to that file and
+    #'   makes it backed in `"r+"` mode (X is stored dense).
+    #'   Assigning a different path to a backed object updates its file then
+    #'   moves it, and assigning `NULL` reads X into memory and ends backed
+    #'   mode.
     filename = function(value) {
-      if (!missing(value)) {
-        abort_read_only("filename")
+      if (missing(value)) {
+        return(private$.file$filename)
       }
-      private$.file$filename
+      private$set_filename(value, rlang::caller_env())
     },
     #' @field file The backing file manager, with the methods `open()`,
     #'   `close()`, `has()`, `keys()`, `get()`, `set()` and `remove()` and the
@@ -1109,6 +1114,60 @@ AnnDataClass <- R6Class(
       if (self$isbacked && !self$is_view) {
         private$.file$set_filename(path.expand(filename))
       }
+      invisible(NULL)
+    },
+    # Python's `filename` setter, see the `filename` field
+    set_filename = function(value, call) {
+      current <- private$.file$filename
+      if (is.null(value)) {
+        if (!is.null(current)) {
+          x <- .subset2(private$.layers, "peek")(NA_character_)
+          if (inherits(x, "backed_x")) {
+            private$.layers$set(
+              NA_character_,
+              backed_in_memory(x),
+              call = call
+            )
+          }
+          private$.file$to_memory_mode()
+        }
+        return(invisible(NULL))
+      }
+      path <- check_filename(value, call)
+      if (!is.null(current) && same_path(path, current)) {
+        return(invisible(NULL))
+      }
+      view <- private$.view
+      if (!is.null(view) && view$parent$isbacked) {
+        abort_invalid_argument(
+          "To copy an {.cls AnnData} object in backed mode, pass a
+           {.arg filename}: {.code .copy(filename = \"myfilename.h5ad\")}.
+           To load the object into memory, use {.code $to_memory()}.",
+          call
+        )
+      }
+      if (is.null(current)) {
+        self$ensure_actual(NULL, NULL, call)
+        write_h5ad(
+          self,
+          path,
+          as_dense = c("X", if (!is.null(private$.raw)) "raw/X")
+        )
+      } else {
+        # A failed move leaves the object backed by the closed old file
+        private$write_backed(NULL, call = call)
+        private$.file$close()
+        if (!dir.exists(dirname(path)) || !file.rename(current, path)) {
+          anndata_abort(
+            "Cannot move {.path {current}} to {.path {path}}.",
+            "anndata_file_not_found_error",
+            call = call
+          )
+        }
+      }
+      private$.file$open(path, "r+", call = call)
+      private$.layers$remove(NA_character_)
+      private$restore_backed_x(call)
       invisible(NULL)
     },
     # Whether X is read from the backing file (or absent), not held in memory
