@@ -1,6 +1,6 @@
 # Backed sparse X and sparse_dataset()
 
-Status: in-progress
+Status: done
 Type: task
 Blocked by: 02
 
@@ -32,3 +32,5 @@ The backed sparse class for CSR and CSC, `sparse_dataset()`, partial reads of `d
 - A group handle gives no file intent in rhdf5, so read-only is found by a probe attribute write
 - Python writes sparse parts with `maxshape=(None,)`, so R's HDF5 writer now does too (`dataset_kwargs$resizable`, chunked via `make_dcpl()`), otherwise R-written files could not be appended to
 - `append()` does not take a Zarr group (backed mode is HDF5 only)
+
+2026-10-17 (third run): Closed the ticket per the decision above. `legacy_attributes` is deferred to `legacy-formats`, and `test-backed-sparse.R` keeps the row in the table with a test as a reminder. Version bumped to 0.0.2.9007.

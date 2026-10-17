@@ -376,6 +376,13 @@ test_that("sparse_dataset gives a handle like Python's", {
   }
 })
 
+# Why: the legacy_attributes row (h5sparse attributes) is deferred to the
+# legacy-formats sub-project (human decision, backed/04). The test keeps the row
+# in the table, so the sub-project that adds legacy reading must pass it
+test_that("the legacy_attributes row is deferred to legacy-formats", {
+  expect_true("legacy_attributes" %in% names(backed_cases()$sparse_dataset))
+})
+
 # Python's handle has no setter for shape and group (rows set_shape and
 # set_group, an AttributeError), so assigning a field is a read-only error
 test_that("a backed sparse handle is read-only", {
