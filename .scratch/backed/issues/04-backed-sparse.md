@@ -13,6 +13,10 @@ The backed sparse class for CSR and CSC, `sparse_dataset()`, partial reads of `d
 - The sparse rows of the operations table pass, and every R index form matches the in-memory selection
 - `scripts/check.sh` passes
 
+## Decisions (2026-10-17)
+
+- The h5sparse legacy attributes (`legacy_attributes` row) move to `legacy-formats`, so this ticket is done once its other work passes: list the row as deferred in the tests, then close the ticket (version bump and tag).
+
 ## Comments
 
 2026-10-17: Added `R/backed-sparse.R` (`backed_sparse` class, also `backed_x`, with `[`, `$` (`format`, `backend`, `to_memory()`), `as.matrix`, `as.array`) and exported `sparse_dataset(group, ..., should_cache_indptr)`, with table-driven tests in `test-backed-sparse.R`.

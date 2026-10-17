@@ -1,6 +1,6 @@
 # Faster test suite, again
 
-Status: needs-info
+Status: ready-for-agent
 Type: task
 Blocked by: none
 
@@ -12,7 +12,7 @@ Speed the suite up as foundations/09 did, without testing less: measure first (i
 ## Acceptance criteria
 
 - No test is removed, skipped or weakened, and the number of expectations does not go down
-- `scripts/check.sh` takes less than 5 minutes, with before and after times in the ticket
+- `scripts/check.sh` takes less than 7 minutes (relaxed from 5 on 2026-10-17, see Decisions), with before and after times in the ticket
 - `scripts/check.sh` passes
 
 ## Decisions (human, 2026-10-17)
@@ -24,6 +24,8 @@ These cuts keep coverage and are approved:
   `scripts/regenerate-fixtures.sh` still regenerates everything and refreshes the hashes.
 - The `write_zarr` AnnData-level tests use the realistic object plus a few edge cases, not every per-encoding store, which `test-io-zarr-basic.R` and `test-io-zarr-compound.R` already cover in all three directions
 - Split slow test files so the 4 workers stay balanced
+
+- 2026-10-17: about 170s of the full check is outside the tests, so the target is relaxed to under 7 minutes. Do not skip `R CMD check` steps (vignettes and the rest stay). Finish by splitting `test-io-zarr-anndata.R` and `test-zarr-fixtures.R` so the 4 workers balance, then close the ticket.
 
 ## Comments
 

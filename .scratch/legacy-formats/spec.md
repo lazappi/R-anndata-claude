@@ -13,6 +13,7 @@ Writing always uses the current encodings.
 ## Scope
 
 - Unencoded elements (`IOSpec("", "")`, `methods.py:202-204`)
+- h5sparse legacy attributes in `sparse_dataset()` (the `legacy_attributes` row of the backed operations table, moved here from backed/04)
 - `dataframe` 0.1.0 (`methods.py:1133`) and legacy dataframes stored as datasets (`h5ad.py:332-355`)
 - Categories stored in `uns["<col>_categories"]` (`anndata.py:1921-1947`, `_clean_up_old_format`)
 - Old `uns["neighbors"]` connectivities moved to obsp (`_move_adj_mtx`)

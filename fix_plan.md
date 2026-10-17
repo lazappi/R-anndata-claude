@@ -7,6 +7,7 @@ The human owns the order of the Queue.
 
 ## Queue
 
+- [ ] foundations/10: faster test suite, again (`.scratch/foundations/issues/10-test-speed-again.md`), target relaxed to 7 minutes (see Decisions)
 - [x] foundations/01: package skeleton (`.scratch/foundations/issues/01-package-skeleton.md`)
 - [x] foundations/02: formatting and linting (`.scratch/foundations/issues/02-formatting-and-linting.md`)
 - [x] foundations/03: check script (`.scratch/foundations/issues/03-check-script.md`)
@@ -90,7 +91,7 @@ The human owns the order of the Queue.
 - [ ] backed/04: backed sparse X and sparse_dataset() (`.scratch/backed/issues/04-backed-sparse.md`)
   - [x] `backed_sparse` class, every index form, `sparse_dataset()` reads, Views, dtype records
   - [x] `sparse_dataset()$append()` (table rows `append_*` in `sparse_dataset`, in `"r+"` mode, resizing `data`, `indices`, `indptr` and the `shape` attribute, and invalidating the `indptr` cache in `x$cache`)
-  - [ ] h5sparse legacy attributes in `sparse_dataset()` (row `legacy_attributes`) belong to `legacy-formats`
+  - [x] (moved to `legacy-formats`) h5sparse legacy attributes in `sparse_dataset()` (row `legacy_attributes`)
 - [ ] backed/05: writing backed objects (`.scratch/backed/issues/05-backed-writing.md`)
 - [ ] backed/06: chunked_X, chunk_X and read_elem_partial (`.scratch/backed/issues/06-backed-chunks-and-partial.md`)
 - [ ] backed/07: backed mode documentation (`.scratch/backed/issues/07-backed-docs.md`)
@@ -99,7 +100,14 @@ The human owns the order of the Queue.
   - [x] Cause of the own-seed zarr block-read error, and verdicts for the own seed on zarr v3 and v2
   - [x] Own-seed probes for every dtype, bool, nullable and string columns, the 2^53 error, sparse and chunk shape
   - [x] Remaining sparse probes for `H5SparseMatrixSeed` (2^53, result types) and ZarrArray (sparse bool)
-- [ ] 🛑 Checkpoint (orchestrator): read `.scratch/lazy/seeds-spike.md`, choose the seeds, finish the lazy spec and write its tickets (ask the human only if there is no clear choice)
+- [x] 🛑 Checkpoint (orchestrator): read `.scratch/lazy/seeds-spike.md`, choose the seeds, finish the lazy spec and write its tickets (ask the human only if there is no clear choice)
+- [ ] lazy/02: lazy operations table (`.scratch/lazy/issues/02-lazy-operations-table.md`)
+- [ ] lazy/03: seed foundations (`.scratch/lazy/issues/03-lazy-seed-foundations.md`)
+- [ ] lazy/04: dense lazy seeds (`.scratch/lazy/issues/04-lazy-dense-seeds.md`)
+- [ ] lazy/05: sparse lazy seeds (`.scratch/lazy/issues/05-lazy-sparse-seeds.md`)
+- [ ] lazy/06: lazy obs and var (`.scratch/lazy/issues/06-lazy-dataframes.md`)
+- [ ] lazy/07: read_elem_lazy and read_lazy (`.scratch/lazy/issues/07-read-lazy.md`)
+- [ ] lazy/08: lazy reading documentation (`.scratch/lazy/issues/08-lazy-docs.md`)
 
 ## Discovered
 
@@ -133,13 +141,11 @@ The human owns the order of the Queue.
 
 - [x] `adata$write()` is missing: Python's `write` is a shortcut for `write_h5ad` (`anndata.py:1744`). Add it as an alias and pass its row of the Views operations table.
 
-- [ ] Deadlock for the human: backed/04's last sub-item (h5sparse legacy attributes) belongs to the stub `legacy-formats` sub-project, so backed/04 cannot become `done` and blocks backed/05, 06 and 07 (all `Blocked by: 04`).
+- [x] Deadlock for the human: backed/04's last sub-item (h5sparse legacy attributes) belongs to the stub `legacy-formats` sub-project, so backed/04 cannot become `done` and blocks backed/05, 06 and 07 (all `Blocked by: 04`).
   Either move that sub-item out of backed/04 (for example into a legacy-formats ticket) and let 04 finish, or remove 04 from the `Blocked by:` lines of 05 and 06.
   The run on 2026-10-17 skipped to lazy/01 for this reason.
 
 ## Blocked
-
-- [ ] foundations/10: faster test suite, again (`.scratch/foundations/issues/10-test-speed-again.md`): tests are about 230s of a 390-420s full check, so the 5 minute criterion needs a human decision (see ticket comments)
 
 ## Follow-up
 
