@@ -24,13 +24,16 @@ The \code{table_read} and \code{table_write} operations of \link{io-store} for z
 which hold the \code{rec-array} Element as a one-dimensional array of the \code{struct}
 data type.
 Rarr cannot read or write these, so the records are packed and unpacked in R
-and only the zstd step goes through Rarr (see \code{zarr_zstd()}).
+and only the zstd and blosc steps go through Rarr (see \code{zarr_compress()}
+and \code{zarr_decompress()}, gzip is done in R).
 }
 \details{
 Python writes the fields in order, one record after another with no padding,
 little-endian, with strings as \code{fixed_length_utf32} (zero padded) or
-\code{null_terminated_bytes}, and compresses each chunk with zstd.
-Reading handles those codecs, and the chunk grid of any size.
+\code{null_terminated_bytes}, and compresses each chunk as \code{compressors} says
+(zstd by default).
+Reading handles those codecs with zstd, gzip, blosc or no compression, and
+the chunk grid of any size.
 Unlike HDF5, zarr keeps the field dtypes (zarr-io/14, ADR 0005 applies to
 HDF5 only).
 Reading records the dtype of each column that is not the R type, as for plain

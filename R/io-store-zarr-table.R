@@ -4,12 +4,15 @@
 #' which hold the `rec-array` Element as a one-dimensional array of the `struct`
 #' data type.
 #' Rarr cannot read or write these, so the records are packed and unpacked in R
-#' and only the zstd step goes through Rarr (see `zarr_zstd()`).
+#' and only the zstd and blosc steps go through Rarr (see `zarr_compress()`
+#' and `zarr_decompress()`, gzip is done in R).
 #'
 #' Python writes the fields in order, one record after another with no padding,
 #' little-endian, with strings as `fixed_length_utf32` (zero padded) or
-#' `null_terminated_bytes`, and compresses each chunk with zstd.
-#' Reading handles those codecs, and the chunk grid of any size.
+#' `null_terminated_bytes`, and compresses each chunk as `compressors` says
+#' (zstd by default).
+#' Reading handles those codecs with zstd, gzip, blosc or no compression, and
+#' the chunk grid of any size.
 #' Unlike HDF5, zarr keeps the field dtypes (zarr-io/14, ADR 0005 applies to
 #' HDF5 only).
 #' Reading records the dtype of each column that is not the R type, as for plain
@@ -146,13 +149,46 @@ zarr_v2_unpack <- function(file, size, meta) {
   as.raw(as.vector(values))
 }
 
-# The bytes of a chunk compressed with zstd, by reading them back as a 1-d
-# uint8 array of `size` values (the inverse of `zarr_zstd()`)
-zarr_unzstd <- function(file, size) {
-  tmp <- tempfile("zarr-unzstd")
+# The compressor codecs a struct array may use (besides `bytes`)
+zarr_struct_compressors <- c("zstd", "gzip", "blosc")
+
+# The compressor codec among the `codecs` metadata, or `NULL` for none
+zarr_struct_codec <- function(codecs) {
+  for (codec in codecs) {
+    if (codec$name %in% zarr_struct_compressors) {
+      return(codec)
+    }
+  }
+  NULL
+}
+
+# The bytes of a chunk compressed as `codec` says (`NULL` is uncompressed),
+# the inverse of `zarr_compress()`: gzip is read in R, and zstd and blosc by
+# reading the chunk back as a 1-d uint8 array of `size` values
+zarr_decompress <- function(file, size, codec) {
+  if (is.null(codec)) {
+    return(readBin(file, "raw", file.size(file)))
+  }
+  if (identical(codec$name, "gzip")) {
+    con <- gzfile(file, "rb")
+    on.exit(close(con), add = TRUE)
+    return(readBin(con, "raw", size))
+  }
+  config <- codec$configuration
+  compressor <- if (identical(codec$name, "blosc")) {
+    list(
+      name = "blosc",
+      cname = config$cname,
+      clevel = config$clevel,
+      shuffle = config$shuffle
+    )
+  } else {
+    list(name = "zstd", level = config$level %||% 0L)
+  }
+  tmp <- tempfile("zarr-decompress")
   on.exit(unlink(tmp, recursive = TRUE), add = TRUE)
   dir.create(file.path(tmp, "c"), recursive = TRUE)
-  zarr_write_array_meta(tmp, "uint8", size, size)
+  zarr_write_array_meta(tmp, "uint8", size, size, compressor)
   file.copy(file, file.path(tmp, "c", "0"))
   values <- suppressMessages(Rarr::read_zarr_array(tmp))
   as.raw(as.vector(values))
@@ -191,12 +227,13 @@ zarr_struct_bytes <- function(array, itemsize, path, call) {
   if (identical(codecs, "sharding_indexed")) {
     return(zarr_sharded_struct_bytes(array, itemsize, path, call))
   }
-  if (!all(codecs %in% c("bytes", "zstd"))) {
+  if (!all(codecs %in% c("bytes", zarr_struct_compressors))) {
     abort_not_supported(
       "Cannot read {.path {path}}, it uses the codecs {codecs}.",
       path = path
     )
   }
+  codec <- zarr_struct_codec(meta$codecs)
   endian <- meta$codecs[[1L]]$configuration$endian %||% "little"
   if (!identical(endian, "little")) {
     abort_not_supported(
@@ -213,11 +250,7 @@ zarr_struct_bytes <- function(array, itemsize, path, call) {
     if (!file.exists(file)) {
       return(raw(count))
     }
-    if ("zstd" %in% codecs) {
-      zarr_unzstd(file, count)
-    } else {
-      readBin(file, "raw", file.size(file))
-    }
+    zarr_decompress(file, count, codec)
   })
   as.raw(unlist(chunks))[seq_len(rows * itemsize)]
 }
@@ -232,12 +265,13 @@ zarr_sharded_struct_bytes <- function(array, itemsize, path, call) {
     function(codec) codec$name,
     character(1)
   )
-  if (!all(inner_codecs %in% c("bytes", "zstd"))) {
+  if (!all(inner_codecs %in% c("bytes", zarr_struct_compressors))) {
     abort_not_supported(
       "Cannot read {.path {path}}, it uses the codecs {inner_codecs}.",
       path = path
     )
   }
+  codec <- zarr_struct_codec(config$codecs)
   rows <- array$shape
   shard_rows <- array$meta$chunk_grid$configuration$chunk_shape[[1L]]
   inner_rows <- config$chunk_shape[[1L]]
@@ -251,13 +285,13 @@ zarr_sharded_struct_bytes <- function(array, itemsize, path, call) {
   }
   dir <- zarr_dir(array$node)
   decode <- function(blob) {
-    if (!"zstd" %in% inner_codecs) {
+    if (is.null(codec)) {
       return(blob)
     }
     file <- tempfile("zarr-inner")
     on.exit(unlink(file), add = TRUE)
     writeBin(blob, file)
-    zarr_unzstd(file, inner_size)
+    zarr_decompress(file, inner_size, codec)
   }
   shards <- lapply(seq_len(ceiling(rows / shard_rows)) - 1L, function(i) {
     file <- file.path(dir, "c", i)
@@ -480,9 +514,17 @@ zarr_table_write <- function(store, key, frame, dataset_kwargs, call) {
   } else {
     zarr_layout(rows, chunk, shards, "struct", itemsize)
   }
-  # The reader only decodes zstd, so `compressors` has no effect on rec-arrays
-  compressor <- zarr_default_compressor
+  compressor <- zarr_compressor_arg(dataset_kwargs, call)
   codecs <- zarr_codecs("int32", compressor)
+  if (identical(compressor$name, "blosc")) {
+    # The type size is that of a record, and the shuffle default follows it
+    config <- codecs[[2L]]$configuration
+    config$typesize <- itemsize
+    config$shuffle <- compressor$shuffle %||%
+      if (itemsize > 1L) "shuffle" else "bitshuffle"
+    codecs[[2L]]$configuration <- config
+    compressor$shuffle <- config$shuffle
+  }
   if (!is.null(layout$shard)) {
     codecs <- zarr_shard_codecs(codecs, layout$chunk)
   }

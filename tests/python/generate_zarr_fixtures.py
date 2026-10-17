@@ -40,6 +40,8 @@ VARIANT_CASES = (
     "array_float64_2d",
     "df_all_types",
     "string_array_1d",
+    "rec_array_basic",
+    "rec_array_widths",
 )
 WHOLE_OBJECT_VARIANT_CASES = ("anndata_full", "realistic")
 

@@ -84,14 +84,14 @@ test_that("a struct array of several chunks is read, with a missing chunk", {
   )
 })
 
-# Only bytes and zstd are understood, so another codec must raise rather than
-# misread the chunk
+# Only bytes, zstd, gzip and blosc are understood, so another codec must raise
+# rather than misread the chunk
 test_that("a struct array with another codec raises", {
   store <- hand_built_struct(
     list(`0` = data.frame(a = 1L, s = "a")),
     rows = 1L,
     chunk_rows = 1L,
-    codecs = list(list(name = "bytes"), list(name = "gzip"))
+    codecs = list(list(name = "bytes"), list(name = "crc32c"))
   )
   expect_error(table_read(store, "x"), "codecs")
 })
@@ -309,4 +309,97 @@ test_that("a shard index at the start raises", {
     read_elem(zarr_open(path), "x"),
     "anndata_not_supported_error"
   )
+})
+
+# The compressor codecs of a written rec-array, from its metadata (inside the
+# shard codec when sharded)
+struct_codec_names <- function(path) {
+  meta <- jsonlite::fromJSON(
+    file.path(path, "x", "zarr.json"),
+    simplifyVector = FALSE
+  )
+  codecs <- meta$codecs
+  if (identical(codecs[[1L]]$name, "sharding_indexed")) {
+    codecs <- codecs[[1L]]$configuration$codecs
+  }
+  vapply(codecs, function(codec) codec$name, character(1))
+}
+
+# The `compressors` argument must be honoured and read back for rec-arrays
+# (zarr-io/15), sharded or not
+test_that("rec-arrays round trip with every compressor", {
+  value <- new_rec_array(data.frame(
+    a = 1:40,
+    d = seq(0.5, by = 1.5, length.out = 40),
+    s = rep(c("ab", "yé", "c"), length.out = 40)
+  ))
+  compressors <- list(
+    none = NULL,
+    zstd = list(name = "zstd", level = 3L),
+    gzip = list(name = "gzip", level = 9L),
+    blosc = list(name = "blosc", cname = "zstd", clevel = 3L),
+    blosc_plain = "blosc"
+  )
+  for (case in names(compressors)) {
+    name <- sub("_plain$", "", case)
+    expected <- if (name == "none") "bytes" else c("bytes", name)
+    for (shards in list(NULL, "auto")) {
+      path <- write_struct(
+        value,
+        compressors = compressors[[case]],
+        shards = shards
+      )
+      info <- paste(case, if (is.null(shards)) "unsharded" else "sharded")
+      expect_identical(struct_codec_names(path), expected, info = info)
+      expect_identical(read_elem(zarr_open(path), "x"), value, info = info)
+    }
+  }
+})
+
+# Python must read the compressed stores R writes, with the same fields and
+# values
+test_that("Python reads compressed rec-arrays written by R", {
+  skip_if_no_python()
+  v3 <- zarr_variant_paths("v3")
+  cases <- v3[c("rec_array_basic", "rec_array_widths")]
+  test_env <- environment()
+  compressors <- list(
+    none = NULL,
+    zstd = "zstd",
+    gzip = "gzip",
+    blosc = "blosc"
+  )
+  written <- character()
+  expected <- character()
+  for (compressor in names(compressors)) {
+    for (case in cases) {
+      written <- c(
+        written,
+        write_struct(
+          read_elem(zarr_open(case), "x"),
+          compressors = compressors[[compressor]],
+          env = test_env
+        )
+      )
+      expected <- c(expected, case)
+    }
+  }
+  expect_all_equivalent(written, expected)
+})
+
+# Python's own compressed rec-arrays (one variant per compressor) must read as
+# the default ones do
+test_that("rec-arrays Python wrote with each compressor are read", {
+  v3 <- zarr_variant_paths("v3")
+  for (name in c("zstd", "blosc", "gzip", "none")) {
+    paths <- zarr_variant_paths(paste0("v3_", name))
+    for (case in c("rec_array_widths", "rec_array_basic")) {
+      expect_true(case %in% names(paths), info = paste(name, case))
+      expect_identical(
+        read_elem(zarr_open(paths[[case]]), "x"),
+        read_elem(zarr_open(v3[[case]]), "x"),
+        info = paste(name, case)
+      )
+    }
+  }
 })

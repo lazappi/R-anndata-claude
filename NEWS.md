@@ -1,5 +1,7 @@
 # anndata.claude (development version)
 
+* rec-arrays in zarr now honour the `compressors` dataset argument (zstd, gzip, blosc or none) and read stores Python compressed with any of them.
+
 # anndata.claude 0.0.2
 
 Second milestone: zarr I/O and Views.

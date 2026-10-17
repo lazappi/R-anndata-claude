@@ -83,7 +83,7 @@ The human owns the order of the Queue.
   - [x] Structural equivalence of a written View with Python writing the same View (`expect_python_equal()`)
   - [x] Table rows with no R method yet: `to_memory`, `write_csvs`, `write_loom`, `chunked_X`, `chunk_X` listed as deferred in `test-views.R` (human decision, see ticket), `write` is under Discovered
 - [x] views/05: Views documentation (`.scratch/views/issues/05-view-docs.md`)
-- [ ] zarr-io/15: zarr rec-array compressors (`.scratch/zarr-io/issues/15-zarr-rec-array-compressors.md`)
+- [x] zarr-io/15: zarr rec-array compressors (`.scratch/zarr-io/issues/15-zarr-rec-array-compressors.md`)
 - [ ] backed/01: backed operations table (`.scratch/backed/issues/01-backed-operations-table.md`)
 - [ ] backed/02: backed reading and the file manager (`.scratch/backed/issues/02-backed-file-manager.md`)
 - [ ] backed/03: backed dense X (`.scratch/backed/issues/03-backed-dense.md`)
