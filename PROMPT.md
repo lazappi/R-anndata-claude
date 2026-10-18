@@ -149,3 +149,5 @@ They override anything above.
   Ask `python-oracle` (it can run any experiment in `tests/python`), and stop for the human only on scope, design or spec questions.
 - If `scripts/check.sh` fails with "timed out", a test is hanging or the suite is too slow.
   Find the test with `devtools::test(filter = ..., reporter = "location")` on one file at a time, and fix it rather than making the test smaller to hide it.
+- Give subagents short, bounded tasks (a question, one experiment, one check), never "write this generator" or other open-ended work.
+  A subagent still running 30 minutes after your last turn is killed and the run ends uncommitted, so write files yourself and use subagents to answer questions about them.
