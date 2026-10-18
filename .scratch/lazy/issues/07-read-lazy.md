@@ -1,6 +1,6 @@
 # read_elem_lazy and read_lazy
 
-Status: in-progress
+Status: done
 Type: task
 Blocked by: 05, 06
 
@@ -32,6 +32,10 @@ Tests in `test-lazy-anndata.R` (h5ad and zarr v3: slot classes, realised values,
 `read_lazy()` now warns (`anndata_unconsolidated_zarr_warning`, Python's message) for a zarr v2 directory with no `.zmetadata`, `read_elem_lazy()` does not.
 Deviation to record in the docs (ticket 08): arrays inside `uns` are read eagerly here, Python keeps them as dask arrays.
 Open question: whether Python also warns for an unconsolidated zarr v3 store (the table has no row), check with `python-oracle` in the operations part.
-Remaining: the operations rows.
+2026-10-18: Part 4 done, the operations rows are in `test-lazy-operations.R`.
+`to_memory()` now realises lazy slots (`realise_lazy_value()`, `delayed_in_memory()` in `R/backed.R`, `memory_copy()` in `R/index.R`), while `copy()` keeps them lazy.
+`write_h5ad()`/`write_zarr()` of an AnnData (or View) with lazy obs or var raise `anndata_not_implemented_error` like Python, and `to_memory()` first makes them writable.
+Deviations: Python's `.T` of a lazy AnnData fails with a ValueError (a Python bug), R transposes lazily. Python's `obs.loc` does not exist on Dataset2D, R indexes lazy frames by row name. Whether Python warns for an unconsolidated zarr v3 store was not checked (v3 keeps consolidation inside `zarr.json`, the table has no row).
+Lazy `X` kept after `copy()` is a `DelayedArray`, `chunks` rows (`dask_chunks`) were covered in tickets 04 and 05.
 
 Earlier note (part 2), now addressed apart from the operations rows: compare against the `read_lazy` table rows (`default`, `load_annotation_index_*`, `open_handle`, `missing_store`, `unconsolidated_zarr` with its warning), zarr v2 fixtures, a missing zarr directory, dtype checks, and decide/record the deviation that arrays inside `uns` are eager here (Python keeps them lazy).

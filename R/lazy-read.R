@@ -113,6 +113,22 @@ warn_unconsolidated_zarr <- function(store, call) {
   invisible(store)
 }
 
+# Python cannot write an AnnData whose obs or var is a lazy frame (also for a
+# View of one), it raises NotImplementedError and points to `to_memory()`
+check_not_lazy <- function(adata, call) {
+  if (
+    methods::is(adata$obs, "LazyDFrame") || methods::is(adata$var, "LazyDFrame")
+  ) {
+    anndata_abort(
+      "Writing an {.cls AnnData} with lazy {.field obs} or {.field var} is not
+       supported yet, use {.code $to_memory()} to bring it into memory first.",
+      "anndata_not_implemented_error",
+      call = call
+    )
+  }
+  invisible(adata)
+}
+
 # The lazy value of the slot `key` of an AnnData group, or `NULL` when the slot
 # is read eagerly
 read_lazy_slot <- function(store, path, key, lazy, call) {

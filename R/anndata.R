@@ -563,7 +563,8 @@ AnnDataClass <- R6Class(
         write_h5ad(self, filename)
         return(read_h5ad(filename, backed = mode))
       }
-      self$to_memory(copy = TRUE)
+      # A lazily read object stays lazy, as Python's copy keeps dask arrays
+      memory_copy(self, realise = FALSE)
     },
     #' @description A new object with every on-disk array read into memory.
     #'   The original stays backed.
@@ -574,17 +575,7 @@ AnnDataClass <- R6Class(
       if (!private$.file$is_open) {
         on.exit(private$.file$close(), add = TRUE)
       }
-      raw <- private$.raw
-      subset_slots(
-        self,
-        raw = if (!is.null(raw)) {
-          list(
-            X = backed_in_memory(raw$X),
-            var = raw$var,
-            varm = as.list(raw$varm)
-          )
-        }
-      )
+      memory_copy(self, realise = TRUE)
     },
     #' @description The rows of X in chunks, read one at a time for a backed
     #'   object. Returns a list with one element per chunk, itself a list with

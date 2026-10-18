@@ -139,6 +139,7 @@ write_zarr <- function(
   }
   path <- check_store_path(store, call)
   check_x_and_layers_are_2d(adata, call)
+  check_not_lazy(adata, call)
   if (!is.null(chunks)) {
     check_chunks(chunks, call)
   }

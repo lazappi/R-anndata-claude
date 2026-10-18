@@ -170,6 +170,7 @@ write_h5ad <- function(
   }
   filename <- check_filename(filename, call)
   check_x_and_layers_are_2d(adata, call)
+  check_not_lazy(adata, call)
   if (!is.character(as_dense) || anyNA(as_dense)) {
     abort_invalid_argument("{.arg as_dense} must be a character vector.", call)
   }

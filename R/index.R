@@ -136,18 +136,29 @@ subset_aligned <- function(adata, attr, oidx = NULL, vidx = NULL) {
 
 # Independent copy of `adata` restricted to observations `oidx` and variables
 # `vidx` (`NULL` keeps an axis), with `raw` as given to `AnnData()`
-subset_slots <- function(adata, oidx = NULL, vidx = NULL, raw = NULL) {
-  layers <- subset_aligned(adata, "layers", oidx, vidx)
+subset_slots <- function(
+  adata,
+  oidx = NULL,
+  vidx = NULL,
+  raw = NULL,
+  realise = FALSE
+) {
+  # `realise` reads lazily read arrays and frames into memory (`to_memory()`)
+  keep <- if (realise) realise_lazy_value else identity
+  aligned <- function(attr) {
+    lapply(subset_aligned(adata, attr, oidx, vidx), keep)
+  }
+  layers <- aligned("layers")
   # Repeated names are expected when indices repeat
   suppressWarnings(
     AnnData(
-      obs = subset_frame(adata$obs, oidx),
-      var = subset_frame(adata$var, vidx),
+      obs = keep(subset_frame(adata$obs, oidx)),
+      var = keep(subset_frame(adata$var, vidx)),
       uns = adata$uns,
-      obsm = subset_aligned(adata, "obsm", oidx, vidx),
-      varm = subset_aligned(adata, "varm", oidx, vidx),
-      obsp = subset_aligned(adata, "obsp", oidx, vidx),
-      varp = subset_aligned(adata, "varp", oidx, vidx),
+      obsm = aligned("obsm"),
+      varm = aligned("varm"),
+      obsp = aligned("obsp"),
+      varp = aligned("varp"),
       layers = layers,
       raw = raw,
       shape = if (!length(layers)) {
@@ -158,6 +169,25 @@ subset_slots <- function(adata, oidx = NULL, vidx = NULL, raw = NULL) {
       }
     ),
     classes = "anndata_names_not_unique_warning"
+  )
+}
+
+# Independent copy of `adata` in memory, reading lazily read slots when
+# `realise` is `TRUE` (`to_memory()`) and keeping them lazy otherwise (`copy()`)
+memory_copy <- function(adata, realise) {
+  raw <- adata$raw
+  keep <- if (realise) realise_lazy_value else identity
+  subset_slots(
+    adata,
+    raw = if (!is.null(raw)) {
+      list(
+        # on-disk X of a backed object is always read, lazy ones only on request
+        X = if (realise) realise_lazy_value(raw$X) else backed_in_memory(raw$X),
+        var = keep(raw$var),
+        varm = lapply(as.list(raw$varm), keep)
+      )
+    },
+    realise = realise
   )
 }
 

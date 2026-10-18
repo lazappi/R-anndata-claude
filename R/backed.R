@@ -370,6 +370,33 @@ backed_in_memory <- function(x) {
   x
 }
 
+# A lazily read array or frame in memory, anything else is returned as is
+realise_lazy_value <- function(x) {
+  if (methods::is(x, "LazyDFrame")) {
+    return(lazy_dataframe_realise(x))
+  }
+  if (methods::is(x, "DelayedArray")) {
+    return(delayed_in_memory(x))
+  }
+  backed_in_memory(x)
+}
+
+# A lazily read array as `read_elem()` gives it: a pristine seed keeps the
+# on-disk class and dtype, a subset or other operation gives a plain matrix
+delayed_in_memory <- function(x) {
+  seed <- x@seed
+  if (methods::is(seed, "StoreSparseSeed")) {
+    return(store_sparse_values(seed))
+  }
+  if (methods::is(seed, "StoreDenseSeed")) {
+    return(store_dense_values(seed))
+  }
+  if (DelayedArray::is_sparse(x)) {
+    return(methods::as(x, "CsparseMatrix"))
+  }
+  as.array(x)
+}
+
 # Whether two paths name the same file, which need not exist
 same_path <- function(a, b) {
   identical(
