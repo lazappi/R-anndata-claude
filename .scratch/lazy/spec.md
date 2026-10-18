@@ -58,6 +58,8 @@ Out:
 
 - Realising any lazy value gives exactly what `read_h5ad()`/`read_zarr()` give for the same Element, including On-disk dtype records, factors and `NA`
 - Reading a lazy object reads metadata only, and data is read when realised or block-processed
+- Documented deviation (orchestrator, 2026-10-18): an int32 array holding -2^31 (the bit pattern of `NA_integer_`) reads eagerly as double with an int32 record, but a lazy seed's type is fixed before any read.
+  Realising a block that holds -2^31 raises `anndata_dtype_overflow_error` with a message suggesting `read_h5ad()`/`read_zarr()`, rather than typing every int32 seed as double or scanning the whole array first.
 - Every operation, error and warning follows Python, as recorded in the operations table
 
 ## Expected behaviour table

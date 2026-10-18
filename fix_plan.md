@@ -152,10 +152,6 @@ The human owns the order of the Queue.
 
 ## Blocked
 
-- lazy/04: a lazy seed cannot return a double for an int32 array holding -2^31 (eager reads do), so the seed raises `anndata_dtype_overflow_error`.
-  The human should accept this deviation (recommended, then set 04 to `done` and bump the version) or choose another rule.
-  Tickets 05 and 06 wait on this.
-
 ## Follow-up
 
 Tickets that need triage before they can be queued.

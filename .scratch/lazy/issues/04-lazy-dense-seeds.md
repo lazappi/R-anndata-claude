@@ -1,6 +1,6 @@
 # Dense lazy seeds
 
-Status: needs-info
+Status: ready-for-agent
 Type: task
 Blocked by: 02, 03
 
@@ -12,6 +12,10 @@ A DelayedArray seed for dense arrays on h5ad and zarr (v3 and v2), using the sto
 
 - Realised values equal `read_h5ad()`/`read_zarr()` for every dense fixture, and block reads read only their blocks
 - `scripts/check.sh` passes
+
+## Decisions (orchestrator, 2026-10-18)
+
+- Accept the recommended answer for `array_int32_min` (spec "Behaviour"): keep the error, make its message suggest an eager read, document the deviation in the help page, then close this ticket (version bump and tag).
 
 ## Comments
 
