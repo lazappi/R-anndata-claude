@@ -53,6 +53,8 @@ importClassesFrom(S4Vectors,DFrame)
 importFrom(DelayedArray,
   chunkdim,
   extract_array,
+  extract_sparse_array,
+  is_sparse,
   type
 )
 importFrom(R6,R6Class)

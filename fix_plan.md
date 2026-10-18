@@ -109,7 +109,7 @@ The human owns the order of the Queue.
 - [x] lazy/02: lazy operations table (`.scratch/lazy/issues/02-lazy-operations-table.md`)
 - [x] lazy/03: seed foundations (`.scratch/lazy/issues/03-lazy-seed-foundations.md`)
 - [x] lazy/04: dense lazy seeds (`.scratch/lazy/issues/04-lazy-dense-seeds.md`)
-- [ ] lazy/05: sparse lazy seeds (`.scratch/lazy/issues/05-lazy-sparse-seeds.md`)
+- [x] lazy/05: sparse lazy seeds (`.scratch/lazy/issues/05-lazy-sparse-seeds.md`)
 - [ ] lazy/06: lazy obs and var (`.scratch/lazy/issues/06-lazy-dataframes.md`)
 - [ ] lazy/07: read_elem_lazy and read_lazy (`.scratch/lazy/issues/07-read-lazy.md`)
 - [ ] lazy/08: lazy reading documentation (`.scratch/lazy/issues/08-lazy-docs.md`)
@@ -149,6 +149,8 @@ The human owns the order of the Queue.
 - [x] Deadlock for the human: backed/04's last sub-item (h5sparse legacy attributes) belongs to the stub `legacy-formats` sub-project, so backed/04 cannot become `done` and blocks backed/05, 06 and 07 (all `Blocked by: 04`).
   Either move that sub-item out of backed/04 (for example into a legacy-formats ticket) and let 04 finish, or remove 04 from the `Blocked by:` lines of 05 and 06.
   The run on 2026-10-17 skipped to lazy/01 for this reason.
+
+- [ ] `resolve_lazy_chunks()` (`R/lazy-dense.R`) forces chunks of at least 1, so a dense array with a zero-length axis has `chunkdim()` larger than `dim()`, which DelayedArray rejects. Use 0 as `StoreSparseSeed` does (Python's layout is `(0,)`) and add a test with an empty dense array.
 
 ## Blocked
 
