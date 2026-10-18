@@ -24,8 +24,18 @@ if [ -z "${ANNDATA_CHECK_TIMED:-}" ] && [ "${1:-}" != "--coverage" ]; then
         my $limit = shift;
         my $pid = fork();
         if (!$pid) { setpgrp(0, 0); exec @ARGV or die "exec: $!"; }
+        # R CMD check starts its tests in their own process groups, so collect
+        # every descendant, not just the process group
+        sub tree {
+            my @all = (shift);
+            for (my $i = 0; $i < @all; $i++) {
+                push @all, grep { /\d/ } split /\s+/, `pgrep -P $all[$i]`;
+            }
+            return @all;
+        }
         $SIG{ALRM} = sub {
-            kill "TERM", -$pid; sleep 3; kill "KILL", -$pid;
+            my @procs = tree($pid);
+            kill "TERM", -$pid, @procs; sleep 3; kill "KILL", -$pid, @procs, tree($pid);
             print STDERR "\nFAILED: timed out after $limit seconds: a test is hanging, or the suite is too slow\n";
             exit 124;
         };
