@@ -113,7 +113,8 @@ The human owns the order of the Queue.
 - [x] lazy/06: lazy obs and var (`.scratch/lazy/issues/06-lazy-dataframes.md`)
 - [ ] lazy/07: read_elem_lazy and read_lazy (`.scratch/lazy/issues/07-read-lazy.md`)
   - [x] `read_elem_lazy()` for every encoding, `chunks`, path and handle stores
-  - [ ] `read_lazy()` (lazy AnnData with lazy X, layers, obsm, raw, obs and var, `load_annotation_index`, the `read_lazy` table rows)
+  - [x] `read_lazy()` (lazy AnnData with lazy X, layers, obsm, raw, obs and var, `load_annotation_index`)
+  - [ ] `read_lazy` table rows: compare each row (`default`, `load_annotation_index_*`, `open_handle`, `missing_store`, `unconsolidated_zarr` warning), zarr v2 fixtures, dtypes, and record the eager `uns` arrays as a deviation
   - [ ] Operations on lazily read objects: subsetting, Views, `to_memory()`, printing, copy, transpose, writing (the `operations` and `dask_chunks` rows)
 - [ ] lazy/08: lazy reading documentation (`.scratch/lazy/issues/08-lazy-docs.md`)
 

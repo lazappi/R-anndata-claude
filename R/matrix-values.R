@@ -61,6 +61,13 @@ as_anndata_matrix <- function(
   if (inherits(x, "backed_x")) {
     return(x)
   }
+  # Lazy arrays (from `read_lazy()`) stay on disk
+  if (methods::is(x, "DelayedArray")) {
+    n_dim <- length(dim(x))
+    if (n_dim == 2L || (allow_array && n_dim > 2L)) {
+      return(x)
+    }
+  }
   if (methods::is(x, "Matrix")) {
     return(coerce_matrix_class(x, what, call))
   }

@@ -52,6 +52,73 @@ read_elem_lazy <- function(store, path = "/", chunks = NULL) {
   lazy_elem(store, absolute_path(path), chunks, call)
 }
 
+#' Read an AnnData lazily
+#'
+#' `read_lazy()` reads an h5ad file or a zarr store (v3 or v2) into an
+#' [AnnData()] whose `X`, `layers`, `obsm`, `varm`, `obsp`, `varp`, `obs`, `var`
+#' and `raw` are lazy (see [read_elem_lazy()]) and whose `uns` is read into
+#' memory.
+#' It matches Python's `read_lazy()`.
+#'
+#' `r lifecycle::badge("experimental")`
+#'
+#' @param store An h5ad file or a zarr directory, given as a path or as an open
+#'   store handle.
+#' @param load_annotation_index Whether the `obs` and `var` indexes are read
+#'   into memory.
+#'   If `FALSE` the names are Python's dummy range (`"0"`, `"1"`, ...).
+#'
+#' @return An [AnnData()].
+#'
+#' @examplesIf requireNamespace("Rarr", quietly = TRUE)
+#' adata <- AnnData(matrix(as.numeric(1:6), nrow = 3))
+#' path <- tempfile(fileext = ".zarr")
+#' write_zarr(adata, path)
+#' read_lazy(path)
+#'
+#' @export
+read_lazy <- function(store, load_annotation_index = TRUE) {
+  call <- rlang::current_env()
+  valid <- is.logical(load_annotation_index) &&
+    length(load_annotation_index) == 1L &&
+    !is.na(load_annotation_index)
+  if (!valid) {
+    abort_invalid_argument(
+      "{.arg load_annotation_index} must be {.code TRUE} or {.code FALSE}.",
+      call
+    )
+  }
+  store <- lazy_open_store(store, call)
+  read_state$lazy <- list(load_annotation_index = load_annotation_index)
+  on.exit(read_state$lazy <- NULL, add = TRUE)
+  read_elem(store, "/")
+}
+
+# The lazy value of the slot `key` of an AnnData group, or `NULL` when the slot
+# is read eagerly
+read_lazy_slot <- function(store, path, key, lazy, call) {
+  if (key == "X") {
+    return(lazy_elem(store, path, NULL, call))
+  }
+  if (key %in% c("obs", "var")) {
+    return(lazy_dataframe(store, path, lazy$load_annotation_index, call))
+  }
+  if (key %in% c("layers", "obsm", "varm", "obsp", "varp")) {
+    group <- node_open(store, path)
+    on.exit(node_close(group), add = TRUE)
+    members <- group_members(group)
+    values <- lapply(
+      members,
+      function(member) {
+        lazy_elem(store, paste0(path, "/", member), NULL, call)
+      }
+    )
+    names(values) <- members
+    return(values)
+  }
+  NULL
+}
+
 check_lazy_path <- function(path, call) {
   valid <- is.character(path) && length(path) == 1L && !is.na(path)
   if (!valid) {

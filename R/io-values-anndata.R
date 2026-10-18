@@ -180,6 +180,8 @@ read_state <- new.env(parent = emptyenv())
 read_state$as_sparse <- character()
 # The file manager while `read_h5ad(backed = )` reads, otherwise `NULL`
 read_state$backed <- NULL
+# `list(load_annotation_index = )` while `read_lazy()` reads, otherwise `NULL`
+read_state$lazy <- NULL
 
 # Python's `read_dense_as_csr` and `read_dense_as_csc`, in chunks of
 # `chunk_size` rows (CSR) or columns (CSC)
@@ -245,6 +247,9 @@ read_anndata_elem <- function(elem, path, store) {
     if (key == "X" && !is.null(read_state$backed)) {
       # In backed mode X and raw X stay on disk
       value <- backed_x_elem(read_state$backed, key_path, store, call)
+    }
+    if (is.null(value) && !is.null(read_state$lazy)) {
+      value <- read_lazy_slot(store, key_path, key, read_state$lazy, call)
     }
     if (is.null(value)) {
       value <- read_elem(store, key_path)

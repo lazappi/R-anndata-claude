@@ -159,6 +159,11 @@ frame_from_frame <- function(anno, attr, expected, source, call) {
     frame_index_name(anno)
   }
   names <- rownames(anno)
+  if (is.null(names) && methods::is(anno, "LazyDFrame")) {
+    # A lazy frame read with `load_annotation_index = FALSE` has Python's dummy
+    # range index, which is already a string index so does not warn
+    names <- default_names(n)
+  }
   if (is.null(names) || (is.data.frame(anno) && automatic_row_names(anno))) {
     names <- seq_len(n) - 1L
   }
