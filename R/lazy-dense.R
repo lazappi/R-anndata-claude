@@ -37,6 +37,8 @@
 #' @param index A list with one entry per dimension, `NULL` (every index) or a
 #'   vector of positions.
 #' @param call The call reported by errors.
+#' @param strings Whether a string array is accepted (type `character`, used for
+#'   string columns of lazy data frames).
 #'
 #' @name lazy-dense
 #' @keywords internal
@@ -62,7 +64,9 @@ setClass(
 
 # The R type of values read from an array of On-disk dtype `dtype`
 lazy_r_type <- function(dtype) {
-  if (dtype == "bool") {
+  if (dtype == "string") {
+    "character"
+  } else if (dtype == "bool") {
     "logical"
   } else if (dtype %in% c("int8", "int16", "int32", "uint8", "uint16")) {
     "integer"
@@ -116,10 +120,14 @@ store_dense_seed <- function(
   store,
   path,
   chunks = NULL,
-  call = rlang::caller_env()
+  call = rlang::caller_env(),
+  strings = FALSE
 ) {
   info <- array_info(store, path)
   dtype <- info_dtype(info)
+  if (strings && identical(info$dclass, "STRING")) {
+    dtype <- "string"
+  }
   if (is.na(dtype)) {
     abort_dataset_type(path, "it is not a dense numeric or bool array", call)
   }
@@ -215,7 +223,7 @@ store_dense_values <- function(x) {
   if (length(x@dim) == 1L && x@dim != 1L) {
     values <- as.vector(values)
   }
-  if (x@dtype == "bool") {
+  if (x@dtype %in% c("bool", "string")) {
     return(values)
   }
   record_dtype(values, x@dtype)

@@ -9,7 +9,13 @@
 \alias{store_dense_values}
 \title{Dense lazy seeds}
 \usage{
-store_dense_seed(store, path, chunks = NULL, call = rlang::caller_env())
+store_dense_seed(
+  store,
+  path,
+  chunks = NULL,
+  call = rlang::caller_env(),
+  strings = FALSE
+)
 
 \S4method{dim}{StoreDenseSeed}(x)
 
@@ -27,6 +33,9 @@ store_dense_values(x)
 \item{chunks}{Optional chunk shape, one entry per dimension.}
 
 \item{call}{The call reported by errors.}
+
+\item{strings}{Whether a string array is accepted (type \code{character}, used for
+string columns of lazy data frames).}
 
 \item{x}{A \code{StoreDenseSeed}.}
 

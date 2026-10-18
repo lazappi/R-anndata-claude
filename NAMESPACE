@@ -50,6 +50,10 @@ importClassesFrom(Matrix,lgCMatrix)
 importClassesFrom(Matrix,lgRMatrix)
 importClassesFrom(S4Arrays,Array)
 importClassesFrom(S4Vectors,DFrame)
+importFrom(BiocGenerics,
+  as.data.frame,
+  as.vector
+)
 importFrom(DelayedArray,
   chunkdim,
   extract_array,
@@ -58,6 +62,10 @@ importFrom(DelayedArray,
   type
 )
 importFrom(R6,R6Class)
+importFrom(S4Vectors,
+  extractROWS,
+  showAsCell
+)
 importFrom(cli,cli_abort)
 importFrom(lifecycle,deprecated)
 importFrom(rhdf5,h5ls)

@@ -179,14 +179,17 @@ read_dataframe_elem <- function(elem, path, store, items = NULL) {
     columns[[i]] <- plain_string(column)
   }
   names(columns) <- col_names
+  frame_from_parts(columns, index, index_key)
+}
 
+# The `DataFrame` of read `columns` and `index`, shared by eager and lazy reads
+frame_from_parts <- function(columns, index, index_key) {
   index <- plain_string(index)
-  names <- categories_as_levels(index)
   df <- methods::new(
     "DFrame",
     listData = columns,
-    nrows = n,
-    rownames = names
+    nrows = length(index),
+    rownames = categories_as_levels(index)
   )
   if (!identical(index_key, "_index")) {
     df <- with_index_name(df, index_key)

@@ -72,12 +72,9 @@ write_factor <- function(store, key, value, dataset_kwargs, path) {
   invisible(NULL)
 }
 
-read_categorical_elem <- function(elem, path, store) {
-  call <- rlang::caller_env()
-  codes <- read_elem(store, paste0(path, "/codes"))
-  categories <- read_elem(store, paste0(path, "/categories"))
-  ordered <- identical(read_elem_attr(elem, "ordered"), "TRUE")
-
+# The factor of `codes` and `categories` as read from the Element at `path`,
+# shared by eager and lazy reads
+categorical_from_parts <- function(codes, categories, ordered, path, call) {
   levels <- categories_as_levels(categories)
   codes <- as.integer(drop_dtype(codes))
   if (anyDuplicated(levels) > 0L) {
@@ -107,6 +104,16 @@ read_categorical_elem <- function(elem, path, store) {
     attr(factor, categories_attr) <- categories
   }
   factor
+}
+
+read_categorical_elem <- function(elem, path, store) {
+  categorical_from_parts(
+    read_elem(store, paste0(path, "/codes")),
+    read_elem(store, paste0(path, "/categories")),
+    identical(read_elem_attr(elem, "ordered"), "TRUE"),
+    path,
+    rlang::caller_env()
+  )
 }
 
 register_writer("factor", "categorical", "0.2.0", write_factor)

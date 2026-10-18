@@ -119,8 +119,17 @@ write_nullable <- function(
 
 # Reads `values` and `mask` of a nullable group, with `NA` where the mask is set
 read_nullable_parts <- function(path, store, call) {
-  values <- read_elem(store, paste0(path, "/values"))
-  mask <- as.vector(read_elem(store, paste0(path, "/mask")))
+  nullable_from_parts(
+    read_elem(store, paste0(path, "/values")),
+    read_elem(store, paste0(path, "/mask")),
+    path,
+    call
+  )
+}
+
+# Combines `values` and `mask` (shared by eager and lazy reads)
+nullable_from_parts <- function(values, mask, path, call) {
+  mask <- as.vector(mask)
   if (length(values) != length(mask)) {
     abort_io_registry(
       "Cannot read {.path {path}}, {.field values} has length
