@@ -1,5 +1,7 @@
 # anndata.claude (development version)
 
+* `read_elem_lazy()` (experimental) reads an Element of an h5ad file or zarr store lazily: arrays are `DelayedArray`s (sparse ones stay sparse), and categorical, nullable and `dataframe` Elements have lazy columns.
+
 * `adata$chunked_X(chunk_size)` returns the rows of X in chunks (a list of `chunk`, 1-based `start` and `end`) and `adata$chunk_X(select, replace)` returns random rows (a single number) or chosen rows (an index, with `I()` for one row), for backed and in-memory objects and Views.
 
 * A backed `raw` cannot be replaced, `filename <- NULL` loads a backed `raw$X` into memory and setting `raw` on a backed object raises Python's error.
