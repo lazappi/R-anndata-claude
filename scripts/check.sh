@@ -2,8 +2,12 @@
 # The check that decides whether a ticket is done. Run from anywhere.
 #
 # Usage:
-#   scripts/check.sh                          full check, stops at the first failing step:
-#                                             air format, lintr, document, R CMD check
+#   scripts/check.sh                          full check: --package then --tests, each under the
+#                                             time limit, so an agent can run each as one command
+#   scripts/check.sh --package                air format, lintr, document, R CMD check without tests
+#   scripts/check.sh --tests                  devtools::test() on every test file
+#   scripts/check.sh --release                the single full R CMD check with its tests (no time
+#                                             limit), run by the human before a release
 #   scripts/check.sh --coverage               covr::package_coverage() report (not part of the
 #                                             full check, because it runs the tests a second time)
 #   scripts/check.sh --quick [test files...]  air format, lintr on changed R files and
@@ -18,7 +22,7 @@ export TESTTHAT_CPUS="${TESTTHAT_CPUS:-4}"
 # Fail with a clear message instead of running past the 10-minute limit of an
 # agent's shell command (a hanging test, or a suite that has become too slow).
 # The whole process group is killed, so no R or Python process is left behind.
-if [ -z "${ANNDATA_CHECK_TIMED:-}" ] && [ "${1:-}" != "--coverage" ]; then
+if [ -z "${ANNDATA_CHECK_TIMED:-}" ] && [ -n "${1:-}" ] && [ "${1:-}" != "--coverage" ] && [ "${1:-}" != "--release" ]; then
     export ANNDATA_CHECK_TIMED=1
     exec perl -e '
         my $limit = shift;
@@ -90,19 +94,45 @@ if [ "${1:-}" = "--quick" ]; then
     exit 0
 fi
 
-step "1/4 air format --check"
+if [ -z "${1:-}" ]; then
+    # Each half runs under its own time limit
+    "$0" --package
+    "$0" --tests
+    printf '\nAll checks passed\n'
+    exit 0
+fi
+
+mode="$1"
+case "$mode" in
+    --package | --tests | --release) ;;
+    *) fail "unknown option $mode" ;;
+esac
+
+if [ "$mode" = "--tests" ]; then
+    step "devtools::test()"
+    Rscript -e 'devtools::test(stop_on_failure = TRUE)' || fail "devtools::test()"
+    printf '\nAll tests passed\n'
+    exit 0
+fi
+
+step "air format --check"
 air format --check . || fail "air format --check"
 
-step "2/4 lintr::lint_package()"
+step "lintr::lint_package()"
 Rscript -e 'pkgload::load_all(quiet = TRUE); lints <- lintr::lint_package(); if (length(lints)) { print(lints); quit(status = 1) }' || fail "lintr::lint_package()"
 
-step "3/4 devtools::document()"
+step "devtools::document()"
 before=$(doc_state)
 Rscript -e 'devtools::document()' || fail "devtools::document()"
 after=$(doc_state)
 [ "$before" = "$after" ] || fail "devtools::document() changed man/ or NAMESPACE, commit the regenerated files"
 
-step "4/4 devtools::check()"
-Rscript -e 'devtools::check(error_on = "note")' || fail "devtools::check()"
+if [ "$mode" = "--release" ]; then
+    step "devtools::check() with tests"
+    Rscript -e 'devtools::check(error_on = "note")' || fail "devtools::check()"
+else
+    step "devtools::check() without tests"
+    Rscript -e 'devtools::check(error_on = "note", args = "--no-tests")' || fail "devtools::check()"
+fi
 
 printf '\nAll checks passed\n'

@@ -151,3 +151,5 @@ They override anything above.
   Find the test with `devtools::test(filter = ..., reporter = "location")` on one file at a time, and fix it rather than making the test smaller to hide it.
 - Give subagents short, bounded tasks (a question, one experiment, one check), never "write this generator" or other open-ended work.
   A subagent still running 30 minutes after your last turn is killed and the run ends uncommitted, so write files yourself and use subagents to answer questions about them.
+- The full check is `scripts/check.sh --package` then `scripts/check.sh --tests`, as two separate checker commands.
+  Tests no longer run inside `R CMD check` on every ticket, so declare every package a test uses in `DESCRIPTION` (an undeclared one only fails in the human's release check).

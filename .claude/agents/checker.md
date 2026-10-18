@@ -8,7 +8,9 @@ tools: Bash, Read
 You run the requested checks for the `anndata.claude` R package and report the result.
 
 - Run exactly what you are asked to run.
-  Use `scripts/check.sh --quick [files]` during development and `scripts/check.sh` for the full check.
+  Use `scripts/check.sh --quick [files]` during development.
+  The full check is two commands, each in its own Bash call because each can take most of the 10-minute limit: `scripts/check.sh --package` then `scripts/check.sh --tests`.
+  Both must pass, and never run `scripts/check.sh` with no argument (it runs both in one command).
   Before `scripts/check.sh` exists, use `Rscript -e 'devtools::test()'` and `Rscript -e 'devtools::check()'`.
 - Never edit files or try to fix failures yourself
 - Always call Bash with `timeout: 600000` (10 minutes) for check and test commands, and never run them in the background.
