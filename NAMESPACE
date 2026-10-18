@@ -48,7 +48,13 @@ importClassesFrom(Matrix,dgCMatrix)
 importClassesFrom(Matrix,dgRMatrix)
 importClassesFrom(Matrix,lgCMatrix)
 importClassesFrom(Matrix,lgRMatrix)
+importClassesFrom(S4Arrays,Array)
 importClassesFrom(S4Vectors,DFrame)
+importFrom(DelayedArray,
+  chunkdim,
+  extract_array,
+  type
+)
 importFrom(R6,R6Class)
 importFrom(cli,cli_abort)
 importFrom(lifecycle,deprecated)

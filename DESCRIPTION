@@ -14,6 +14,7 @@ Depends:
     R (>= 4.3)
 Imports:
     cli,
+    DelayedArray,
     jsonlite,
     lifecycle,
     methods,
@@ -22,6 +23,7 @@ Imports:
     Rarr (>= 2.1.48),
     rhdf5,
     rlang,
+    S4Arrays,
     S4Vectors
 Suggests:
     bit64,

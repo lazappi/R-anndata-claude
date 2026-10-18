@@ -108,7 +108,7 @@ The human owns the order of the Queue.
 - [x] 🛑 Checkpoint (orchestrator): read `.scratch/lazy/seeds-spike.md`, choose the seeds, finish the lazy spec and write its tickets (ask the human only if there is no clear choice)
 - [x] lazy/02: lazy operations table (`.scratch/lazy/issues/02-lazy-operations-table.md`)
 - [x] lazy/03: seed foundations (`.scratch/lazy/issues/03-lazy-seed-foundations.md`)
-- [ ] lazy/04: dense lazy seeds (`.scratch/lazy/issues/04-lazy-dense-seeds.md`)
+- [~] lazy/04: dense lazy seeds (`.scratch/lazy/issues/04-lazy-dense-seeds.md`), implemented, waiting for a human decision on `array_int32_min` (see Blocked)
 - [ ] lazy/05: sparse lazy seeds (`.scratch/lazy/issues/05-lazy-sparse-seeds.md`)
 - [ ] lazy/06: lazy obs and var (`.scratch/lazy/issues/06-lazy-dataframes.md`)
 - [ ] lazy/07: read_elem_lazy and read_lazy (`.scratch/lazy/issues/07-read-lazy.md`)
@@ -151,6 +151,10 @@ The human owns the order of the Queue.
   The run on 2026-10-17 skipped to lazy/01 for this reason.
 
 ## Blocked
+
+- lazy/04: a lazy seed cannot return a double for an int32 array holding -2^31 (eager reads do), so the seed raises `anndata_dtype_overflow_error`.
+  The human should accept this deviation (recommended, then set 04 to `done` and bump the version) or choose another rule.
+  Tickets 05 and 06 wait on this.
 
 ## Follow-up
 
