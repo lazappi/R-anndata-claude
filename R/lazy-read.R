@@ -88,10 +88,29 @@ read_lazy <- function(store, load_annotation_index = TRUE) {
       call
     )
   }
+  warn_unconsolidated_zarr(store, call)
   store <- lazy_open_store(store, call)
   read_state$lazy <- list(load_annotation_index = load_annotation_index)
   on.exit(read_state$lazy <- NULL, add = TRUE)
   read_elem(store, "/")
+}
+
+# Python's warning for a zarr v2 directory with no `.zmetadata`, which it reads
+# group by group (this package never reads consolidated metadata, so only the
+# warning is kept)
+warn_unconsolidated_zarr <- function(store, call) {
+  is_v2 <- is.character(store) &&
+    length(store) == 1L &&
+    file.exists(file.path(store, ".zgroup"))
+  if (is_v2 && !file.exists(file.path(store, ".zmetadata"))) {
+    anndata_warn(
+      "Did not read zarr as consolidated. Consider consolidating your
+       metadata.",
+      "anndata_unconsolidated_zarr_warning",
+      call = call
+    )
+  }
+  invisible(store)
 }
 
 # The lazy value of the slot `key` of an AnnData group, or `NULL` when the slot

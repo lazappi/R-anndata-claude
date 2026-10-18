@@ -28,4 +28,10 @@ Remaining parts are in `fix_plan.md`: `read_lazy()` (lazy AnnData) and the opera
 `as_anndata_matrix()` now accepts any `DelayedArray` of the right dimensionality, and a `LazyDFrame` with `NULL` row names (`load_annotation_index = FALSE`) gets the dummy range names `"0"`... without the implicit-modification warning.
 `lazy_small_paths()` moved to `helper-lazy.R`.
 Tests in `test-lazy-anndata.R` (h5ad and zarr v3: slot classes, realised values, obsm/varm/obsp/raw, dummy index, argument errors).
-Reviewer said FAIL on coverage, still to do: compare against the `read_lazy` table rows (`default`, `load_annotation_index_*`, `open_handle`, `missing_store`, `unconsolidated_zarr` with its warning), zarr v2 fixtures, a missing zarr directory, dtype checks, and decide/record the deviation that arrays inside `uns` are eager here (Python keeps them lazy).
+2026-10-18: Part 3 done, the `read_lazy` table rows are compared in `test-lazy-anndata.R` (`default`, `load_annotation_index_*`, `open_handle`, `missing_store` for zarr, `unconsolidated_zarr`), plus the zarr v2 fixture and dtype checks.
+`read_lazy()` now warns (`anndata_unconsolidated_zarr_warning`, Python's message) for a zarr v2 directory with no `.zmetadata`, `read_elem_lazy()` does not.
+Deviation to record in the docs (ticket 08): arrays inside `uns` are read eagerly here, Python keeps them as dask arrays.
+Open question: whether Python also warns for an unconsolidated zarr v3 store (the table has no row), check with `python-oracle` in the operations part.
+Remaining: the operations rows.
+
+Earlier note (part 2), now addressed apart from the operations rows: compare against the `read_lazy` table rows (`default`, `load_annotation_index_*`, `open_handle`, `missing_store`, `unconsolidated_zarr` with its warning), zarr v2 fixtures, a missing zarr directory, dtype checks, and decide/record the deviation that arrays inside `uns` are eager here (Python keeps them lazy).
