@@ -150,7 +150,7 @@ The human owns the order of the Queue.
   Either move that sub-item out of backed/04 (for example into a legacy-formats ticket) and let 04 finish, or remove 04 from the `Blocked by:` lines of 05 and 06.
   The run on 2026-10-17 skipped to lazy/01 for this reason.
 
-- [ ] `resolve_lazy_chunks()` (`R/lazy-dense.R`) forces chunks of at least 1, so a dense array with a zero-length axis has `chunkdim()` larger than `dim()`, which DelayedArray rejects. Use 0 as `StoreSparseSeed` does (Python's layout is `(0,)`) and add a test with an empty dense array.
+- [x] `resolve_lazy_chunks()` (`R/lazy-dense.R`) forces chunks of at least 1, so a dense array with a zero-length axis has `chunkdim()` larger than `dim()`, which DelayedArray rejects. Use 0 as `StoreSparseSeed` does (Python's layout is `(0,)`) and add a test with an empty dense array.
 
 ## Blocked
 

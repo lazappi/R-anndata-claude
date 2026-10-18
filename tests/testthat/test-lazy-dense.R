@@ -219,6 +219,17 @@ test_that("chunkdim follows Python's default and explicit chunks", {
   )
 })
 
+test_that("an empty axis has a chunk of zero", {
+  # DelayedArray rejects a chunkdim larger than dim(), so a zero-length axis
+  # must not be forced up to 1
+  dir <- withr::local_tempdir()
+  s <- zarr_create(file.path(dir, "e.zarr"))
+  write_elem(s, "x", matrix(0, nrow = 0, ncol = 3))
+  seed <- store_dense_seed(s, "/x")
+  expect_identical(DelayedArray::chunkdim(seed), c(0L, 3L))
+  expect_identical(dim(as.matrix(DelayedArray::DelayedArray(seed))), c(0L, 3L))
+})
+
 test_that("zarr chunkdim is the on-disk chunk shape", {
   # A zarr array has its own chunks, which the grid uses unless overridden
   dir <- withr::local_tempdir()

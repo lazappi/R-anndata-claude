@@ -107,8 +107,8 @@ resolve_lazy_chunks <- function(chunks, shape, disk, call) {
   } else {
     chunks <- disk
   }
-  # A chunk grid cannot have an empty cell, so an empty axis gets one
-  as.integer(pmax(chunks, 1))
+  # An empty axis has a chunk of 0 (Python's layout), never above the axis
+  as.integer(pmin(pmax(chunks, 1), shape))
 }
 
 #' @rdname lazy-dense
