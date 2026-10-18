@@ -107,7 +107,7 @@ The human owns the order of the Queue.
   - [x] Remaining sparse probes for `H5SparseMatrixSeed` (2^53, result types) and ZarrArray (sparse bool)
 - [x] 🛑 Checkpoint (orchestrator): read `.scratch/lazy/seeds-spike.md`, choose the seeds, finish the lazy spec and write its tickets (ask the human only if there is no clear choice)
 - [x] lazy/02: lazy operations table (`.scratch/lazy/issues/02-lazy-operations-table.md`)
-- [ ] lazy/03: seed foundations (`.scratch/lazy/issues/03-lazy-seed-foundations.md`)
+- [x] lazy/03: seed foundations (`.scratch/lazy/issues/03-lazy-seed-foundations.md`)
 - [ ] lazy/04: dense lazy seeds (`.scratch/lazy/issues/04-lazy-dense-seeds.md`)
 - [ ] lazy/05: sparse lazy seeds (`.scratch/lazy/issues/05-lazy-sparse-seeds.md`)
 - [ ] lazy/06: lazy obs and var (`.scratch/lazy/issues/06-lazy-dataframes.md`)

@@ -278,7 +278,30 @@ h5_info <- function(loc, path) {
   parent <- rhdf5::H5Gopen(loc, dirname(path))
   on.exit(rhdf5::H5Gclose(parent), add = TRUE)
   listing <- rhdf5::h5ls(parent, recursive = FALSE, all = TRUE)
-  listing[listing$name == basename(path), , drop = FALSE]
+  info <- listing[listing$name == basename(path), , drop = FALSE]
+  shape <- h5_shape_chunks(loc, path)
+  info$shape <- list(shape$shape)
+  info$chunks <- list(shape$chunks)
+  info
+}
+
+# The shape and chunk shape of a dataset in numpy order, with `chunks` of
+# `NULL` when the layout is not chunked and a shape of `numeric()` for scalar
+# and null datasets
+h5_shape_chunks <- function(loc, path) {
+  dset <- rhdf5::H5Dopen(loc, path)
+  on.exit(rhdf5::H5Dclose(dset), add = TRUE)
+  space <- rhdf5::H5Dget_space(dset)
+  on.exit(rhdf5::H5Sclose(space), add = TRUE, after = FALSE)
+  # rhdf5 reverses the extent into R's order
+  shape <- rev(as.numeric(rhdf5::H5Sget_simple_extent_dims(space)$size))
+  plist <- rhdf5::H5Dget_create_plist(dset)
+  on.exit(rhdf5::H5Pclose(plist), add = TRUE, after = FALSE)
+  chunks <- NULL
+  if (identical(rhdf5::H5Pget_layout(plist), "H5D_CHUNKED")) {
+    chunks <- as.numeric(rhdf5::H5Pget_chunk(plist))
+  }
+  list(shape = shape, chunks = chunks)
 }
 
 # The dtype of a numeric dataset, or NA when it is not an integer or float

@@ -108,6 +108,9 @@ Dimensions are in Python's order, so \code{selection = list(1:2, NULL)} is numpy
 
 The array information from \code{array_info()} is a one-row data frame, as
 \code{h5ls()} gives, with \code{name}, \code{dclass} (\code{INTEGER}, \code{FLOAT}, \code{ENUM},
-\code{COMPOUND} or \code{STRING}), \code{dtype} and \code{rank}.
+\code{COMPOUND} or \code{STRING}), \code{dtype} and \code{rank}, and the list columns \code{shape}
+and \code{chunks} (numeric vectors in Python's order).
+\code{chunks} is \code{NULL} for a contiguous HDF5 dataset and for a 0-d array, and
+the inner chunk shape for a sharded zarr array.
 }
 \keyword{internal}

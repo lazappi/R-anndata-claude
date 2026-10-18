@@ -281,13 +281,37 @@ zarr_array_meta <- function(store, path) {
 # The row of an array in the shape `h5ls()` gives
 zarr_info <- function(store, path) {
   array <- zarr_array_meta(store, path)
-  data.frame(
+  info <- data.frame(
     name = basename(array$node$path),
     dclass = zarr_dtype_class(array$dtype),
     dtype = array$dtype,
     rank = length(array$shape),
     stringsAsFactors = FALSE
   )
+  info$shape <- list(array$shape)
+  info$chunks <- list(zarr_inner_chunks(array))
+  info
+}
+
+# The chunk shape readers see: the inner chunk shape of a sharded v3 array, the
+# chunk shape otherwise, and `NULL` for a 0-d array
+zarr_inner_chunks <- function(array) {
+  if (length(array$shape) == 0L) {
+    return(NULL)
+  }
+  meta <- array$meta
+  chunks <- if (array$node$version == 3L) {
+    inner <- NULL
+    for (codec in meta$codecs) {
+      if (identical(codec$name, "sharding_indexed")) {
+        inner <- codec$configuration$chunk_shape
+      }
+    }
+    inner %||% meta$chunk_grid$configuration$chunk_shape
+  } else {
+    meta$chunks
+  }
+  as.numeric(unlist(chunks))
 }
 
 # The selection checked against the shape, with every `NULL` entry filled in

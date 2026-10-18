@@ -96,6 +96,8 @@ def describe(path, obj):
         # A null dataspace (the `null` encoding) has no shape and no values
         node["shape"] = None if obj.shape is None else list(obj.shape)
         node["digest"] = "empty" if obj.shape is None else digest(obj)
+        # None when the layout is contiguous
+        node["chunks"] = None if obj.chunks is None else list(obj.chunks)
     return node
 
 

@@ -61,13 +61,17 @@ def describe(path, node):
         return {"path": path, "attrs": attrs, "kind": "group"}
     out = {"path": path, "attrs": attrs, "kind": "dataset"}
     if attrs.get("encoding-type", {}).get("value") == "null":
-        out.update(dtype="float32", shape=None, digest="empty")
+        out.update(dtype="float32", shape=None, digest="empty", chunks=None)
         return out
     values = node[...]
     if isinstance(values, np.ndarray) and values.dtype.kind == "T":
         values = values.astype(object)
     out.update(
-        dtype=dtype_text(node), shape=list(node.shape), digest=digest_values(values)
+        dtype=dtype_text(node),
+        shape=list(node.shape),
+        digest=digest_values(values),
+        # zarr-python's chunks, the inner chunk shape of a sharded array
+        chunks=None if len(node.shape) == 0 else list(node.chunks),
     )
     return out
 

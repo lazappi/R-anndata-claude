@@ -18,7 +18,10 @@
 #'
 #' The array information from `array_info()` is a one-row data frame, as
 #' `h5ls()` gives, with `name`, `dclass` (`INTEGER`, `FLOAT`, `ENUM`,
-#' `COMPOUND` or `STRING`), `dtype` and `rank`.
+#' `COMPOUND` or `STRING`), `dtype` and `rank`, and the list columns `shape`
+#' and `chunks` (numeric vectors in Python's order).
+#' `chunks` is `NULL` for a contiguous HDF5 dataset and for a 0-d array, and
+#' the inner chunk shape for a sharded zarr array.
 #'
 #' @param store,node An open file or group handle.
 #' @param key,name Name of a member of `store`, or of an attribute.
