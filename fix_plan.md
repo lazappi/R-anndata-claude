@@ -108,7 +108,7 @@ The human owns the order of the Queue.
 - [x] 🛑 Checkpoint (orchestrator): read `.scratch/lazy/seeds-spike.md`, choose the seeds, finish the lazy spec and write its tickets (ask the human only if there is no clear choice)
 - [x] lazy/02: lazy operations table (`.scratch/lazy/issues/02-lazy-operations-table.md`)
 - [x] lazy/03: seed foundations (`.scratch/lazy/issues/03-lazy-seed-foundations.md`)
-- [~] lazy/04: dense lazy seeds (`.scratch/lazy/issues/04-lazy-dense-seeds.md`), implemented, waiting for a human decision on `array_int32_min` (see Blocked)
+- [ ] lazy/04: dense lazy seeds (`.scratch/lazy/issues/04-lazy-dense-seeds.md`), implemented, finish with the 2026-10-18 decision
 - [ ] lazy/05: sparse lazy seeds (`.scratch/lazy/issues/05-lazy-sparse-seeds.md`)
 - [ ] lazy/06: lazy obs and var (`.scratch/lazy/issues/06-lazy-dataframes.md`)
 - [ ] lazy/07: read_elem_lazy and read_lazy (`.scratch/lazy/issues/07-read-lazy.md`)
