@@ -1,6 +1,6 @@
 # Dense lazy seeds
 
-Status: ready-for-agent
+Status: done
 Type: task
 Blocked by: 02, 03
 
@@ -29,3 +29,5 @@ The seed raises `anndata_dtype_overflow_error` when a block holds -2^31, and the
 Recommended answer: accept it as a documented deviation (the value is in practice `NA` in R), and mark this ticket done.
 The alternative, typing every int32 seed as double, would make all int32 data lazily double.
 Tickets 05 and 06 are blocked by this one.
+
+2026-10-18 (second run): Applied the decision. The int32 -2^31 error now says to read eagerly, the deviation is in the `lazy-dense` help page and the test asserts the message. Full check and review pass. Not user-visible yet (seeds are internal), so no NEWS entry. Released as 0.0.2.9013.

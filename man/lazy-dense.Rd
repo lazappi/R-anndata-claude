@@ -53,6 +53,12 @@ with the On-disk dtype record that \code{read_h5ad()} gives.
 Reading int64 or uint64 values of magnitude 2^53 or more raises the error of
 \code{read_h5ad()} when the block holding them is realised.
 
+Deviation from eager reads: an int32 array holding -2^31 (the bit pattern of
+\code{NA_integer_}) is read as \code{double} by \code{read_h5ad()}, but a seed's type is
+fixed before any read.
+Realising a block that holds -2^31 therefore raises
+\code{anndata_dtype_overflow_error}, suggesting an eager read.
+
 \code{chunkdim()} is the chunk grid of Python's \code{read_elem_lazy()}: the
 \code{chunks} argument if given (\code{NA} or \code{-1} for the whole axis), otherwise the
 on-disk chunk shape (the inner chunk shape of sharded zarr), and for a

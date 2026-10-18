@@ -18,6 +18,12 @@
 #' Reading int64 or uint64 values of magnitude 2^53 or more raises the error of
 #' `read_h5ad()` when the block holding them is realised.
 #'
+#' Deviation from eager reads: an int32 array holding -2^31 (the bit pattern of
+#' `NA_integer_`) is read as `double` by `read_h5ad()`, but a seed's type is
+#' fixed before any read.
+#' Realising a block that holds -2^31 therefore raises
+#' `anndata_dtype_overflow_error`, suggesting an eager read.
+#'
 #' `chunkdim()` is the chunk grid of Python's `read_elem_lazy()`: the
 #' `chunks` argument if given (`NA` or `-1` for the whole axis), otherwise the
 #' on-disk chunk shape (the inner chunk shape of sharded zarr), and for a
@@ -176,12 +182,17 @@ lazy_dense_block <- function(x, index, call = rlang::caller_env()) {
   # -2^31 is the bit pattern of NA_integer_, which read_h5ad() keeps by
   # returning a double, but a seed's type is fixed
   if (x@type == "integer" && any(block == -2^31, na.rm = TRUE)) {
-    abort_dtype_overflow(
-      x@path,
-      x@dtype,
-      "A lazy integer array cannot hold the value of NA_integer_",
-      -2^31,
-      call
+    anndata_abort(
+      c(
+        "Cannot represent the values of {.path {x@path}} as {.val {x@dtype}}.",
+        "x" = "A lazy integer array cannot hold the value of {.code NA_integer_}
+               ({.val {-2^31}}).",
+        "i" = "Read the array eagerly with {.fn read_h5ad} or {.fn read_zarr}."
+      ),
+      "anndata_dtype_overflow_error",
+      path = x@path,
+      dtype = x@dtype,
+      call = call
     )
   }
   storage.mode(block) <- x@type

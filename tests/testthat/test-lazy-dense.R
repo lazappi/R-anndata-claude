@@ -42,10 +42,12 @@ test_that("a seed realises to the values read_elem() gives", {
       truth <- read_elem(store, "x")
       seed <- store_dense_seed(store, "/x")
       if (case == "array_int32_min") {
-        # Known gap (ticket 04 comments): eager reads return double for -2^31
-        # (the NA_integer_ pattern) but a seed's type is fixed, so it raises
+        # Documented deviation (spec "Behaviour"): eager reads return double for
+        # -2^31 (the NA_integer_ pattern) but a seed's type is fixed, so it
+        # raises and suggests an eager read
         expect_error(
           store_dense_values(seed),
+          "eagerly",
           class = "anndata_dtype_overflow_error",
           label = label
         )
