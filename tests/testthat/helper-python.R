@@ -38,6 +38,7 @@ generator_inputs <- function() {
     "encoding_table.py" = "generate_fixtures.py",
     "zarr_encoding_table.py" = "generate_zarr_fixtures.py",
     "backed_cases.py" = character(),
+    "lazy_cases.py" = character(),
     "unwriteable_cases.py" = character(),
     "view_cases.py" = character(),
     "categorical_cases.py" = character(),

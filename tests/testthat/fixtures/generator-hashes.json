@@ -1,10 +1,11 @@
 {
-  "encoding_table.py": "693606552c4389ded009745835776cf7",
-  "zarr_encoding_table.py": "8234a39c0229d4869ecbe0f7d438d48a",
-  "backed_cases.py": "7dce29c6012f89408cec94a3d7a724f6",
-  "unwriteable_cases.py": "5266ac964fad7664944718ac6a2488d3",
-  "view_cases.py": "018c79319c47db899d91067768e79564",
-  "categorical_cases.py": "58fc2c7d69bf965b1c6608406845dfba",
-  "make_unique_cases.py": "e75e48fd4444bb015e4c57b82b0ca2d8",
-  "repr_cases.py": "bfc5a79d5c6f9a885b13b9c6342056dd"
+  "encoding_table.py": "c9d8b71ed1951992f7c5a562813255db",
+  "zarr_encoding_table.py": "a8d20d0232b68d82110e59b357f0d091",
+  "backed_cases.py": "98a4404eded366a9c884d79f2f51f1f0",
+  "lazy_cases.py": "fba90e2ffa0ce3da992a67e24da52bd4",
+  "unwriteable_cases.py": "4f532a518ae94326ea1d4c12bb98513d",
+  "view_cases.py": "10fef512cc84bb1d1fbc70e472566bd9",
+  "categorical_cases.py": "847ad5dd994f5142db19f930463d7ca6",
+  "make_unique_cases.py": "6725343e6bceaf3c9437b3746f7c0e1b",
+  "repr_cases.py": "e2b460886d5afde23bc6314da7364106"
 }
