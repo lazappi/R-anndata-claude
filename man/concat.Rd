@@ -8,16 +8,35 @@ concat(
   adatas,
   axis = c("obs", "var"),
   join = c("inner", "outer"),
+  merge = NULL,
+  uns_merge = NULL,
+  label = NULL,
+  keys = NULL,
+  index_unique = NULL,
   fill_value = NULL
 )
 }
 \arguments{
-\item{adatas}{A list of \code{AnnData} objects.}
+\item{adatas}{A list of \code{AnnData} objects.
+A named list uses its names as \code{keys}.}
 
 \item{axis}{Which axis to concatenate along, \code{"obs"} or \code{"var"}.}
 
 \item{join}{How to align the other axis, \code{"inner"} (the default) or
 \code{"outer"}.}
+
+\item{merge}{How the annotation of the other axis is selected, see the
+Merge strategies section.}
+
+\item{uns_merge}{How \code{uns} is selected, with the same strategies as \code{merge}.}
+
+\item{label}{A column of the concatenated axis annotation that gets the
+\code{keys} of the objects as a factor, or \code{NULL} for none.}
+
+\item{keys}{A name for each object (unique), by default \code{"0"}, \code{"1"}, ...}
+
+\item{index_unique}{A delimiter to make the concatenated names unique, as
+\code{"{name}{index_unique}{key}"}, or \code{NULL} to keep the names.}
 
 \item{fill_value}{The value for entries an outer join introduces, see the
 Arrays section.}
@@ -53,10 +72,37 @@ other objects contributing \code{fill_value}, and dropped on an inner join.
 The same applies to X, and objects without X give a result without X.
 }
 
+\section{Annotations}{
+
+The annotation of the concatenated axis (\code{obs} for \code{axis = "obs"}) has the
+columns every object has on an inner join and all of them on an outer join,
+with \code{NA} where an object lacks a column.
+Categorical columns take the union of the categories in natural order
+unless some are ordered, and \code{bool} columns become nullable boolean when
+missing values are introduced.
+The annotation of the other axis keeps the columns \code{merge} selects, from the
+annotations reindexed to the result's names.
+Columns of types that pandas would combine into an \code{object} column of mixed
+values (such as numbers with strings) raise
+\code{anndata_unsupported_value_error}.
+Keys are character, so numeric \code{keys} are converted to strings.
+}
+
+\section{Merge strategies}{
+
+\code{merge} and \code{uns_merge} are \code{NULL} (nothing is kept), \code{"same"} (values that
+are the same in every object), \code{"unique"} (values with one possible value),
+\code{"first"} (the first value) or \code{"only"} (values in only one object).
+\code{uns_merge} applies them recursively to lists.
+A function takes its place: it is called with the list of reindexed
+annotation data frames (or of \code{uns} lists) and returns a data frame or named
+list (or a list).
+}
+
 \section{Not yet supported}{
 
-The annotations of the result (\code{obs}, \code{var}, \code{obsm}, \code{varm}, \code{obsp}, \code{varp},
-\code{uns} and \code{raw}) are not combined yet, so the result only has names.
+The aligned mappings \code{obsm}, \code{varm}, \code{obsp} and \code{varp}, \code{pairwise} and \code{raw}
+of the result are not combined yet.
 }
 
 \examples{

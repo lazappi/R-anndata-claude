@@ -44,19 +44,84 @@ table_array <- function(desc) {
   }
 }
 
-# The input objects of a table row: X, layers and names (the annotations come
-# with later tickets)
+# An annotation column from its table description, with the pandas dtype as
+# the record: `str` is a nullable string, `object` a plain string and
+# `boolean` a nullable logical
+table_column <- function(col) {
+  na_or <- function(convert, empty) {
+    vapply(col$values, function(v) if (is.null(v)) empty else convert(v), empty)
+  }
+  switch(
+    col$dtype,
+    category = factor(
+      na_or(as.character, NA_character_),
+      levels = unlist(col$categories),
+      ordered = isTRUE(col$ordered)
+    ),
+    str = set_nullable(na_or(as.character, NA_character_), "NaN"),
+    object = na_or(as.character, NA_character_),
+    bool = na_or(as.logical, NA),
+    boolean = set_nullable(na_or(as.logical, NA), TRUE),
+    typed_dense(na_or(as.double, NA_real_), col$dtype)
+  )
+}
+
+table_frame <- function(desc) {
+  frame_from_columns(
+    lapply(desc$columns, table_column),
+    as.character(unlist(desc$index))
+  )
+}
+
+# The input objects of a table row: X, layers, obs, var and uns (the aligned
+# mappings and raw come with ticket 04)
 table_anndata <- function(desc) {
   layers <- desc$layers[names(desc$layers) != "None"]
   layers <- lapply(layers, table_array)
   x <- if (!is.null(desc$X)) table_array(desc$X)
   AnnData(
     X = x,
-    obs = S4Vectors::DataFrame(row.names = unlist(desc$obs_names)),
-    var = S4Vectors::DataFrame(row.names = unlist(desc$var_names)),
+    obs = table_frame(desc$obs),
+    var = table_frame(desc$var),
+    uns = desc$uns,
     layers = if (length(layers)) layers,
     shape = if (is.null(x)) unlist(desc$shape)
   )
+}
+
+# What Python gave for an annotation frame: index, column order, dtypes (as
+# `column_dtype()` names them), categories and values
+expect_matches_table_frame <- function(actual, desc, info) {
+  expect_identical(
+    rownames(actual),
+    as.character(unlist(desc$index)),
+    info = info
+  )
+  expect_identical(
+    colnames(actual),
+    names(desc$columns) %||% character(),
+    info = info
+  )
+  for (name in names(desc$columns)) {
+    expected <- desc$columns[[name]]
+    column <- actual[[name]]
+    label <- paste(info, name)
+    expect_identical(column_dtype(column), expected$dtype, info = label)
+    values <- vapply(
+      expected$values,
+      function(v) if (is.null(v)) NA_character_ else as.character(v),
+      character(1)
+    )
+    expect_identical(as.character(drop_dtype(column)), values, info = label)
+    if (identical(expected$dtype, "category")) {
+      expect_identical(
+        levels(column),
+        unlist(expected$categories),
+        info = label
+      )
+      expect_identical(is.ordered(column), expected$ordered, info = label)
+    }
+  }
 }
 
 # What Python gave for an array: sparse format, On-disk dtype and values
@@ -89,9 +154,24 @@ concat_cases_with_args <- function(table, allowed) {
 # Runs a table row, returning the result and the classes of the warnings
 run_concat_case <- function(case, table) {
   adatas <- lapply(case$inputs, function(i) table_anndata(table$inputs[[i]]))
+  args <- case$args
+  # `named` is a list input whose names are the keys
+  if (!is.null(args$named)) {
+    names(adatas) <- unlist(args$named)
+    args$named <- NULL
+  }
+  if (!is.null(args$keys)) {
+    args$keys <- unlist(args$keys)
+  }
+  # The table's custom merge function is "the first value"
+  for (arg in c("merge", "uns_merge")) {
+    if (identical(args[[arg]], "first_fn")) {
+      args[[arg]] <- function(values) values[[1L]]
+    }
+  }
   classes <- character()
   result <- withCallingHandlers(
-    do.call(concat, c(list(adatas), case$args)),
+    do.call(concat, c(list(adatas), args)),
     warning = function(w) {
       classes <<- c(classes, class(w))
       rlang::cnd_muffle(w)

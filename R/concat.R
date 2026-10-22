@@ -25,14 +25,46 @@
 #' other objects contributing `fill_value`, and dropped on an inner join.
 #' The same applies to X, and objects without X give a result without X.
 #'
+#' @section Annotations:
+#' The annotation of the concatenated axis (`obs` for `axis = "obs"`) has the
+#' columns every object has on an inner join and all of them on an outer join,
+#' with `NA` where an object lacks a column.
+#' Categorical columns take the union of the categories in natural order
+#' unless some are ordered, and `bool` columns become nullable boolean when
+#' missing values are introduced.
+#' The annotation of the other axis keeps the columns `merge` selects, from the
+#' annotations reindexed to the result's names.
+#' Columns of types that pandas would combine into an `object` column of mixed
+#' values (such as numbers with strings) raise
+#' `anndata_unsupported_value_error`.
+#' Keys are character, so numeric `keys` are converted to strings.
+#'
+#' @section Merge strategies:
+#' `merge` and `uns_merge` are `NULL` (nothing is kept), `"same"` (values that
+#' are the same in every object), `"unique"` (values with one possible value),
+#' `"first"` (the first value) or `"only"` (values in only one object).
+#' `uns_merge` applies them recursively to lists.
+#' A function takes its place: it is called with the list of reindexed
+#' annotation data frames (or of `uns` lists) and returns a data frame or named
+#' list (or a list).
+#'
 #' @section Not yet supported:
-#' The annotations of the result (`obs`, `var`, `obsm`, `varm`, `obsp`, `varp`,
-#' `uns` and `raw`) are not combined yet, so the result only has names.
+#' The aligned mappings `obsm`, `varm`, `obsp` and `varp`, `pairwise` and `raw`
+#' of the result are not combined yet.
 #'
 #' @param adatas A list of `AnnData` objects.
+#'   A named list uses its names as `keys`.
 #' @param axis Which axis to concatenate along, `"obs"` or `"var"`.
 #' @param join How to align the other axis, `"inner"` (the default) or
 #'   `"outer"`.
+#' @param merge How the annotation of the other axis is selected, see the
+#'   Merge strategies section.
+#' @param uns_merge How `uns` is selected, with the same strategies as `merge`.
+#' @param label A column of the concatenated axis annotation that gets the
+#'   `keys` of the objects as a factor, or `NULL` for none.
+#' @param keys A name for each object (unique), by default `"0"`, `"1"`, ...
+#' @param index_unique A delimiter to make the concatenated names unique, as
+#'   `"{name}{index_unique}{key}"`, or `NULL` to keep the names.
 #' @param fill_value The value for entries an outer join introduces, see the
 #'   Arrays section.
 #'
@@ -49,24 +81,44 @@ concat <- function(
   adatas,
   axis = c("obs", "var"),
   join = c("inner", "outer"),
+  merge = NULL,
+  uns_merge = NULL,
+  label = NULL,
+  keys = NULL,
+  index_unique = NULL,
   fill_value = NULL
 ) {
   join_given <- !missing(join)
   axis <- check_concat_choice(axis, c("obs", "var"), "axis")
   join <- check_concat_choice(join, c("inner", "outer"), "join")
+  merge_fn <- resolve_merge_strategy(merge, "merge", same_type = TRUE)
+  uns_merge_fn <- resolve_merge_strategy(uns_merge, "uns_merge")
+  list_names <- concat_list_names(adatas)
   adatas <- as_concat_inputs(adatas)
   check_fill_value(fill_value)
+  check_concat_string(label, "label")
+  check_concat_string(index_unique, "index_unique")
+  keys <- resolve_concat_keys(
+    keys,
+    list_names,
+    length(adatas),
+    rlang::caller_env()
+  )
 
   axis_index <- match(axis, c("obs", "var"))
   alt_index <- 3L - axis_index
   names_of <- function(adata, i) {
     if (i == 1L) adata$obs_names else adata$var_names
   }
-  concat_names <- unlist(lapply(adatas, names_of, i = axis_index))
+  ns <- vapply(adatas, function(a) a$shape[[axis_index]], integer(1))
+  concat_names <- as.character(unlist(lapply(adatas, names_of, i = axis_index)))
+  if (!is.null(index_unique)) {
+    concat_names <- paste0(concat_names, index_unique, rep(keys, times = ns))
+  }
   old_alt <- lapply(adatas, names_of, i = alt_index)
   alt_names <- merge_names(old_alt, join)
 
-  keys <- layer_keys(adatas, join)
+  array_keys <- layer_keys(adatas, join)
   # Python warns when only some objects have an X and `join` is not explicit
   has_x <- vapply(adatas, function(a) !is.null(a$X), logical(1))
   if (!join_given && any(has_x) && !all(has_x)) {
@@ -78,8 +130,7 @@ concat <- function(
     )
   }
 
-  ns <- vapply(adatas, function(a) a$shape[[axis_index]], integer(1))
-  arrays <- lapply(keys, function(key) {
+  arrays <- lapply(array_keys, function(key) {
     els <- lapply(adatas, function(a) layer_array(a, key))
     concat_arrays(
       els,
@@ -90,15 +141,36 @@ concat <- function(
       fill_value
     )
   })
-  names(arrays) <- ifelse(is.na(keys), NA_character_, keys)
-  x_position <- which(is.na(keys))
+  names(arrays) <- ifelse(is.na(array_keys), NA_character_, array_keys)
+  x_position <- which(is.na(array_keys))
   x <- if (length(x_position)) arrays[[x_position]] else NULL
-  arrays <- arrays[!is.na(keys)]
+  arrays <- arrays[!is.na(array_keys)]
 
-  frames <- list(
-    obs = names_frame(if (axis_index == 1L) concat_names else alt_names),
-    var = names_frame(if (axis_index == 2L) concat_names else alt_names)
+  call <- rlang::caller_env()
+  annotation_of <- function(i) {
+    lapply(adatas, function(a) if (i == 1L) a$obs else a$var)
+  }
+  axis_frame <- concat_axis_annotation(
+    annotation_of(axis_index),
+    ns,
+    join,
+    concat_names,
+    label,
+    keys,
+    call
   )
+  alt_frame <- concat_alt_annotation(
+    annotation_of(alt_index),
+    old_alt,
+    alt_names,
+    merge_fn,
+    is.function(merge)
+  )
+  frames <- if (axis_index == 1L) {
+    list(obs = axis_frame, var = alt_frame)
+  } else {
+    list(obs = alt_frame, var = axis_frame)
+  }
   shape <- if (is.null(x)) {
     c(nrow(frames$obs), nrow(frames$var))
   }
@@ -106,9 +178,30 @@ concat <- function(
     X = x,
     obs = frames$obs,
     var = frames$var,
+    uns = uns_merge_fn(lapply(adatas, function(a) a$uns)),
     layers = if (length(arrays)) arrays,
     shape = shape
   )
+}
+
+# The names of a list of objects, which are the keys (as a Python mapping's
+# keys are), or `NULL` when the list is unnamed
+concat_list_names <- function(adatas) {
+  nms <- names(adatas)
+  if (is.null(nms) || !is.list(adatas) || all(!nzchar(nms))) {
+    return(NULL)
+  }
+  nms
+}
+
+check_concat_string <- function(value, arg, call = rlang::caller_env(2L)) {
+  if (!is.null(value) && !(is.character(value) && length(value) == 1L)) {
+    anndata_abort(
+      "{.arg {arg}} must be {.code NULL} or a single string.",
+      "anndata_invalid_argument_error",
+      call = call
+    )
+  }
 }
 
 check_concat_choice <- function(
@@ -163,10 +256,6 @@ check_fill_value <- function(fill_value, call = rlang::caller_env(2L)) {
       call = call
     )
   }
-}
-
-names_frame <- function(names) {
-  S4Vectors::DataFrame(row.names = names)
 }
 
 # pandas `Index.intersection` keeps the order of the first index and drops

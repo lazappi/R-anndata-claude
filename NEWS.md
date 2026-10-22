@@ -1,6 +1,6 @@
 # anndata.claude (development version)
 
-* `concat()` (first part) combines `AnnData` objects along `axis` with an inner or outer `join`, stacking X and the layers like Python (numpy dtype promotion, CSR for any sparse input, `fill_value` for outer joins). Annotations other than names are not combined yet.
+* `concat()` (first part) combines `AnnData` objects along `axis` with an inner or outer `join`, stacking X and the layers like Python (numpy dtype promotion, CSR for any sparse input, `fill_value` for outer joins). The `obs` and `var` annotations are combined (categoricals, nullable boolean promotion), with `merge` and `uns_merge` strategies or functions, `label`, `keys` (or a named list) and `index_unique`. The aligned mappings, `pairwise` and `raw` are not combined yet.
 
 * The vignette has a section on lazy reading.
 
