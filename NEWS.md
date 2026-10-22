@@ -1,4 +1,6 @@
-# anndata.claude (development version)
+# anndata.claude 0.0.3
+
+Third milestone: backed mode, lazy reading and concatenation.
 
 * `concat()` combines `AnnData` objects along `axis` with an inner or outer `join`, stacking X and the layers like Python (numpy dtype promotion, CSR for any sparse input, `fill_value` for outer joins). The `obs` and `var` annotations are combined (categoricals, nullable boolean promotion), with `merge` and `uns_merge` strategies or functions, `label`, `keys` (or a named list) and `index_unique`. The aligned mappings (`obsm`, `varm`, `obsp`, `varp`), `pairwise` and `raw` are combined like Python (`raw` is dropped with a warning when only some objects have one). Views and backed objects can be concatenated (backed `X` is read into memory, as Python does). Lazily read objects (`read_lazy()`) give a lazy `X`, `layers` and `obsm` (their `obs` and `var` are read into memory).
 
@@ -27,6 +29,13 @@
 * `read_h5ad(backed = "r")` (or `"r+"`) keeps `X` and `raw$X` on disk, with `adata$isbacked`, `adata$filename`, the file manager `adata$file` (`open()`, `close()`, `is_open`) and `backed at '<file>'` in `print()`.
 
 * rec-arrays in zarr now honour the `compressors` dataset argument (zstd, gzip, blosc or none) and read stores Python compressed with any of them.
+
+## Known limitations
+
+* Legacy formats (files from older anndata versions) and other formats (csv, mtx, loom and others) are not yet supported.
+* Writing zarr v2 and zip stores (`.zarr.zip`) are not supported.
+* rec-array field dtypes are still not preserved in h5ad (ADR 0005), and unsorted sparse indices are sorted on read (ADR 0006).
+* A lazily read int32 array holding -2^31 cannot be realised lazily, read it with `read_h5ad()` or `read_zarr()` instead.
 
 # anndata.claude 0.0.2
 
