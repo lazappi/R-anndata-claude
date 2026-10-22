@@ -123,7 +123,7 @@ The human owns the order of the Queue.
 - [x] concat/04: concat: aligned mappings, pairwise and raw (`.scratch/concat/issues/04-concat-mappings.md`)
 - [x] concat/05: concat: Views and backed inputs (`.scratch/concat/issues/05-concat-views-backed.md`)
 - [x] concat/06: concat: lazy inputs (`.scratch/concat/issues/06-concat-lazy.md`)
-- [ ] concat/07: concatenation documentation (`.scratch/concat/issues/07-concat-docs.md`)
+- [x] concat/07: concatenation documentation (`.scratch/concat/issues/07-concat-docs.md`)
 
 ## Discovered
 

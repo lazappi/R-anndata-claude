@@ -176,6 +176,40 @@ class(lazy_memory$X)
 read_elem_lazy(zarr_path, "X", chunks = c(2, NA))
 ```
 
+## Concatenate
+
+`concat()` combines `AnnData` objects along `axis` (`"obs"` by default) and follows Python's `concat()`.
+An inner join keeps the variables every object has and an outer join keeps all of them, filling new entries with `fill_value`.
+
+```{r concat}
+a <- AnnData(
+  matrix(1, nrow = 2, ncol = 2),
+  obs = data.frame(row.names = c("a1", "a2")),
+  var = data.frame(row.names = c("g1", "g2"))
+)
+b <- AnnData(
+  matrix(2, nrow = 2, ncol = 2),
+  obs = data.frame(row.names = c("b1", "b2")),
+  var = data.frame(row.names = c("g2", "g3"))
+)
+concat(list(a, b))$var_names
+concat(list(a, b), join = "outer")$X
+```
+
+A named list gives the `keys`, which `label` stores in `obs` and `index_unique` adds to the names.
+
+```{r concat-label}
+combined <- concat(
+  list(first = a, second = b),
+  label = "batch",
+  index_unique = "-"
+)
+combined$obs
+```
+
+`merge` and `uns_merge` choose which annotations of the other axis and which `uns` entries are kept (`"same"`, `"unique"`, `"first"` or `"only"`, or a function).
+Views and backed objects can be concatenated, and objects from `read_lazy()` give a lazy result.
+
 ## Move a zarr store to Python and back
 
 Python anndata reads and writes the same store.
