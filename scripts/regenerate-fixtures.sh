@@ -14,6 +14,7 @@ uv run --project "$ROOT/tests/python" python -I "$ROOT/tests/python/unwriteable_
 uv run --project "$ROOT/tests/python" python -I "$ROOT/tests/python/view_cases.py" "$DEST/view_cases.json"
 uv run --project "$ROOT/tests/python" python -I "$ROOT/tests/python/backed_cases.py" "$DEST/backed_cases.json"
 uv run --project "$ROOT/tests/python" python -I "$ROOT/tests/python/lazy_cases.py" "$DEST/lazy_cases.json"
+uv run --project "$ROOT/tests/python" python -I "$ROOT/tests/python/concat_cases.py" "$DEST/concat_cases.json"
 uv run --project "$ROOT/tests/python" python -I "$ROOT/tests/python/encoding_table.py" "$DEST" "$ROOT/.scratch/h5ad-io/encoding-table.md"
 # zarr stores are packed into one archive, because R CMD check notes the hidden
 # files (.zarray) and the long paths of a zarr directory tree in a package
