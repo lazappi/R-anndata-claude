@@ -50,7 +50,7 @@ A stub spec must be grilled into a full spec before tickets are written for it.
 | 6 | `zarr-io` | done (0.0.2) | `read_zarr()` / `write_zarr()` for zarr v2 and v3 | h5ad-io |
 | 7 | `backed` | done | Backed mode for h5ad | h5ad-io, views |
 | 8 | `lazy` | done | Lazy arrays and lazy reading | h5ad-io, backed |
-| 9 | `legacy-formats` | stub, spike first | Reading files from before the current encodings | h5ad-io |
+| 9 | `legacy-formats` | full | Reading files from before the current encodings | h5ad-io |
 | 10 | `other-formats` | stub | csv, mtx, text, excel, loom, umi_tools, hdf readers and writers | core-object |
 | 11 | `experimental` | stub, low priority (experimental in Python, little effort) | `concat_on_disk`, `AnnCollection`, awkward arrays, `acc` accessors, extension namespaces | most of the above |
 

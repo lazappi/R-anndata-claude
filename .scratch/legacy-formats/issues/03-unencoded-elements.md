@@ -1,6 +1,6 @@
 # legacy-formats: unencoded Elements and h5sparse groups
 
-Status: needs-triage
+Status: ready-for-agent
 Type: task
 Blocked by: 02
 

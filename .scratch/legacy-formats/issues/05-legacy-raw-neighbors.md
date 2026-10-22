@@ -1,6 +1,6 @@
 # legacy-formats: raw.X, raw.var and the neighbors move
 
-Status: needs-triage
+Status: ready-for-agent
 Type: task
 Blocked by: 04
 

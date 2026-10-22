@@ -1,6 +1,6 @@
 # legacy-formats: legacy dataframes and categories in uns
 
-Status: needs-triage
+Status: ready-for-agent
 Type: task
 Blocked by: 03
 

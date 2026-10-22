@@ -34,6 +34,11 @@ Writing always uses the current encodings.
 - Follow Python for everything else: `OldFormatWarning` where Python raises it, legacy files through backed and lazy reading, and writing always in the current encodings
 - A spike (legacy-formats/01) finds which releases install and which layouts each produces, then the orchestrator finishes the spec and writes the tickets, asking the human only if there is no clear choice
 
-## Open questions
+Orchestrator, 2026-10-23, after the spike (`.scratch/legacy-formats/releases-spike.md`):
 
-- Which releases install and which layouts they produce (spike legacy-formats/01)
+- Fixtures come from 0.6.22.post1 (h5ad), 0.7.8 (h5ad and zarr) and 0.10.9 (the `uns["neighbors"]` move, h5ad and zarr), driven by one `tests/python/legacy_fixtures.py` with the release pins kept in the script
+- Unsupported and untested, because no installable release exercises them or Python 0.13.4 cannot read them:
+  - 0.6.x zarr stores (0.13.4 fails with `No Zarr data type found that matches {'name': '|O', 'object_codec_id': 'json2'}`), so the zarr branches of `read_dataframe_legacy`, `raw.X`/`raw.var`, `_clean_uns` and h5sparse groups
+  - layouts only written before 0.6 (0.5.x does not install)
+  - the multicolumn `obs_keys_multicol`, `smp_keys_multicol` and `var_keys_multicol` handling of `_clean_up_old_format`
+  Reading one of these gives whatever the shared readers do, with no promise of matching Python.

@@ -1,6 +1,6 @@
 # legacy-formats: backed, lazy and real-world files
 
-Status: needs-triage
+Status: ready-for-agent
 Type: task
 Blocked by: 05
 
