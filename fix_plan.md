@@ -116,7 +116,7 @@ The human owns the order of the Queue.
   - [x] `read_lazy()` (lazy AnnData with lazy X, layers, obsm, raw, obs and var, `load_annotation_index`)
   - [x] `read_lazy` table rows: compare each row (`default`, `load_annotation_index_*`, `open_handle`, `missing_store`, `unconsolidated_zarr` warning), zarr v2 fixtures, dtypes, and record the eager `uns` arrays as a deviation
   - [x] Operations on lazily read objects: subsetting, Views, `to_memory()`, printing, copy, transpose, writing (the `operations` and `dask_chunks` rows)
-- [ ] lazy/08: lazy reading documentation (`.scratch/lazy/issues/08-lazy-docs.md`)
+- [x] lazy/08: lazy reading documentation (`.scratch/lazy/issues/08-lazy-docs.md`)
 - [ ] concat/01: concat table (`.scratch/concat/issues/01-concat-table.md`)
 - [ ] concat/02: concat: axes, joins and arrays (`.scratch/concat/issues/02-concat-arrays.md`)
 - [ ] concat/03: concat: obs, var and merge strategies (`.scratch/concat/issues/03-concat-annotations.md`)

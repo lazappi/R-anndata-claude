@@ -150,6 +150,32 @@ identical(zarr_roundtrip$obs_names, adata$obs_names)
 Use the `compressors` argument to choose the compression (zstd, gzip, blosc or none) and `shards` to set the shard shape.
 Writing zarr v2 is not yet supported.
 
+## Lazy reading
+
+`read_lazy()` reads an h5ad file or zarr store into an `AnnData` whose `X`, layers, mappings, `obs` and `var` are lazy.
+Arrays are `DelayedArray`s (sparse ones stay sparse) and data frame columns are read when they are used.
+`uns` is read into memory.
+
+```{r lazy}
+lazy <- read_lazy(zarr_path)
+class(lazy$X)
+lazy$X[1:2, ]
+```
+
+Subsetting, Views, `copy()` and `t()` stay lazy, and `to_memory()` reads everything.
+Writing a lazy object is not supported yet, so call `to_memory()` first.
+
+```{r lazy-memory}
+lazy_memory <- lazy$to_memory()
+class(lazy_memory$X)
+```
+
+`read_elem_lazy()` does the same for a single Element, and `chunks` sets the chunk shape of the `DelayedArray` grid.
+
+```{r lazy-elem}
+read_elem_lazy(zarr_path, "X", chunks = c(2, NA))
+```
+
 ## Move a zarr store to Python and back
 
 Python anndata reads and writes the same store.

@@ -1,5 +1,7 @@
 # anndata.claude (development version)
 
+* The vignette has a section on lazy reading.
+
 * `read_lazy()` (experimental) reads an h5ad file or zarr store as an `AnnData` with lazy X, layers, obsm, varm, obsp, raw, obs and var. `to_memory()` reads everything into memory, `copy()` keeps it lazy, and writing a lazy object (or a View of one) raises Python's not-implemented error until `to_memory()` is used.
 
 * `read_elem_lazy()` (experimental) reads an Element of an h5ad file or zarr store lazily: arrays are `DelayedArray`s (sparse ones stay sparse), and categorical, nullable and `dataframe` Elements have lazy columns.
