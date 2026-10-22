@@ -1,10 +1,3 @@
-concat_table <- function() {
-  jsonlite::fromJSON(
-    fixture_path("concat_cases.json"),
-    simplifyVector = FALSE
-  )
-}
-
 # Guards the committed concat table against drifting from what Python gives
 test_that("the committed concat table matches the generator", {
   expect_generator_current("concat_cases.py")

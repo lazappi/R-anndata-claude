@@ -1,5 +1,7 @@
 # anndata.claude (development version)
 
+* `concat()` (first part) combines `AnnData` objects along `axis` with an inner or outer `join`, stacking X and the layers like Python (numpy dtype promotion, CSR for any sparse input, `fill_value` for outer joins). Annotations other than names are not combined yet.
+
 * The vignette has a section on lazy reading.
 
 * `read_lazy()` (experimental) reads an h5ad file or zarr store as an `AnnData` with lazy X, layers, obsm, varm, obsp, raw, obs and var. `to_memory()` reads everything into memory, `copy()` keeps it lazy, and writing a lazy object (or a View of one) raises Python's not-implemented error until `to_memory()` is used.

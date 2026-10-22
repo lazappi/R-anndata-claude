@@ -118,7 +118,7 @@ The human owns the order of the Queue.
   - [x] Operations on lazily read objects: subsetting, Views, `to_memory()`, printing, copy, transpose, writing (the `operations` and `dask_chunks` rows)
 - [x] lazy/08: lazy reading documentation (`.scratch/lazy/issues/08-lazy-docs.md`)
 - [x] concat/01: concat table (`.scratch/concat/issues/01-concat-table.md`)
-- [ ] concat/02: concat: axes, joins and arrays (`.scratch/concat/issues/02-concat-arrays.md`)
+- [x] concat/02: concat: axes, joins and arrays (`.scratch/concat/issues/02-concat-arrays.md`)
 - [ ] concat/03: concat: obs, var and merge strategies (`.scratch/concat/issues/03-concat-annotations.md`)
 - [ ] concat/04: concat: aligned mappings, pairwise and raw (`.scratch/concat/issues/04-concat-mappings.md`)
 - [ ] concat/05: concat: Views and backed inputs (`.scratch/concat/issues/05-concat-views-backed.md`)
