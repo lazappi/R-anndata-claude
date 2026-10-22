@@ -178,9 +178,6 @@ The human owns the order of the Queue.
 
 ## Follow-up
 
-- legacy-formats/02 to 06 (`.scratch/legacy-formats/issues/`): written from the releases spike, need triage and queueing.
-  The loop may not edit specs, so `.scratch/legacy-formats/spec.md` still lists its open question as open: the human should replace it with the spike's findings (releases 0.6.22, 0.7.8, 0.10.9, unsupported zarr-only paths in `releases-spike.md`)
-
 Tickets that need triage before they can be queued.
 
 - zarr-io/13: zip stores (`.scratch/zarr-io/issues/13-zarr-zip-stores.md`)
