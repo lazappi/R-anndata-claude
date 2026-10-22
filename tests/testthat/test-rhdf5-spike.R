@@ -214,7 +214,8 @@ spike_write_all <- function(path, env = parent.frame()) {
   spike_attr(group, "int", 5, "H5T_STD_I64LE", scalar = TRUE)
   spike_attr(group, "float", 0.5, "H5T_IEEE_F64LE", scalar = TRUE)
   spike_attr(group, "int_array", 1:3, "H5T_STD_I32LE")
-  rhdf5::h5writeAttribute(TRUE, group, "bool", asScalar = TRUE)
+  # rhdf5 2.57.20 adds an `NA` enum member here, so use the package writer
+  h5_attr_write(group, "bool", TRUE, NULL, TRUE)
   spike_attr(group, "shape", c(2, 3), "H5T_STD_I64LE")
   invisible(path)
 }

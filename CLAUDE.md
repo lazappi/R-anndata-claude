@@ -81,6 +81,7 @@ Kept brief and current by the loop.
 - Nullable Elements keep an `anndata_nullable` record and factors with non-string categories keep `anndata_categories`, `drop_dtype()` removes the first, and a write that passes the record on to a nested `write_elem()` recurses forever
 - Test helpers shared between files (`read_fixture_elem()`, `write_fixture_like()`, `read_written()`) live in `helper-io.R`
 - Sparse `data`, `indices` and `indptr` are plain datasets with no Encoding attributes, so `R/io-sparse.R` uses `write_dataset()` and `read_values()` and not `write_elem()`/`read_elem()` (which reject unencoded Elements)
+- rhdf5 2.57.20 `h5writeAttribute(<logical>)` adds an `NA` enum member (h5py reads uint8), so `h5_attr_write()` creates the attribute with `bool_type()` and `H5Awrite()`s the plain logical (raw and integer buffers fail)
 - Open files that are only read with `H5Fopen(path, flags = "H5F_ACC_RDONLY")`, because the default takes a write lock and breaks parallel tests that read the same fixture from h5py
 - Rec-arrays (`R/io-values-rec-array.R`): `H5Dread(bit64conversion = "double")` keeps `u4`/`i8` values, bool fields read as factors, `h5writeDataset(<data.frame>, store, key, level = 0L, chunk = nrow)` writes the compound, and anndata cannot read non-ASCII fixed-length strings so writing them raises
 - `h5ls` lists a dict's members alphabetically, so a dict reads back in that order, and `result[i] <- list(NULL)` is how to keep `NULL` members

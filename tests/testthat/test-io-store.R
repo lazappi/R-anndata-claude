@@ -99,6 +99,26 @@ test_that("attributes round trip through the store layer", {
   expect_equal(as.vector(attr_read(group, "shape")), c(3, 4))
 })
 
+test_that("logical attributes are h5py's two-member bool enum", {
+  # rhdf5 2.57.20 writes a third `NA` member, which h5py reads as uint8
+  store <- local_h5_store()
+  group <- group_create(store, "g")
+  withr::defer(node_close(group))
+  attr_write(group, "flag", FALSE)
+  attr <- rhdf5::H5Aopen(group, "flag")
+  withr::defer(rhdf5::H5Aclose(attr))
+  type <- rhdf5::H5Aget_type(attr)
+
+  expect_equal(rhdf5::H5Tget_nmembers(type), 2L)
+  expect_equal(read_elem_attr(group, "flag"), "FALSE")
+
+  attr_write(group, "flags", c(TRUE, FALSE, TRUE), scalar = FALSE)
+  expect_equal(
+    as.character(attr_read(group, "flags")),
+    c("TRUE", "FALSE", "TRUE")
+  )
+})
+
 test_that("groups, members and paths work through the store layer", {
   # write_elem() and the readers rely on these for every encoding
   store <- local_h5_store()

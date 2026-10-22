@@ -71,6 +71,18 @@ h5_attr_write <- function(node, name, value, dtype, scalar) {
       variableLengthString = TRUE,
       asScalar = scalar
     )
+  } else if (is.logical(value) && !anyNA(value)) {
+    # rhdf5 2.57.20 writes a three-member enum with NA, h5py's bool has two
+    type <- bool_type()
+    space <- if (scalar) {
+      rhdf5::H5Screate("H5S_SCALAR")
+    } else {
+      rhdf5::H5Screate_simple(length(value))
+    }
+    on.exit(rhdf5::H5Sclose(space), add = TRUE)
+    attr <- rhdf5::H5Acreate(node, name, type, space)
+    on.exit(rhdf5::H5Aclose(attr), add = TRUE, after = FALSE)
+    rhdf5::H5Awrite(attr, as.vector(value))
   } else if (identical(dtype, "int64")) {
     space <- rhdf5::H5Screate_simple(length(value))
     on.exit(rhdf5::H5Sclose(space), add = TRUE)

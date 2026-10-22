@@ -163,7 +163,7 @@ The human owns the order of the Queue.
 
 - [x] `resolve_lazy_chunks()` (`R/lazy-dense.R`) forces chunks of at least 1, so a dense array with a zero-length axis has `chunkdim()` larger than `dim()`, which DelayedArray rejects. Use 0 as `StoreSparseSeed` does (Python's layout is `(0,)`) and add a test with an empty dense array.
 
-- [ ] Regression from upgrading rhdf5 to 2.57.20 (with R 4.6.1): the categorical `ordered` attribute is now written (or read back) as `uint8` instead of h5py's bool enum, so `test-io-dataframe.R:138` fails Structural equivalence (`/x/c: attribute ordered type differs ("uint8" vs "bool")`).
+- [x] Fixed: `h5_attr_write()` writes logicals with `bool_type()`, the full suite passes. Regression from upgrading rhdf5 to 2.57.20 (with R 4.6.1): the categorical `ordered` attribute is now written (or read back) as `uint8` instead of h5py's bool enum, so `test-io-dataframe.R:138` fails Structural equivalence (`/x/c: attribute ordered type differs ("uint8" vs "bool")`).
   The writer builds the enum in `R/io-values.R:78-82`, so check what rhdf5 2.57.20 does with enum attributes (`attr_write()` in the store layer), fix it so Python sees a bool, and look for other bool attributes and datasets hit the same way.
   `scripts/check.sh --tests` stopped at the failure limit, so other regressions may hide behind it: rerun the whole suite with `testthat::set_max_fails(Inf)` once this is fixed.
 
