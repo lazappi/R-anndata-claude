@@ -126,7 +126,7 @@ The human owns the order of the Queue.
 - [x] concat/07: concatenation documentation (`.scratch/concat/issues/07-concat-docs.md`)
 - [x] legacy-formats/01: legacy releases spike (`.scratch/legacy-formats/issues/01-legacy-releases-spike.md`)
 - [x] 🛑 Checkpoint (orchestrator): read `.scratch/legacy-formats/releases-spike.md`, finish the legacy-formats spec and write its tickets (ask the human only if there is no clear choice) (5 tickets 02-06, all `needs-triage`, awaiting human triage)
-- [ ] legacy-formats/02: fixture generator and expectation table (`.scratch/legacy-formats/issues/02-legacy-fixtures.md`)
+- [x] legacy-formats/02: fixture generator and expectation table (`.scratch/legacy-formats/issues/02-legacy-fixtures.md`)
 - [ ] legacy-formats/03: unencoded Elements and h5sparse groups (`.scratch/legacy-formats/issues/03-unencoded-elements.md`)
 - [ ] legacy-formats/04: legacy dataframes and categories in uns (`.scratch/legacy-formats/issues/04-legacy-dataframes.md`)
 - [ ] legacy-formats/05: raw.X, raw.var and the neighbors move (`.scratch/legacy-formats/issues/05-legacy-raw-neighbors.md`)

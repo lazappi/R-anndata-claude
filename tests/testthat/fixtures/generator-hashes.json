@@ -8,5 +8,6 @@
   "categorical_cases.py": "847ad5dd994f5142db19f930463d7ca6",
   "make_unique_cases.py": "6725343e6bceaf3c9437b3746f7c0e1b",
   "repr_cases.py": "e2b460886d5afde23bc6314da7364106",
-  "concat_cases.py": "6a637997b46e3bb7407e0e6943cef243"
+  "concat_cases.py": "6a637997b46e3bb7407e0e6943cef243",
+  "legacy_cases.py": "9d7a6bb4d0a564459535e9c953bfc33f"
 }

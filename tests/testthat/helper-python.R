@@ -44,7 +44,8 @@ generator_inputs <- function() {
     "categorical_cases.py" = character(),
     "make_unique_cases.py" = character(),
     "repr_cases.py" = character(),
-    "concat_cases.py" = character()
+    "concat_cases.py" = character(),
+    "legacy_cases.py" = "legacy_fixtures.py"
   )
 }
 

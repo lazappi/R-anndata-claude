@@ -9,6 +9,7 @@ STOP
 *.Rcheck/
 *.tar.gz
 !tests/testthat/fixtures/zarr-fixtures.tar.gz
+!tests/testthat/fixtures/legacy-zarr-fixtures.tar.gz
 .venv/
 __pycache__/
 # Unpacked zarr fixtures, the committed form is zarr-fixtures.tar.gz

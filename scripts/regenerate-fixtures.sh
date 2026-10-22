@@ -23,5 +23,9 @@ trap 'rm -rf "$STAGE"' EXIT
 uv run --project "$ROOT/tests/python" python -I "$ROOT/tests/python/generate_zarr_fixtures.py" "$STAGE/zarr"
 uv run --project "$ROOT/tests/python" python -I "$ROOT/tests/python/zarr_encoding_table.py" "$STAGE/zarr" "$ROOT/.scratch/zarr-io/encoding-table.md"
 uv run --project "$ROOT/tests/python" python -I "$ROOT/tests/python/pack_zarr_fixtures.py" "$STAGE/zarr" "$DEST/zarr-fixtures.tar.gz"
+# Legacy fixtures come from real old releases (each in its own uv environment),
+# so legacy_fixtures.py needs no project, then 0.13.4 reads them for the table
+uv run --project "$ROOT/tests/python" python -I "$ROOT/tests/python/legacy_fixtures.py" "$DEST"
+uv run --project "$ROOT/tests/python" python -I "$ROOT/tests/python/legacy_cases.py" "$DEST" "$DEST/legacy_cases.json"
 (cd "$ROOT" && Rscript scripts/write-generator-hashes.R)
 echo "Regenerated fixtures in $DEST"

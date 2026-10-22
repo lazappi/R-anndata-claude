@@ -1,0 +1,4507 @@
+{
+  "anndata": "0.13.4",
+  "fixtures": {
+    "0.10.9-neighbors.h5ad": {
+      "status": "ok",
+      "values": {
+        "shape": [
+          6,
+          4
+        ],
+        "obs": {
+          "index": [
+            "0",
+            "1",
+            "2",
+            "3",
+            "4",
+            "5"
+          ],
+          "index_name": null,
+          "columns": {}
+        },
+        "var": {
+          "index": [
+            "0",
+            "1",
+            "2",
+            "3"
+          ],
+          "index_name": null,
+          "columns": {}
+        },
+        "X": {
+          "type": "ndarray",
+          "dtype": "float32",
+          "shape": [
+            6,
+            4
+          ],
+          "values": [
+            [
+              0.0,
+              1.0,
+              2.0,
+              3.0
+            ],
+            [
+              4.0,
+              5.0,
+              6.0,
+              7.0
+            ],
+            [
+              8.0,
+              9.0,
+              10.0,
+              11.0
+            ],
+            [
+              12.0,
+              13.0,
+              14.0,
+              15.0
+            ],
+            [
+              16.0,
+              17.0,
+              18.0,
+              19.0
+            ],
+            [
+              20.0,
+              21.0,
+              22.0,
+              23.0
+            ]
+          ]
+        },
+        "layers": {
+          "None": {
+            "type": "ndarray",
+            "dtype": "float32",
+            "shape": [
+              6,
+              4
+            ],
+            "values": [
+              [
+                0.0,
+                1.0,
+                2.0,
+                3.0
+              ],
+              [
+                4.0,
+                5.0,
+                6.0,
+                7.0
+              ],
+              [
+                8.0,
+                9.0,
+                10.0,
+                11.0
+              ],
+              [
+                12.0,
+                13.0,
+                14.0,
+                15.0
+              ],
+              [
+                16.0,
+                17.0,
+                18.0,
+                19.0
+              ],
+              [
+                20.0,
+                21.0,
+                22.0,
+                23.0
+              ]
+            ]
+          }
+        },
+        "obsm": {},
+        "varm": {},
+        "obsp": {
+          "connectivities": {
+            "type": "csr_matrix",
+            "dtype": "float32",
+            "shape": [
+              6,
+              6
+            ],
+            "values": [
+              [
+                1.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                1.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ]
+            ]
+          },
+          "distances": {
+            "type": "csr_matrix",
+            "dtype": "float32",
+            "shape": [
+              6,
+              6
+            ],
+            "values": [
+              [
+                1.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                1.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ]
+            ]
+          }
+        },
+        "varp": {},
+        "uns": {
+          "neighbors": {
+            "params": {
+              "n": {
+                "type": "int",
+                "value": 3
+              }
+            }
+          }
+        },
+        "raw": null
+      },
+      "warnings": [
+        {
+          "category": "FutureWarning",
+          "message": "Moving element from .uns['neighbors']['connectivities'] to .obsp['connectivities'].\n\nThis is where adjacency matrices should go now."
+        },
+        {
+          "category": "FutureWarning",
+          "message": "Moving element from .uns['neighbors']['distances'] to .obsp['distances'].\n\nThis is where adjacency matrices should go now."
+        }
+      ]
+    },
+    "0.10.9-neighbors.zarr": {
+      "status": "ok",
+      "values": {
+        "shape": [
+          6,
+          4
+        ],
+        "obs": {
+          "index": [
+            "0",
+            "1",
+            "2",
+            "3",
+            "4",
+            "5"
+          ],
+          "index_name": null,
+          "columns": {}
+        },
+        "var": {
+          "index": [
+            "0",
+            "1",
+            "2",
+            "3"
+          ],
+          "index_name": null,
+          "columns": {}
+        },
+        "X": {
+          "type": "ndarray",
+          "dtype": "float32",
+          "shape": [
+            6,
+            4
+          ],
+          "values": [
+            [
+              0.0,
+              1.0,
+              2.0,
+              3.0
+            ],
+            [
+              4.0,
+              5.0,
+              6.0,
+              7.0
+            ],
+            [
+              8.0,
+              9.0,
+              10.0,
+              11.0
+            ],
+            [
+              12.0,
+              13.0,
+              14.0,
+              15.0
+            ],
+            [
+              16.0,
+              17.0,
+              18.0,
+              19.0
+            ],
+            [
+              20.0,
+              21.0,
+              22.0,
+              23.0
+            ]
+          ]
+        },
+        "layers": {
+          "None": {
+            "type": "ndarray",
+            "dtype": "float32",
+            "shape": [
+              6,
+              4
+            ],
+            "values": [
+              [
+                0.0,
+                1.0,
+                2.0,
+                3.0
+              ],
+              [
+                4.0,
+                5.0,
+                6.0,
+                7.0
+              ],
+              [
+                8.0,
+                9.0,
+                10.0,
+                11.0
+              ],
+              [
+                12.0,
+                13.0,
+                14.0,
+                15.0
+              ],
+              [
+                16.0,
+                17.0,
+                18.0,
+                19.0
+              ],
+              [
+                20.0,
+                21.0,
+                22.0,
+                23.0
+              ]
+            ]
+          }
+        },
+        "obsm": {},
+        "varm": {},
+        "obsp": {
+          "connectivities": {
+            "type": "csr_matrix",
+            "dtype": "float32",
+            "shape": [
+              6,
+              6
+            ],
+            "values": [
+              [
+                1.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                1.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ]
+            ]
+          },
+          "distances": {
+            "type": "csr_matrix",
+            "dtype": "float32",
+            "shape": [
+              6,
+              6
+            ],
+            "values": [
+              [
+                1.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                1.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ]
+            ]
+          }
+        },
+        "varp": {},
+        "uns": {
+          "neighbors": {
+            "params": {
+              "n": {
+                "type": "int",
+                "value": 3
+              }
+            }
+          }
+        },
+        "raw": null
+      },
+      "warnings": [
+        {
+          "category": "FutureWarning",
+          "message": "Moving element from .uns['neighbors']['connectivities'] to .obsp['connectivities'].\n\nThis is where adjacency matrices should go now."
+        },
+        {
+          "category": "FutureWarning",
+          "message": "Moving element from .uns['neighbors']['distances'] to .obsp['distances'].\n\nThis is where adjacency matrices should go now."
+        }
+      ]
+    },
+    "0.6.22-dense.h5ad": {
+      "status": "ok",
+      "values": {
+        "shape": [
+          6,
+          4
+        ],
+        "obs": {
+          "index": [
+            "o0",
+            "o1",
+            "o2",
+            "o3",
+            "o4",
+            "o5"
+          ],
+          "index_name": "index",
+          "columns": {
+            "cat": {
+              "dtype": "category",
+              "values": [
+                "a",
+                "b",
+                "a",
+                "c",
+                "b",
+                "a"
+              ],
+              "categories": [
+                "a",
+                "b",
+                "c"
+              ],
+              "ordered": false
+            },
+            "num": {
+              "dtype": "float64",
+              "values": [
+                0.0,
+                1.0,
+                2.0,
+                3.0,
+                4.0,
+                5.0
+              ]
+            },
+            "str": {
+              "dtype": "category",
+              "values": [
+                "x",
+                "y",
+                "z",
+                "x",
+                "y",
+                "z"
+              ],
+              "categories": [
+                "x",
+                "y",
+                "z"
+              ],
+              "ordered": false
+            }
+          }
+        },
+        "var": {
+          "index": [
+            "v0",
+            "v1",
+            "v2",
+            "v3"
+          ],
+          "index_name": "index",
+          "columns": {
+            "vnum": {
+              "dtype": "int64",
+              "values": [
+                0,
+                1,
+                2,
+                3
+              ]
+            }
+          }
+        },
+        "X": {
+          "type": "ndarray",
+          "dtype": "float32",
+          "shape": [
+            6,
+            4
+          ],
+          "values": [
+            [
+              2.0,
+              1.0,
+              1.0,
+              2.0
+            ],
+            [
+              2.0,
+              1.0,
+              0.0,
+              0.0
+            ],
+            [
+              5.0,
+              1.0,
+              1.0,
+              2.0
+            ],
+            [
+              0.0,
+              1.0,
+              1.0,
+              2.0
+            ],
+            [
+              2.0,
+              1.0,
+              0.0,
+              2.0
+            ],
+            [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ]
+          ]
+        },
+        "layers": {
+          "None": {
+            "type": "ndarray",
+            "dtype": "float32",
+            "shape": [
+              6,
+              4
+            ],
+            "values": [
+              [
+                2.0,
+                1.0,
+                1.0,
+                2.0
+              ],
+              [
+                2.0,
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                5.0,
+                1.0,
+                1.0,
+                2.0
+              ],
+              [
+                0.0,
+                1.0,
+                1.0,
+                2.0
+              ],
+              [
+                2.0,
+                1.0,
+                0.0,
+                2.0
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ]
+            ]
+          },
+          "counts": {
+            "type": "ndarray",
+            "dtype": "float32",
+            "shape": [
+              6,
+              4
+            ],
+            "values": [
+              [
+                2.0,
+                1.0,
+                1.0,
+                2.0
+              ],
+              [
+                2.0,
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                5.0,
+                1.0,
+                1.0,
+                2.0
+              ],
+              [
+                0.0,
+                1.0,
+                1.0,
+                2.0
+              ],
+              [
+                2.0,
+                1.0,
+                0.0,
+                2.0
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ]
+            ]
+          }
+        },
+        "obsm": {
+          "X_pca": {
+            "type": "ndarray",
+            "dtype": "float64",
+            "shape": [
+              6,
+              2
+            ],
+            "values": [
+              [
+                0.9883738380592262,
+                0.10204481074802807
+              ],
+              [
+                0.2088767560948347,
+                0.16130951788499626
+              ],
+              [
+                0.6531083254653984,
+                0.2532916025397821
+              ],
+              [
+                0.4663107728563063,
+                0.24442559200160274
+              ],
+              [
+                0.15896958364551972,
+                0.11037514116430513
+              ],
+              [
+                0.6563295894652734,
+                0.1381829513486138
+              ]
+            ]
+          }
+        },
+        "varm": {
+          "PCs": {
+            "type": "ndarray",
+            "dtype": "float64",
+            "shape": [
+              4,
+              2
+            ],
+            "values": [
+              [
+                0.1965823616800535,
+                0.3687251706609641
+              ],
+              [
+                0.8209932298479351,
+                0.09710127579306127
+              ],
+              [
+                0.8379449074988039,
+                0.09609840789396307
+              ],
+              [
+                0.9764594650133958,
+                0.4686512016477016
+              ]
+            ]
+          }
+        },
+        "obsp": {
+          "connectivities": {
+            "type": "csr_matrix",
+            "dtype": "float32",
+            "shape": [
+              6,
+              6
+            ],
+            "values": [
+              [
+                1.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                1.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ]
+            ]
+          },
+          "distances": {
+            "type": "csr_matrix",
+            "dtype": "float32",
+            "shape": [
+              6,
+              6
+            ],
+            "values": [
+              [
+                1.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                1.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ]
+            ]
+          }
+        },
+        "varp": {},
+        "uns": {
+          "arr": {
+            "type": "ndarray",
+            "dtype": "int64",
+            "shape": [
+              3
+            ],
+            "values": [
+              0,
+              1,
+              2
+            ]
+          },
+          "neighbors": {
+            "params": {
+              "n": {
+                "type": "ndarray",
+                "dtype": "int64",
+                "shape": [
+                  1
+                ],
+                "values": [
+                  3
+                ]
+              }
+            }
+          },
+          "scalar": {
+            "type": "ndarray",
+            "dtype": "int64",
+            "shape": [
+              1
+            ],
+            "values": [
+              3
+            ]
+          },
+          "str": {
+            "type": "ndarray",
+            "dtype": "object",
+            "shape": [
+              1
+            ],
+            "values": [
+              "hello"
+            ]
+          }
+        },
+        "raw": {
+          "shape": [
+            6,
+            4
+          ],
+          "var": {
+            "index": [
+              "v0",
+              "v1",
+              "v2",
+              "v3"
+            ],
+            "index_name": "index",
+            "columns": {
+              "vnum": {
+                "dtype": "int64",
+                "values": [
+                  0,
+                  1,
+                  2,
+                  3
+                ]
+              }
+            }
+          },
+          "X": {
+            "type": "ndarray",
+            "dtype": "float32",
+            "shape": [
+              6,
+              4
+            ],
+            "values": [
+              [
+                2.0,
+                1.0,
+                1.0,
+                2.0
+              ],
+              [
+                2.0,
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                5.0,
+                1.0,
+                1.0,
+                2.0
+              ],
+              [
+                0.0,
+                1.0,
+                1.0,
+                2.0
+              ],
+              [
+                2.0,
+                1.0,
+                0.0,
+                2.0
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ]
+            ]
+          },
+          "varm": {
+            "PCs": {
+              "type": "ndarray",
+              "dtype": "float64",
+              "shape": [
+                4,
+                2
+              ],
+              "values": [
+                [
+                  0.1965823616800535,
+                  0.3687251706609641
+                ],
+                [
+                  0.8209932298479351,
+                  0.09710127579306127
+                ],
+                [
+                  0.8379449074988039,
+                  0.09609840789396307
+                ],
+                [
+                  0.9764594650133958,
+                  0.4686512016477016
+                ]
+              ]
+            }
+          }
+        }
+      },
+      "warnings": [
+        {
+          "category": "FutureWarning",
+          "message": "Moving element from .uns['neighbors']['connectivities'] to .obsp['connectivities'].\n\nThis is where adjacency matrices should go now."
+        },
+        {
+          "category": "FutureWarning",
+          "message": "Moving element from .uns['neighbors']['distances'] to .obsp['distances'].\n\nThis is where adjacency matrices should go now."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "'/obs' was written with a very old version of AnnData. Consider rewriting it."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "'/raw.var' was written with a very old version of AnnData. Consider rewriting it."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "'/var' was written with a very old version of AnnData. Consider rewriting it."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/X' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/layers' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/layers/counts' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/obsm' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/obsm/X_pca' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/raw.X' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/raw.varm' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/raw.varm/PCs' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/uns' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/uns/arr' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/uns/cat_categories' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/uns/neighbors' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/uns/neighbors/connectivities' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/uns/neighbors/distances' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/uns/neighbors/params' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/uns/neighbors/params/n' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/uns/scalar' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/uns/str' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/uns/str_categories' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/varm' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/varm/PCs' was written without encoding metadata."
+        }
+      ]
+    },
+    "0.6.22-dense.zarr": {
+      "status": "error",
+      "error": "ValueError",
+      "message": "No Zarr data type found that matches {'name': '|O', 'object_codec_id': 'json2'}",
+      "warnings": []
+    },
+    "0.6.22-sparse.h5ad": {
+      "status": "ok",
+      "values": {
+        "shape": [
+          6,
+          4
+        ],
+        "obs": {
+          "index": [
+            "o0",
+            "o1",
+            "o2",
+            "o3",
+            "o4",
+            "o5"
+          ],
+          "index_name": "index",
+          "columns": {
+            "cat": {
+              "dtype": "category",
+              "values": [
+                "a",
+                "b",
+                "a",
+                "c",
+                "b",
+                "a"
+              ],
+              "categories": [
+                "a",
+                "b",
+                "c"
+              ],
+              "ordered": false
+            },
+            "num": {
+              "dtype": "float64",
+              "values": [
+                0.0,
+                1.0,
+                2.0,
+                3.0,
+                4.0,
+                5.0
+              ]
+            },
+            "str": {
+              "dtype": "category",
+              "values": [
+                "x",
+                "y",
+                "z",
+                "x",
+                "y",
+                "z"
+              ],
+              "categories": [
+                "x",
+                "y",
+                "z"
+              ],
+              "ordered": false
+            }
+          }
+        },
+        "var": {
+          "index": [
+            "v0",
+            "v1",
+            "v2",
+            "v3"
+          ],
+          "index_name": "index",
+          "columns": {
+            "vnum": {
+              "dtype": "int64",
+              "values": [
+                0,
+                1,
+                2,
+                3
+              ]
+            }
+          }
+        },
+        "X": {
+          "type": "csr_matrix",
+          "dtype": "float32",
+          "shape": [
+            6,
+            4
+          ],
+          "values": [
+            [
+              2.0,
+              1.0,
+              1.0,
+              2.0
+            ],
+            [
+              2.0,
+              1.0,
+              0.0,
+              0.0
+            ],
+            [
+              5.0,
+              1.0,
+              1.0,
+              2.0
+            ],
+            [
+              0.0,
+              1.0,
+              1.0,
+              2.0
+            ],
+            [
+              2.0,
+              1.0,
+              0.0,
+              2.0
+            ],
+            [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ]
+          ]
+        },
+        "layers": {
+          "None": {
+            "type": "csr_matrix",
+            "dtype": "float32",
+            "shape": [
+              6,
+              4
+            ],
+            "values": [
+              [
+                2.0,
+                1.0,
+                1.0,
+                2.0
+              ],
+              [
+                2.0,
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                5.0,
+                1.0,
+                1.0,
+                2.0
+              ],
+              [
+                0.0,
+                1.0,
+                1.0,
+                2.0
+              ],
+              [
+                2.0,
+                1.0,
+                0.0,
+                2.0
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ]
+            ]
+          },
+          "counts": {
+            "type": "csr_matrix",
+            "dtype": "float32",
+            "shape": [
+              6,
+              4
+            ],
+            "values": [
+              [
+                2.0,
+                1.0,
+                1.0,
+                2.0
+              ],
+              [
+                2.0,
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                5.0,
+                1.0,
+                1.0,
+                2.0
+              ],
+              [
+                0.0,
+                1.0,
+                1.0,
+                2.0
+              ],
+              [
+                2.0,
+                1.0,
+                0.0,
+                2.0
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ]
+            ]
+          }
+        },
+        "obsm": {
+          "X_pca": {
+            "type": "ndarray",
+            "dtype": "float64",
+            "shape": [
+              6,
+              2
+            ],
+            "values": [
+              [
+                0.9883738380592262,
+                0.10204481074802807
+              ],
+              [
+                0.2088767560948347,
+                0.16130951788499626
+              ],
+              [
+                0.6531083254653984,
+                0.2532916025397821
+              ],
+              [
+                0.4663107728563063,
+                0.24442559200160274
+              ],
+              [
+                0.15896958364551972,
+                0.11037514116430513
+              ],
+              [
+                0.6563295894652734,
+                0.1381829513486138
+              ]
+            ]
+          }
+        },
+        "varm": {
+          "PCs": {
+            "type": "ndarray",
+            "dtype": "float64",
+            "shape": [
+              4,
+              2
+            ],
+            "values": [
+              [
+                0.1965823616800535,
+                0.3687251706609641
+              ],
+              [
+                0.8209932298479351,
+                0.09710127579306127
+              ],
+              [
+                0.8379449074988039,
+                0.09609840789396307
+              ],
+              [
+                0.9764594650133958,
+                0.4686512016477016
+              ]
+            ]
+          }
+        },
+        "obsp": {
+          "connectivities": {
+            "type": "csr_matrix",
+            "dtype": "float32",
+            "shape": [
+              6,
+              6
+            ],
+            "values": [
+              [
+                1.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                1.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ]
+            ]
+          },
+          "distances": {
+            "type": "csr_matrix",
+            "dtype": "float32",
+            "shape": [
+              6,
+              6
+            ],
+            "values": [
+              [
+                1.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                1.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ]
+            ]
+          }
+        },
+        "varp": {},
+        "uns": {
+          "arr": {
+            "type": "ndarray",
+            "dtype": "int64",
+            "shape": [
+              3
+            ],
+            "values": [
+              0,
+              1,
+              2
+            ]
+          },
+          "neighbors": {
+            "params": {
+              "n": {
+                "type": "ndarray",
+                "dtype": "int64",
+                "shape": [
+                  1
+                ],
+                "values": [
+                  3
+                ]
+              }
+            }
+          },
+          "scalar": {
+            "type": "ndarray",
+            "dtype": "int64",
+            "shape": [
+              1
+            ],
+            "values": [
+              3
+            ]
+          },
+          "str": {
+            "type": "ndarray",
+            "dtype": "object",
+            "shape": [
+              1
+            ],
+            "values": [
+              "hello"
+            ]
+          }
+        },
+        "raw": {
+          "shape": [
+            6,
+            4
+          ],
+          "var": {
+            "index": [
+              "v0",
+              "v1",
+              "v2",
+              "v3"
+            ],
+            "index_name": "index",
+            "columns": {
+              "vnum": {
+                "dtype": "int64",
+                "values": [
+                  0,
+                  1,
+                  2,
+                  3
+                ]
+              }
+            }
+          },
+          "X": {
+            "type": "csr_matrix",
+            "dtype": "float32",
+            "shape": [
+              6,
+              4
+            ],
+            "values": [
+              [
+                2.0,
+                1.0,
+                1.0,
+                2.0
+              ],
+              [
+                2.0,
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                5.0,
+                1.0,
+                1.0,
+                2.0
+              ],
+              [
+                0.0,
+                1.0,
+                1.0,
+                2.0
+              ],
+              [
+                2.0,
+                1.0,
+                0.0,
+                2.0
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ]
+            ]
+          },
+          "varm": {
+            "PCs": {
+              "type": "ndarray",
+              "dtype": "float64",
+              "shape": [
+                4,
+                2
+              ],
+              "values": [
+                [
+                  0.1965823616800535,
+                  0.3687251706609641
+                ],
+                [
+                  0.8209932298479351,
+                  0.09710127579306127
+                ],
+                [
+                  0.8379449074988039,
+                  0.09609840789396307
+                ],
+                [
+                  0.9764594650133958,
+                  0.4686512016477016
+                ]
+              ]
+            }
+          }
+        }
+      },
+      "warnings": [
+        {
+          "category": "FutureWarning",
+          "message": "Moving element from .uns['neighbors']['connectivities'] to .obsp['connectivities'].\n\nThis is where adjacency matrices should go now."
+        },
+        {
+          "category": "FutureWarning",
+          "message": "Moving element from .uns['neighbors']['distances'] to .obsp['distances'].\n\nThis is where adjacency matrices should go now."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "'/obs' was written with a very old version of AnnData. Consider rewriting it."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "'/raw.var' was written with a very old version of AnnData. Consider rewriting it."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "'/var' was written with a very old version of AnnData. Consider rewriting it."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/X' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/layers' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/layers/counts' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/obsm' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/obsm/X_pca' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/raw.X' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/raw.varm' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/raw.varm/PCs' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/uns' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/uns/arr' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/uns/cat_categories' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/uns/neighbors' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/uns/neighbors/connectivities' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/uns/neighbors/distances' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/uns/neighbors/params' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/uns/neighbors/params/n' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/uns/scalar' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/uns/str' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/uns/str_categories' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/varm' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/varm/PCs' was written without encoding metadata."
+        }
+      ]
+    },
+    "0.7.8-dense.h5ad": {
+      "status": "ok",
+      "values": {
+        "shape": [
+          6,
+          4
+        ],
+        "obs": {
+          "index": [
+            "o0",
+            "o1",
+            "o2",
+            "o3",
+            "o4",
+            "o5"
+          ],
+          "index_name": null,
+          "columns": {
+            "cat": {
+              "dtype": "category",
+              "values": [
+                "a",
+                "b",
+                "a",
+                "c",
+                "b",
+                "a"
+              ],
+              "categories": [
+                "a",
+                "b",
+                "c"
+              ],
+              "ordered": false
+            },
+            "num": {
+              "dtype": "float64",
+              "values": [
+                0.0,
+                1.0,
+                2.0,
+                3.0,
+                4.0,
+                5.0
+              ]
+            },
+            "str": {
+              "dtype": "category",
+              "values": [
+                "x",
+                "y",
+                "z",
+                "x",
+                "y",
+                "z"
+              ],
+              "categories": [
+                "x",
+                "y",
+                "z"
+              ],
+              "ordered": false
+            }
+          }
+        },
+        "var": {
+          "index": [
+            "v0",
+            "v1",
+            "v2",
+            "v3"
+          ],
+          "index_name": null,
+          "columns": {
+            "vnum": {
+              "dtype": "int64",
+              "values": [
+                0,
+                1,
+                2,
+                3
+              ]
+            }
+          }
+        },
+        "X": {
+          "type": "ndarray",
+          "dtype": "float32",
+          "shape": [
+            6,
+            4
+          ],
+          "values": [
+            [
+              2.0,
+              1.0,
+              1.0,
+              2.0
+            ],
+            [
+              2.0,
+              1.0,
+              0.0,
+              0.0
+            ],
+            [
+              5.0,
+              1.0,
+              1.0,
+              2.0
+            ],
+            [
+              0.0,
+              1.0,
+              1.0,
+              2.0
+            ],
+            [
+              2.0,
+              1.0,
+              0.0,
+              2.0
+            ],
+            [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ]
+          ]
+        },
+        "layers": {
+          "None": {
+            "type": "ndarray",
+            "dtype": "float32",
+            "shape": [
+              6,
+              4
+            ],
+            "values": [
+              [
+                2.0,
+                1.0,
+                1.0,
+                2.0
+              ],
+              [
+                2.0,
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                5.0,
+                1.0,
+                1.0,
+                2.0
+              ],
+              [
+                0.0,
+                1.0,
+                1.0,
+                2.0
+              ],
+              [
+                2.0,
+                1.0,
+                0.0,
+                2.0
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ]
+            ]
+          },
+          "counts": {
+            "type": "ndarray",
+            "dtype": "float32",
+            "shape": [
+              6,
+              4
+            ],
+            "values": [
+              [
+                2.0,
+                1.0,
+                1.0,
+                2.0
+              ],
+              [
+                2.0,
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                5.0,
+                1.0,
+                1.0,
+                2.0
+              ],
+              [
+                0.0,
+                1.0,
+                1.0,
+                2.0
+              ],
+              [
+                2.0,
+                1.0,
+                0.0,
+                2.0
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ]
+            ]
+          }
+        },
+        "obsm": {
+          "X_pca": {
+            "type": "ndarray",
+            "dtype": "float64",
+            "shape": [
+              6,
+              2
+            ],
+            "values": [
+              [
+                0.9883738380592262,
+                0.10204481074802807
+              ],
+              [
+                0.2088767560948347,
+                0.16130951788499626
+              ],
+              [
+                0.6531083254653984,
+                0.2532916025397821
+              ],
+              [
+                0.4663107728563063,
+                0.24442559200160274
+              ],
+              [
+                0.15896958364551972,
+                0.11037514116430513
+              ],
+              [
+                0.6563295894652734,
+                0.1381829513486138
+              ]
+            ]
+          }
+        },
+        "varm": {
+          "PCs": {
+            "type": "ndarray",
+            "dtype": "float64",
+            "shape": [
+              4,
+              2
+            ],
+            "values": [
+              [
+                0.1965823616800535,
+                0.3687251706609641
+              ],
+              [
+                0.8209932298479351,
+                0.09710127579306127
+              ],
+              [
+                0.8379449074988039,
+                0.09609840789396307
+              ],
+              [
+                0.9764594650133958,
+                0.4686512016477016
+              ]
+            ]
+          }
+        },
+        "obsp": {
+          "connectivities": {
+            "type": "csr_matrix",
+            "dtype": "float32",
+            "shape": [
+              6,
+              6
+            ],
+            "values": [
+              [
+                1.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                1.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ]
+            ]
+          },
+          "distances": {
+            "type": "csr_matrix",
+            "dtype": "float32",
+            "shape": [
+              6,
+              6
+            ],
+            "values": [
+              [
+                1.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                1.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ]
+            ]
+          }
+        },
+        "varp": {},
+        "uns": {
+          "arr": {
+            "type": "ndarray",
+            "dtype": "int64",
+            "shape": [
+              3
+            ],
+            "values": [
+              0,
+              1,
+              2
+            ]
+          },
+          "neighbors": {
+            "params": {
+              "n": {
+                "type": "int64",
+                "value": 3
+              }
+            }
+          },
+          "scalar": {
+            "type": "int64",
+            "value": 3
+          },
+          "str": {
+            "type": "str",
+            "value": "hello"
+          }
+        },
+        "raw": {
+          "shape": [
+            6,
+            4
+          ],
+          "var": {
+            "index": [
+              "v0",
+              "v1",
+              "v2",
+              "v3"
+            ],
+            "index_name": null,
+            "columns": {
+              "vnum": {
+                "dtype": "int64",
+                "values": [
+                  0,
+                  1,
+                  2,
+                  3
+                ]
+              }
+            }
+          },
+          "X": {
+            "type": "ndarray",
+            "dtype": "float32",
+            "shape": [
+              6,
+              4
+            ],
+            "values": [
+              [
+                2.0,
+                1.0,
+                1.0,
+                2.0
+              ],
+              [
+                2.0,
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                5.0,
+                1.0,
+                1.0,
+                2.0
+              ],
+              [
+                0.0,
+                1.0,
+                1.0,
+                2.0
+              ],
+              [
+                2.0,
+                1.0,
+                0.0,
+                2.0
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ]
+            ]
+          },
+          "varm": {
+            "PCs": {
+              "type": "ndarray",
+              "dtype": "float64",
+              "shape": [
+                4,
+                2
+              ],
+              "values": [
+                [
+                  0.1965823616800535,
+                  0.3687251706609641
+                ],
+                [
+                  0.8209932298479351,
+                  0.09710127579306127
+                ],
+                [
+                  0.8379449074988039,
+                  0.09609840789396307
+                ],
+                [
+                  0.9764594650133958,
+                  0.4686512016477016
+                ]
+              ]
+            }
+          }
+        }
+      },
+      "warnings": [
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/X' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/layers' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/layers/counts' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/obs/__categories/cat' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/obs/__categories/str' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/obs/_index' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/obs/cat' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/obs/num' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/obs/str' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/obsm' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/obsm/X_pca' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/obsp' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/raw/X' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/raw/var/_index' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/raw/var/vnum' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/raw/varm' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/raw/varm/PCs' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/uns' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/uns/arr' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/uns/neighbors' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/uns/neighbors/params' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/uns/neighbors/params/n' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/uns/scalar' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/uns/str' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/var/_index' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/var/vnum' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/varm' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/varm/PCs' was written without encoding metadata."
+        }
+      ]
+    },
+    "0.7.8-dense.zarr": {
+      "status": "ok",
+      "values": {
+        "shape": [
+          6,
+          4
+        ],
+        "obs": {
+          "index": [
+            "o0",
+            "o1",
+            "o2",
+            "o3",
+            "o4",
+            "o5"
+          ],
+          "index_name": null,
+          "columns": {
+            "cat": {
+              "dtype": "category",
+              "values": [
+                "a",
+                "b",
+                "a",
+                "c",
+                "b",
+                "a"
+              ],
+              "categories": [
+                "a",
+                "b",
+                "c"
+              ],
+              "ordered": false
+            },
+            "num": {
+              "dtype": "float64",
+              "values": [
+                0.0,
+                1.0,
+                2.0,
+                3.0,
+                4.0,
+                5.0
+              ]
+            },
+            "str": {
+              "dtype": "category",
+              "values": [
+                "x",
+                "y",
+                "z",
+                "x",
+                "y",
+                "z"
+              ],
+              "categories": [
+                "x",
+                "y",
+                "z"
+              ],
+              "ordered": false
+            }
+          }
+        },
+        "var": {
+          "index": [
+            "v0",
+            "v1",
+            "v2",
+            "v3"
+          ],
+          "index_name": null,
+          "columns": {
+            "vnum": {
+              "dtype": "int64",
+              "values": [
+                0,
+                1,
+                2,
+                3
+              ]
+            }
+          }
+        },
+        "X": {
+          "type": "ndarray",
+          "dtype": "float32",
+          "shape": [
+            6,
+            4
+          ],
+          "values": [
+            [
+              2.0,
+              1.0,
+              1.0,
+              2.0
+            ],
+            [
+              2.0,
+              1.0,
+              0.0,
+              0.0
+            ],
+            [
+              5.0,
+              1.0,
+              1.0,
+              2.0
+            ],
+            [
+              0.0,
+              1.0,
+              1.0,
+              2.0
+            ],
+            [
+              2.0,
+              1.0,
+              0.0,
+              2.0
+            ],
+            [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ]
+          ]
+        },
+        "layers": {
+          "None": {
+            "type": "ndarray",
+            "dtype": "float32",
+            "shape": [
+              6,
+              4
+            ],
+            "values": [
+              [
+                2.0,
+                1.0,
+                1.0,
+                2.0
+              ],
+              [
+                2.0,
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                5.0,
+                1.0,
+                1.0,
+                2.0
+              ],
+              [
+                0.0,
+                1.0,
+                1.0,
+                2.0
+              ],
+              [
+                2.0,
+                1.0,
+                0.0,
+                2.0
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ]
+            ]
+          },
+          "counts": {
+            "type": "ndarray",
+            "dtype": "float32",
+            "shape": [
+              6,
+              4
+            ],
+            "values": [
+              [
+                2.0,
+                1.0,
+                1.0,
+                2.0
+              ],
+              [
+                2.0,
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                5.0,
+                1.0,
+                1.0,
+                2.0
+              ],
+              [
+                0.0,
+                1.0,
+                1.0,
+                2.0
+              ],
+              [
+                2.0,
+                1.0,
+                0.0,
+                2.0
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ]
+            ]
+          }
+        },
+        "obsm": {
+          "X_pca": {
+            "type": "ndarray",
+            "dtype": "float64",
+            "shape": [
+              6,
+              2
+            ],
+            "values": [
+              [
+                0.9883738380592262,
+                0.10204481074802807
+              ],
+              [
+                0.2088767560948347,
+                0.16130951788499626
+              ],
+              [
+                0.6531083254653984,
+                0.2532916025397821
+              ],
+              [
+                0.4663107728563063,
+                0.24442559200160274
+              ],
+              [
+                0.15896958364551972,
+                0.11037514116430513
+              ],
+              [
+                0.6563295894652734,
+                0.1381829513486138
+              ]
+            ]
+          }
+        },
+        "varm": {
+          "PCs": {
+            "type": "ndarray",
+            "dtype": "float64",
+            "shape": [
+              4,
+              2
+            ],
+            "values": [
+              [
+                0.1965823616800535,
+                0.3687251706609641
+              ],
+              [
+                0.8209932298479351,
+                0.09710127579306127
+              ],
+              [
+                0.8379449074988039,
+                0.09609840789396307
+              ],
+              [
+                0.9764594650133958,
+                0.4686512016477016
+              ]
+            ]
+          }
+        },
+        "obsp": {
+          "connectivities": {
+            "type": "csr_matrix",
+            "dtype": "float32",
+            "shape": [
+              6,
+              6
+            ],
+            "values": [
+              [
+                1.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                1.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ]
+            ]
+          },
+          "distances": {
+            "type": "csr_matrix",
+            "dtype": "float32",
+            "shape": [
+              6,
+              6
+            ],
+            "values": [
+              [
+                1.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                1.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ]
+            ]
+          }
+        },
+        "varp": {},
+        "uns": {
+          "arr": {
+            "type": "ndarray",
+            "dtype": "int64",
+            "shape": [
+              3
+            ],
+            "values": [
+              0,
+              1,
+              2
+            ]
+          },
+          "neighbors": {
+            "params": {
+              "n": {
+                "type": "int64",
+                "value": 3
+              }
+            }
+          },
+          "scalar": {
+            "type": "int64",
+            "value": 3
+          },
+          "str": {
+            "type": "str_",
+            "value": "hello"
+          }
+        },
+        "raw": {
+          "shape": [
+            6,
+            4
+          ],
+          "var": {
+            "index": [
+              "v0",
+              "v1",
+              "v2",
+              "v3"
+            ],
+            "index_name": null,
+            "columns": {
+              "vnum": {
+                "dtype": "int64",
+                "values": [
+                  0,
+                  1,
+                  2,
+                  3
+                ]
+              }
+            }
+          },
+          "X": {
+            "type": "ndarray",
+            "dtype": "float32",
+            "shape": [
+              6,
+              4
+            ],
+            "values": [
+              [
+                2.0,
+                1.0,
+                1.0,
+                2.0
+              ],
+              [
+                2.0,
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                5.0,
+                1.0,
+                1.0,
+                2.0
+              ],
+              [
+                0.0,
+                1.0,
+                1.0,
+                2.0
+              ],
+              [
+                2.0,
+                1.0,
+                0.0,
+                2.0
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ]
+            ]
+          },
+          "varm": {
+            "PCs": {
+              "type": "ndarray",
+              "dtype": "float64",
+              "shape": [
+                4,
+                2
+              ],
+              "values": [
+                [
+                  0.1965823616800535,
+                  0.3687251706609641
+                ],
+                [
+                  0.8209932298479351,
+                  0.09710127579306127
+                ],
+                [
+                  0.8379449074988039,
+                  0.09609840789396307
+                ],
+                [
+                  0.9764594650133958,
+                  0.4686512016477016
+                ]
+              ]
+            }
+          }
+        }
+      },
+      "warnings": [
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/X' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/layers' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/layers/counts' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/obs/__categories/cat' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/obs/__categories/str' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/obs/_index' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/obs/cat' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/obs/num' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/obs/str' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/obsm' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/obsm/X_pca' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/obsp' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/raw/X' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/raw/var/_index' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/raw/var/vnum' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/raw/varm' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/raw/varm/PCs' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/uns' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/uns/arr' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/uns/neighbors' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/uns/neighbors/params' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/uns/neighbors/params/n' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/uns/scalar' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/uns/str' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/var/_index' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/var/vnum' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/varm' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/varm/PCs' was written without encoding metadata."
+        }
+      ]
+    },
+    "0.7.8-sparse.h5ad": {
+      "status": "ok",
+      "values": {
+        "shape": [
+          6,
+          4
+        ],
+        "obs": {
+          "index": [
+            "o0",
+            "o1",
+            "o2",
+            "o3",
+            "o4",
+            "o5"
+          ],
+          "index_name": null,
+          "columns": {
+            "cat": {
+              "dtype": "category",
+              "values": [
+                "a",
+                "b",
+                "a",
+                "c",
+                "b",
+                "a"
+              ],
+              "categories": [
+                "a",
+                "b",
+                "c"
+              ],
+              "ordered": false
+            },
+            "num": {
+              "dtype": "float64",
+              "values": [
+                0.0,
+                1.0,
+                2.0,
+                3.0,
+                4.0,
+                5.0
+              ]
+            },
+            "str": {
+              "dtype": "category",
+              "values": [
+                "x",
+                "y",
+                "z",
+                "x",
+                "y",
+                "z"
+              ],
+              "categories": [
+                "x",
+                "y",
+                "z"
+              ],
+              "ordered": false
+            }
+          }
+        },
+        "var": {
+          "index": [
+            "v0",
+            "v1",
+            "v2",
+            "v3"
+          ],
+          "index_name": null,
+          "columns": {
+            "vnum": {
+              "dtype": "int64",
+              "values": [
+                0,
+                1,
+                2,
+                3
+              ]
+            }
+          }
+        },
+        "X": {
+          "type": "csr_matrix",
+          "dtype": "float32",
+          "shape": [
+            6,
+            4
+          ],
+          "values": [
+            [
+              2.0,
+              1.0,
+              1.0,
+              2.0
+            ],
+            [
+              2.0,
+              1.0,
+              0.0,
+              0.0
+            ],
+            [
+              5.0,
+              1.0,
+              1.0,
+              2.0
+            ],
+            [
+              0.0,
+              1.0,
+              1.0,
+              2.0
+            ],
+            [
+              2.0,
+              1.0,
+              0.0,
+              2.0
+            ],
+            [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ]
+          ]
+        },
+        "layers": {
+          "None": {
+            "type": "csr_matrix",
+            "dtype": "float32",
+            "shape": [
+              6,
+              4
+            ],
+            "values": [
+              [
+                2.0,
+                1.0,
+                1.0,
+                2.0
+              ],
+              [
+                2.0,
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                5.0,
+                1.0,
+                1.0,
+                2.0
+              ],
+              [
+                0.0,
+                1.0,
+                1.0,
+                2.0
+              ],
+              [
+                2.0,
+                1.0,
+                0.0,
+                2.0
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ]
+            ]
+          },
+          "counts": {
+            "type": "csr_matrix",
+            "dtype": "float32",
+            "shape": [
+              6,
+              4
+            ],
+            "values": [
+              [
+                2.0,
+                1.0,
+                1.0,
+                2.0
+              ],
+              [
+                2.0,
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                5.0,
+                1.0,
+                1.0,
+                2.0
+              ],
+              [
+                0.0,
+                1.0,
+                1.0,
+                2.0
+              ],
+              [
+                2.0,
+                1.0,
+                0.0,
+                2.0
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ]
+            ]
+          }
+        },
+        "obsm": {
+          "X_pca": {
+            "type": "ndarray",
+            "dtype": "float64",
+            "shape": [
+              6,
+              2
+            ],
+            "values": [
+              [
+                0.9883738380592262,
+                0.10204481074802807
+              ],
+              [
+                0.2088767560948347,
+                0.16130951788499626
+              ],
+              [
+                0.6531083254653984,
+                0.2532916025397821
+              ],
+              [
+                0.4663107728563063,
+                0.24442559200160274
+              ],
+              [
+                0.15896958364551972,
+                0.11037514116430513
+              ],
+              [
+                0.6563295894652734,
+                0.1381829513486138
+              ]
+            ]
+          }
+        },
+        "varm": {
+          "PCs": {
+            "type": "ndarray",
+            "dtype": "float64",
+            "shape": [
+              4,
+              2
+            ],
+            "values": [
+              [
+                0.1965823616800535,
+                0.3687251706609641
+              ],
+              [
+                0.8209932298479351,
+                0.09710127579306127
+              ],
+              [
+                0.8379449074988039,
+                0.09609840789396307
+              ],
+              [
+                0.9764594650133958,
+                0.4686512016477016
+              ]
+            ]
+          }
+        },
+        "obsp": {
+          "connectivities": {
+            "type": "csr_matrix",
+            "dtype": "float32",
+            "shape": [
+              6,
+              6
+            ],
+            "values": [
+              [
+                1.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                1.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ]
+            ]
+          },
+          "distances": {
+            "type": "csr_matrix",
+            "dtype": "float32",
+            "shape": [
+              6,
+              6
+            ],
+            "values": [
+              [
+                1.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                1.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ]
+            ]
+          }
+        },
+        "varp": {},
+        "uns": {
+          "arr": {
+            "type": "ndarray",
+            "dtype": "int64",
+            "shape": [
+              3
+            ],
+            "values": [
+              0,
+              1,
+              2
+            ]
+          },
+          "neighbors": {
+            "params": {
+              "n": {
+                "type": "int64",
+                "value": 3
+              }
+            }
+          },
+          "scalar": {
+            "type": "int64",
+            "value": 3
+          },
+          "str": {
+            "type": "str",
+            "value": "hello"
+          }
+        },
+        "raw": {
+          "shape": [
+            6,
+            4
+          ],
+          "var": {
+            "index": [
+              "v0",
+              "v1",
+              "v2",
+              "v3"
+            ],
+            "index_name": null,
+            "columns": {
+              "vnum": {
+                "dtype": "int64",
+                "values": [
+                  0,
+                  1,
+                  2,
+                  3
+                ]
+              }
+            }
+          },
+          "X": {
+            "type": "csr_matrix",
+            "dtype": "float32",
+            "shape": [
+              6,
+              4
+            ],
+            "values": [
+              [
+                2.0,
+                1.0,
+                1.0,
+                2.0
+              ],
+              [
+                2.0,
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                5.0,
+                1.0,
+                1.0,
+                2.0
+              ],
+              [
+                0.0,
+                1.0,
+                1.0,
+                2.0
+              ],
+              [
+                2.0,
+                1.0,
+                0.0,
+                2.0
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ]
+            ]
+          },
+          "varm": {
+            "PCs": {
+              "type": "ndarray",
+              "dtype": "float64",
+              "shape": [
+                4,
+                2
+              ],
+              "values": [
+                [
+                  0.1965823616800535,
+                  0.3687251706609641
+                ],
+                [
+                  0.8209932298479351,
+                  0.09710127579306127
+                ],
+                [
+                  0.8379449074988039,
+                  0.09609840789396307
+                ],
+                [
+                  0.9764594650133958,
+                  0.4686512016477016
+                ]
+              ]
+            }
+          }
+        }
+      },
+      "warnings": [
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/layers' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/obs/__categories/cat' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/obs/__categories/str' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/obs/_index' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/obs/cat' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/obs/num' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/obs/str' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/obsm' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/obsm/X_pca' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/obsp' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/raw/var/_index' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/raw/var/vnum' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/raw/varm' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/raw/varm/PCs' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/uns' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/uns/arr' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/uns/neighbors' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/uns/neighbors/params' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/uns/neighbors/params/n' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/uns/scalar' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/uns/str' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/var/_index' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/var/vnum' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/varm' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/varm/PCs' was written without encoding metadata."
+        }
+      ]
+    },
+    "0.7.8-sparse.zarr": {
+      "status": "ok",
+      "values": {
+        "shape": [
+          6,
+          4
+        ],
+        "obs": {
+          "index": [
+            "o0",
+            "o1",
+            "o2",
+            "o3",
+            "o4",
+            "o5"
+          ],
+          "index_name": null,
+          "columns": {
+            "cat": {
+              "dtype": "category",
+              "values": [
+                "a",
+                "b",
+                "a",
+                "c",
+                "b",
+                "a"
+              ],
+              "categories": [
+                "a",
+                "b",
+                "c"
+              ],
+              "ordered": false
+            },
+            "num": {
+              "dtype": "float64",
+              "values": [
+                0.0,
+                1.0,
+                2.0,
+                3.0,
+                4.0,
+                5.0
+              ]
+            },
+            "str": {
+              "dtype": "category",
+              "values": [
+                "x",
+                "y",
+                "z",
+                "x",
+                "y",
+                "z"
+              ],
+              "categories": [
+                "x",
+                "y",
+                "z"
+              ],
+              "ordered": false
+            }
+          }
+        },
+        "var": {
+          "index": [
+            "v0",
+            "v1",
+            "v2",
+            "v3"
+          ],
+          "index_name": null,
+          "columns": {
+            "vnum": {
+              "dtype": "int64",
+              "values": [
+                0,
+                1,
+                2,
+                3
+              ]
+            }
+          }
+        },
+        "X": {
+          "type": "csr_matrix",
+          "dtype": "float32",
+          "shape": [
+            6,
+            4
+          ],
+          "values": [
+            [
+              2.0,
+              1.0,
+              1.0,
+              2.0
+            ],
+            [
+              2.0,
+              1.0,
+              0.0,
+              0.0
+            ],
+            [
+              5.0,
+              1.0,
+              1.0,
+              2.0
+            ],
+            [
+              0.0,
+              1.0,
+              1.0,
+              2.0
+            ],
+            [
+              2.0,
+              1.0,
+              0.0,
+              2.0
+            ],
+            [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ]
+          ]
+        },
+        "layers": {
+          "None": {
+            "type": "csr_matrix",
+            "dtype": "float32",
+            "shape": [
+              6,
+              4
+            ],
+            "values": [
+              [
+                2.0,
+                1.0,
+                1.0,
+                2.0
+              ],
+              [
+                2.0,
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                5.0,
+                1.0,
+                1.0,
+                2.0
+              ],
+              [
+                0.0,
+                1.0,
+                1.0,
+                2.0
+              ],
+              [
+                2.0,
+                1.0,
+                0.0,
+                2.0
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ]
+            ]
+          },
+          "counts": {
+            "type": "csr_matrix",
+            "dtype": "float32",
+            "shape": [
+              6,
+              4
+            ],
+            "values": [
+              [
+                2.0,
+                1.0,
+                1.0,
+                2.0
+              ],
+              [
+                2.0,
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                5.0,
+                1.0,
+                1.0,
+                2.0
+              ],
+              [
+                0.0,
+                1.0,
+                1.0,
+                2.0
+              ],
+              [
+                2.0,
+                1.0,
+                0.0,
+                2.0
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ]
+            ]
+          }
+        },
+        "obsm": {
+          "X_pca": {
+            "type": "ndarray",
+            "dtype": "float64",
+            "shape": [
+              6,
+              2
+            ],
+            "values": [
+              [
+                0.9883738380592262,
+                0.10204481074802807
+              ],
+              [
+                0.2088767560948347,
+                0.16130951788499626
+              ],
+              [
+                0.6531083254653984,
+                0.2532916025397821
+              ],
+              [
+                0.4663107728563063,
+                0.24442559200160274
+              ],
+              [
+                0.15896958364551972,
+                0.11037514116430513
+              ],
+              [
+                0.6563295894652734,
+                0.1381829513486138
+              ]
+            ]
+          }
+        },
+        "varm": {
+          "PCs": {
+            "type": "ndarray",
+            "dtype": "float64",
+            "shape": [
+              4,
+              2
+            ],
+            "values": [
+              [
+                0.1965823616800535,
+                0.3687251706609641
+              ],
+              [
+                0.8209932298479351,
+                0.09710127579306127
+              ],
+              [
+                0.8379449074988039,
+                0.09609840789396307
+              ],
+              [
+                0.9764594650133958,
+                0.4686512016477016
+              ]
+            ]
+          }
+        },
+        "obsp": {
+          "connectivities": {
+            "type": "csr_matrix",
+            "dtype": "float32",
+            "shape": [
+              6,
+              6
+            ],
+            "values": [
+              [
+                1.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                1.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ]
+            ]
+          },
+          "distances": {
+            "type": "csr_matrix",
+            "dtype": "float32",
+            "shape": [
+              6,
+              6
+            ],
+            "values": [
+              [
+                1.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                1.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ]
+            ]
+          }
+        },
+        "varp": {},
+        "uns": {
+          "arr": {
+            "type": "ndarray",
+            "dtype": "int64",
+            "shape": [
+              3
+            ],
+            "values": [
+              0,
+              1,
+              2
+            ]
+          },
+          "neighbors": {
+            "params": {
+              "n": {
+                "type": "int64",
+                "value": 3
+              }
+            }
+          },
+          "scalar": {
+            "type": "int64",
+            "value": 3
+          },
+          "str": {
+            "type": "str_",
+            "value": "hello"
+          }
+        },
+        "raw": {
+          "shape": [
+            6,
+            4
+          ],
+          "var": {
+            "index": [
+              "v0",
+              "v1",
+              "v2",
+              "v3"
+            ],
+            "index_name": null,
+            "columns": {
+              "vnum": {
+                "dtype": "int64",
+                "values": [
+                  0,
+                  1,
+                  2,
+                  3
+                ]
+              }
+            }
+          },
+          "X": {
+            "type": "csr_matrix",
+            "dtype": "float32",
+            "shape": [
+              6,
+              4
+            ],
+            "values": [
+              [
+                2.0,
+                1.0,
+                1.0,
+                2.0
+              ],
+              [
+                2.0,
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                5.0,
+                1.0,
+                1.0,
+                2.0
+              ],
+              [
+                0.0,
+                1.0,
+                1.0,
+                2.0
+              ],
+              [
+                2.0,
+                1.0,
+                0.0,
+                2.0
+              ],
+              [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ]
+            ]
+          },
+          "varm": {
+            "PCs": {
+              "type": "ndarray",
+              "dtype": "float64",
+              "shape": [
+                4,
+                2
+              ],
+              "values": [
+                [
+                  0.1965823616800535,
+                  0.3687251706609641
+                ],
+                [
+                  0.8209932298479351,
+                  0.09710127579306127
+                ],
+                [
+                  0.8379449074988039,
+                  0.09609840789396307
+                ],
+                [
+                  0.9764594650133958,
+                  0.4686512016477016
+                ]
+              ]
+            }
+          }
+        }
+      },
+      "warnings": [
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/layers' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/obs/__categories/cat' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/obs/__categories/str' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/obs/_index' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/obs/cat' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/obs/num' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/obs/str' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/obsm' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/obsm/X_pca' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/obsp' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/raw/var/_index' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/raw/var/vnum' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/raw/varm' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/raw/varm/PCs' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/uns' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/uns/arr' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/uns/neighbors' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/uns/neighbors/params' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/uns/neighbors/params/n' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/uns/scalar' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/uns/str' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/var/_index' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/var/vnum' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/varm' was written without encoding metadata."
+        },
+        {
+          "category": "OldFormatWarning",
+          "message": "Element '/varm/PCs' was written without encoding metadata."
+        }
+      ]
+    }
+  },
+  "unsupported": [
+    {
+      "layout": "0.6.x zarr store",
+      "fixture": "0.6.22-dense.zarr",
+      "reason": "obs, var and raw.var are zarr arrays with the json2 object codec, which zarr 3 cannot open",
+      "behaviour": {
+        "status": "error",
+        "error": "ValueError",
+        "message": "No Zarr data type found that matches {'name': '|O', 'object_codec_id': 'json2'}"
+      }
+    },
+    {
+      "layout": "read_dataframe_legacy and raw.X/raw.var for zarr (zarr.py:152-235)",
+      "fixture": null,
+      "reason": "only written by 0.6.x zarr stores, which 0.13.4 cannot read, so there is no expectation",
+      "behaviour": null
+    },
+    {
+      "layout": "anything written by releases before 0.6 (0.5.x and earlier)",
+      "fixture": null,
+      "reason": "not installable (0.5.10 needs scipy 1.2)",
+      "behaviour": null
+    },
+    {
+      "layout": "multicolumn keys obs_keys_multicol, smp_keys_multicol, var_keys_multicol",
+      "fixture": null,
+      "reason": "no tried release wrote them (0.6.22 stores multicolumn arrays in obsm)",
+      "behaviour": null
+    },
+    {
+      "layout": "zarr groups with h5sparse_format attributes (read_basic_zarr)",
+      "fixture": null,
+      "reason": "no release writes h5sparse attributes to zarr",
+      "behaviour": null
+    },
+    {
+      "layout": "uns categories <col>_categories in zarr (_clean_uns after read_zarr)",
+      "fixture": null,
+      "reason": "only reachable with a zarr obs Array, which is a 0.6.22 zarr store",
+      "behaviour": null
+    }
+  ]
+}
