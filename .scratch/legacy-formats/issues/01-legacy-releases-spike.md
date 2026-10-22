@@ -1,6 +1,6 @@
 # Legacy releases spike
 
-Status: ready-for-agent
+Status: done
 Type: research
 Blocked by: none
 
@@ -19,3 +19,9 @@ Find out which old anndata releases can still be installed and which legacy layo
 - The full check (`scripts/check.sh --package` and `--tests`) passes
 
 ## Comments
+
+2026-10-23: Probed 0.5.10 (not installable), 0.6.22.post1, 0.7.0, 0.7.8, 0.8.0 and 0.10.9, all written as h5ad and zarr and read with 0.13.4.
+Findings and the fixture generator recommendation are in `.scratch/legacy-formats/releases-spike.md`.
+Key points: 0.6.22 is the only fully unencoded layout (compound `obs`/`var`, `*_categories` in `uns`, `raw.X`, h5sparse groups), 0.7.x gives dataframe 0.1.0 with `__categories`, 0.8.0 is already current, and 0.6.22 zarr stores cannot be read by 0.13.4 at all (zarr 3 has no object dtype).
+`scripts/check.sh --package` (0 errors, warnings and notes) and `--tests` (22778 passed) both pass, and the reviewer's findings (values, warnings, `_clean_up_old_format` and `raw.varm` gaps) were addressed in the doc.
+No environment definitions are committed (pins live in the recommended generator script).
