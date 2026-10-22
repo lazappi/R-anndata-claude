@@ -68,6 +68,17 @@
 #' When only some objects have `raw` it is dropped with a warning of class
 #' `anndata_missing_raw_warning`.
 #'
+#' @section Lazy inputs:
+#' When every object is read with [read_lazy()], `X`, `layers` and the `obsm`
+#' arrays stay lazy (`DelayedArray`) and their realised values equal the
+#' in-memory result.
+#' When some objects are lazy and others are not, the lazy ones are read into
+#' memory, as Python does.
+#' Two deviations from Python: `obs` and `var` of lazy objects are always read
+#' into memory (Python keeps them lazy, loses their categorical columns and
+#' fails on an outer join with string columns), and a lazy result has
+#' DelayedArray's R types, not the promoted On-disk dtype.
+#'
 #' @param adatas A list of `AnnData` objects.
 #'   A named list uses its names as `keys`.
 #' @param axis Which axis to concatenate along, `"obs"` or `"var"`.
@@ -175,7 +186,10 @@ concat <- function(
 
   call <- rlang::caller_env()
   annotation_of <- function(i) {
-    lapply(adatas, function(a) if (i == 1L) a$obs else a$var)
+    # Lazy frames are read into memory (Python keeps them lazy, see `concat()`)
+    lapply(adatas, function(a) {
+      realise_lazy_value(if (i == 1L) a$obs else a$var)
+    })
   }
   axis_frame <- concat_axis_annotation(
     annotation_of(axis_index),
@@ -205,7 +219,7 @@ concat <- function(
   axis_slots <- paste0(c("obs", "var")[c(axis_index, alt_index)], c("m", "m"))
   pair_slots <- paste0(c("obs", "var")[c(axis_index, alt_index)], c("p", "p"))
   axis_mapping <- concat_axis_mapping(
-    lapply(adatas, mapping_entries, slot = axis_slots[[1L]]),
+    lapply(adatas, mapping_entries, slot = axis_slots[[1L]], lazy = TRUE),
     ns,
     join,
     concat_names,
@@ -484,6 +498,22 @@ concat_arrays <- function(
   axis_index,
   fill_value
 ) {
+  # Python keeps the result lazy only when every input is lazy, otherwise it
+  # reads the lazy ones into memory
+  lazy <- vapply(els, is_delayed, logical(1))
+  if (any(lazy)) {
+    if (all(lazy | vapply(els, is.null, logical(1)))) {
+      return(concat_arrays_lazy(
+        els,
+        ns,
+        old_alt,
+        alt_names,
+        axis_index,
+        fill_value
+      ))
+    }
+    els <- lapply(els, realise_lazy_value)
+  }
   sparse <- any(vapply(
     els,
     function(el) !is.null(el) && is_sparse(el),
@@ -536,6 +566,60 @@ concat_arrays <- function(
   } else {
     stack_dense(pieces, dtype, axis_index)
   }
+}
+
+is_delayed <- function(x) {
+  methods::is(x, "DelayedArray")
+}
+
+# `concat_arrays()` for lazily read inputs: the pieces are reindexed and
+# stacked as DelayedArray operations, so nothing is read until the result is.
+# The result type is DelayedArray's (R types, not the On-disk dtype), and
+# a sparse result is whatever DelayedArray keeps sparse.
+concat_arrays_lazy <- function(
+  els,
+  ns,
+  old_alt,
+  alt_names,
+  axis_index,
+  fill_value
+) {
+  sparse <- any(vapply(
+    els,
+    function(el) !is.null(el) && DelayedArray::is_sparse(el),
+    logical(1)
+  ))
+  fill <- fill_value %||% if (sparse) 0 else NA_real_
+  n_alt <- length(alt_names)
+  constant <- function(n, m) {
+    DelayedArray::ConstantArray(c(n, m), value = fill)
+  }
+  pieces <- lapply(seq_along(els), function(k) {
+    el <- els[[k]]
+    if (is.null(el)) {
+      return(constant(ns[[k]], n_alt))
+    }
+    dimnames(el) <- NULL
+    oriented <- if (axis_index == 2L) t(el) else el
+    old <- old_alt[[k]]
+    if (identical(old, alt_names)) {
+      return(oriented)
+    }
+    positions <- reindex_positions(old, alt_names)
+    present <- which(!is.na(positions))
+    absent <- which(is.na(positions))
+    if (length(present) == 0L) {
+      return(constant(ns[[k]], n_alt))
+    }
+    taken <- oriented[, positions[present], drop = FALSE]
+    if (length(absent) == 0L) {
+      return(taken)
+    }
+    joined <- cbind(taken, constant(ns[[k]], length(absent)))
+    joined[, order(c(present, absent)), drop = FALSE]
+  })
+  stacked <- do.call(S4Arrays::arbind, pieces)
+  if (axis_index == 2L) t(stacked) else stacked
 }
 
 # The fill for an object without the array (numpy broadcasts the fill value,

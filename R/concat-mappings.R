@@ -2,14 +2,19 @@
 # Python anndata)
 
 # The entries of an aligned mapping slot (`"obsm"`, ...) as a named list
-mapping_entries <- function(adata, slot) {
-  as.list(switch(
+mapping_entries <- function(adata, slot, lazy = FALSE) {
+  entries <- as.list(switch(
     slot,
     obsm = adata$obsm,
     varm = adata$varm,
     obsp = adata$obsp,
     varp = adata$varp
   ))
+  # Lazy frames are always read, lazy arrays only where `concat_arrays()` can
+  # keep them lazy
+  lapply(entries, function(el) {
+    if (lazy && is_delayed(el)) el else realise_lazy_value(el)
+  })
 }
 
 is_frame_element <- function(x) {
@@ -229,9 +234,9 @@ concat_raw <- function(
   }
   parts <- lapply(adatas, function(a) {
     AnnData(
-      X = backed_in_memory(a$raw$X),
+      X = realise_lazy_value(a$raw$X),
       obs = frame_from_columns(list(), a$obs_names),
-      var = a$raw$var,
+      var = realise_lazy_value(a$raw$var),
       varm = as.list(a$raw$varm)
     )
   })

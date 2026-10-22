@@ -127,6 +127,19 @@ When only some objects have \code{raw} it is dropped with a warning of class
 \code{anndata_missing_raw_warning}.
 }
 
+\section{Lazy inputs}{
+
+When every object is read with \code{\link[=read_lazy]{read_lazy()}}, \code{X}, \code{layers} and the \code{obsm}
+arrays stay lazy (\code{DelayedArray}) and their realised values equal the
+in-memory result.
+When some objects are lazy and others are not, the lazy ones are read into
+memory, as Python does.
+Two deviations from Python: \code{obs} and \code{var} of lazy objects are always read
+into memory (Python keeps them lazy, loses their categorical columns and
+fails on an outer join with string columns), and a lazy result has
+DelayedArray's R types, not the promoted On-disk dtype.
+}
+
 \examples{
 a <- AnnData(data.frame(x = c(1, 1), y = c(1, 1), row.names = c("a", "b")))
 b <- AnnData(data.frame(y = c(2, 2), z = c(2, 2), row.names = c("c", "d")))
