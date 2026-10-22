@@ -369,7 +369,8 @@ layer_keys <- function(adatas, join) {
 layer_array <- function(adata, key) {
   layers <- as.list(adata$layers)
   position <- match(key, names(layers))
-  if (is.na(position)) NULL else layers[[position]]
+  # Python reads a backed X into memory to concatenate it
+  if (is.na(position)) NULL else backed_in_memory(layers[[position]])
 }
 
 # numpy's result type for two dtypes

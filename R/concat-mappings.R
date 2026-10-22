@@ -229,7 +229,7 @@ concat_raw <- function(
   }
   parts <- lapply(adatas, function(a) {
     AnnData(
-      X = a$raw$X,
+      X = backed_in_memory(a$raw$X),
       obs = frame_from_columns(list(), a$obs_names),
       var = a$raw$var,
       varm = as.list(a$raw$varm)
