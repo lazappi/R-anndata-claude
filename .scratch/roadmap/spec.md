@@ -46,13 +46,13 @@ A stub spec must be grilled into a full spec before tickets are written for it.
 | 2 | `core-object` | done (MVP) | `AnnData` R6 class and in-memory behaviour | foundations |
 | 3 | `h5ad-io` | done (MVP) | Element registry and h5ad read/write for all current encodings except awkward-array | foundations, core-object |
 | 4 | `views` | done (0.0.2) | Lazy views with copy-on-write | core-object |
-| 5 | `concat` | stub | `concat()` | core-object, views |
+| 5 | `concat` | full | `concat()` | core-object, views |
 | 6 | `zarr-io` | done (0.0.2) | `read_zarr()` / `write_zarr()` for zarr v2 and v3 | h5ad-io |
-| 7 | `backed` | full | Backed mode for h5ad | h5ad-io, views |
-| 8 | `lazy` | full | Lazy arrays and lazy reading | h5ad-io, backed |
+| 7 | `backed` | done | Backed mode for h5ad | h5ad-io, views |
+| 8 | `lazy` | full (docs left) | Lazy arrays and lazy reading | h5ad-io, backed |
 | 9 | `legacy-formats` | stub | Reading files from before the current encodings | h5ad-io |
 | 10 | `other-formats` | stub | csv, mtx, text, excel, loom, umi_tools, hdf readers and writers | core-object |
-| 11 | `experimental` | stub | `concat_on_disk`, `AnnCollection`, awkward arrays, `acc` accessors, extension namespaces | most of the above |
+| 11 | `experimental` | stub, low priority (experimental in Python, little effort) | `concat_on_disk`, `AnnCollection`, awkward arrays, `acc` accessors, extension namespaces | most of the above |
 
 The MVP is sub-projects 1 to 3, released as 0.0.1.
 Next: `zarr-io`, then `views`, `backed` and `lazy`, then the rest (h5ad-io/15, full rec-array fidelity, after `lazy`).
