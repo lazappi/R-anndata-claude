@@ -124,6 +124,8 @@ The human owns the order of the Queue.
 - [x] concat/05: concat: Views and backed inputs (`.scratch/concat/issues/05-concat-views-backed.md`)
 - [x] concat/06: concat: lazy inputs (`.scratch/concat/issues/06-concat-lazy.md`)
 - [x] concat/07: concatenation documentation (`.scratch/concat/issues/07-concat-docs.md`)
+- [ ] legacy-formats/01: legacy releases spike (`.scratch/legacy-formats/issues/01-legacy-releases-spike.md`)
+- [ ] 🛑 Checkpoint (orchestrator): read `.scratch/legacy-formats/releases-spike.md`, finish the legacy-formats spec and write its tickets (ask the human only if there is no clear choice)
 
 ## Discovered
 
