@@ -125,7 +125,7 @@ The human owns the order of the Queue.
 - [x] concat/06: concat: lazy inputs (`.scratch/concat/issues/06-concat-lazy.md`)
 - [x] concat/07: concatenation documentation (`.scratch/concat/issues/07-concat-docs.md`)
 - [x] legacy-formats/01: legacy releases spike (`.scratch/legacy-formats/issues/01-legacy-releases-spike.md`)
-- [ ] 🛑 Checkpoint (orchestrator): read `.scratch/legacy-formats/releases-spike.md`, finish the legacy-formats spec and write its tickets (ask the human only if there is no clear choice)
+- [x] 🛑 Checkpoint (orchestrator): read `.scratch/legacy-formats/releases-spike.md`, finish the legacy-formats spec and write its tickets (ask the human only if there is no clear choice) (5 tickets 02-06, all `needs-triage`, awaiting human triage)
 
 ## Discovered
 
@@ -172,6 +172,9 @@ The human owns the order of the Queue.
 ## Blocked
 
 ## Follow-up
+
+- legacy-formats/02 to 06 (`.scratch/legacy-formats/issues/`): written from the releases spike, need triage and queueing.
+  The loop may not edit specs, so `.scratch/legacy-formats/spec.md` still lists its open question as open: the human should replace it with the spike's findings (releases 0.6.22, 0.7.8, 0.10.9, unsupported zarr-only paths in `releases-spike.md`)
 
 Tickets that need triage before they can be queued.
 
