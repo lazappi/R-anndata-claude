@@ -73,20 +73,57 @@ table_frame <- function(desc) {
   )
 }
 
-# The input objects of a table row: X, layers, obs, var and uns (the aligned
-# mappings and raw come with ticket 04)
+# The elements of an aligned mapping from their table descriptions
+table_mapping <- function(desc) {
+  lapply(desc, function(d) {
+    if (identical(d$kind, "dataframe")) table_frame(d) else table_array(d)
+  })
+}
+
+# The input objects of a table row: X, layers, obs, var, uns, the aligned
+# mappings and raw
 table_anndata <- function(desc) {
   layers <- desc$layers[names(desc$layers) != "None"]
   layers <- lapply(layers, table_array)
   x <- if (!is.null(desc$X)) table_array(desc$X)
+  raw <- if (!is.null(desc$raw)) {
+    list(
+      X = table_array(desc$raw$X),
+      var = table_frame(desc$raw$var),
+      varm = table_mapping(desc$raw$varm)
+    )
+  }
   AnnData(
     X = x,
     obs = table_frame(desc$obs),
     var = table_frame(desc$var),
     uns = desc$uns,
+    obsm = table_mapping(desc$obsm),
+    varm = table_mapping(desc$varm),
+    obsp = table_mapping(desc$obsp),
+    varp = table_mapping(desc$varp),
     layers = if (length(layers)) layers,
+    raw = raw,
     shape = if (is.null(x)) unlist(desc$shape)
   )
+}
+
+# What Python gave for an aligned mapping: keys and each element
+expect_matches_table_mapping <- function(actual, expected, info) {
+  actual <- as.list(actual)
+  expect_setequal(
+    names(actual) %||% character(),
+    names(expected) %||% character()
+  )
+  for (key in names(expected)) {
+    element <- expected[[key]]
+    label <- paste(info, key)
+    if (identical(element$kind, "dataframe")) {
+      expect_matches_table_frame(actual[[key]], element, label)
+    } else {
+      expect_matches_table_array(actual[[key]], element, label)
+    }
+  }
 }
 
 # What Python gave for an annotation frame: index, column order, dtypes (as

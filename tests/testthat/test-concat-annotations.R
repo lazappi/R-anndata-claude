@@ -250,6 +250,10 @@ test_that("concat passes reindexed frames to a custom merge function", {
     list(a, b),
     join = "outer",
     merge = function(values) {
+      # Python also calls the function for the varm mappings
+      if (!methods::is(values[[1L]], "DataFrame")) {
+        return(list())
+      }
       seen <<- values
       list(g = values[[2L]][["g"]])
     }

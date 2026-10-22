@@ -48,9 +48,25 @@
 #' annotation data frames (or of `uns` lists) and returns a data frame or named
 #' list (or a list).
 #'
-#' @section Not yet supported:
-#' The aligned mappings `obsm`, `varm`, `obsp` and `varp`, `pairwise` and `raw`
-#' of the result are not combined yet.
+#' @section Aligned mappings:
+#' The mapping of the concatenated axis (`obsm` for `axis = "obs"`) is
+#' concatenated for the keys every object has (inner join) or all keys (outer
+#' join).
+#' Arrays of different widths are cut to the narrowest on an inner join and
+#' padded to the widest with `fill_value` on an outer join, and data frames are
+#' combined on their columns.
+#' The mapping of the other axis (`varm`) is reindexed to the result's names and
+#' selected with `merge`, so it is empty by default.
+#' With `pairwise = TRUE` the pairwise mapping of the concatenated axis (`obsp`)
+#' is combined as a block diagonal CSR matrix, and otherwise it is empty.
+#' The pairwise mapping of the other axis (`varp`) follows `merge`.
+#'
+#' @section Raw:
+#' When every object has `raw` its `X`, `var` and `varm` are concatenated with
+#' the same `axis`, `join` and other arguments, and the `var` columns and `varm`
+#' entries follow the rules for the other axis above.
+#' When only some objects have `raw` it is dropped with a warning of class
+#' `anndata_missing_raw_warning`.
 #'
 #' @param adatas A list of `AnnData` objects.
 #'   A named list uses its names as `keys`.
@@ -67,6 +83,8 @@
 #'   `"{name}{index_unique}{key}"`, or `NULL` to keep the names.
 #' @param fill_value The value for entries an outer join introduces, see the
 #'   Arrays section.
+#' @param pairwise Whether to combine the pairwise mapping of the concatenated
+#'   axis, see the Aligned mappings section.
 #'
 #' @return An `AnnData`.
 #'
@@ -86,12 +104,21 @@ concat <- function(
   label = NULL,
   keys = NULL,
   index_unique = NULL,
-  fill_value = NULL
+  fill_value = NULL,
+  pairwise = FALSE
 ) {
   join_given <- !missing(join)
   axis <- check_concat_choice(axis, c("obs", "var"), "axis")
   join <- check_concat_choice(join, c("inner", "outer"), "join")
+  if (!rlang::is_bool(pairwise)) {
+    anndata_abort(
+      "{.arg pairwise} must be {.code TRUE} or {.code FALSE}.",
+      "anndata_invalid_argument_error"
+    )
+  }
   merge_fn <- resolve_merge_strategy(merge, "merge", same_type = TRUE)
+  # Arrays are equal whatever their dtype, only data frame columns compare it
+  mapping_merge_fn <- resolve_merge_strategy(merge, "merge")
   uns_merge_fn <- resolve_merge_strategy(uns_merge, "uns_merge")
   list_names <- concat_list_names(adatas)
   adatas <- as_concat_inputs(adatas)
@@ -174,12 +201,63 @@ concat <- function(
   shape <- if (is.null(x)) {
     c(nrow(frames$obs), nrow(frames$var))
   }
+
+  axis_slots <- paste0(c("obs", "var")[c(axis_index, alt_index)], c("m", "m"))
+  pair_slots <- paste0(c("obs", "var")[c(axis_index, alt_index)], c("p", "p"))
+  axis_mapping <- concat_axis_mapping(
+    lapply(adatas, mapping_entries, slot = axis_slots[[1L]]),
+    ns,
+    join,
+    concat_names,
+    fill_value,
+    call
+  )
+  axis_pairwise <- if (pairwise) {
+    concat_pairwise_mapping(
+      lapply(adatas, mapping_entries, slot = pair_slots[[1L]]),
+      ns,
+      join
+    )
+  }
+  alt_mapping <- merge_alt_mapping(
+    adatas,
+    axis_slots[[2L]],
+    old_alt,
+    alt_names,
+    mapping_merge_fn,
+    FALSE
+  )
+  alt_pairwise <- merge_alt_mapping(
+    adatas,
+    pair_slots[[2L]],
+    old_alt,
+    alt_names,
+    mapping_merge_fn,
+    TRUE
+  )
+  uns <- uns_merge_fn(lapply(adatas, function(a) a$uns))
+  raw <- concat_raw(adatas, axis, join, label, keys, index_unique, fill_value)
+
+  slots <- list(
+    obsm = axis_mapping,
+    varm = alt_mapping,
+    obsp = axis_pairwise,
+    varp = alt_pairwise
+  )
+  if (axis_index == 2L) {
+    names(slots) <- c("varm", "obsm", "varp", "obsp")
+  }
   AnnData(
     X = x,
     obs = frames$obs,
     var = frames$var,
-    uns = uns_merge_fn(lapply(adatas, function(a) a$uns)),
+    uns = uns,
+    obsm = slots$obsm,
+    varm = slots$varm,
+    obsp = slots$obsp,
+    varp = slots$varp,
     layers = if (length(arrays)) arrays,
+    raw = raw,
     shape = shape
   )
 }
@@ -568,14 +646,20 @@ stack_sparse <- function(pieces, dtype, n_alt, axis_index) {
     triplets[c("i", "j")] <- triplets[c("j", "i")]
     dims <- rev(dims)
   }
-  data <- if (dtype == "bool") as.logical(triplets$x) else triplets$x
+  sparse_from_triplets(triplets$i, triplets$j, triplets$x, dims, dtype, "R")
+}
+
+# A sparse matrix (`repr` "R" is CSR) from zero-based triplets, with `dtype` as
+# the dtype of its data
+sparse_from_triplets <- function(i, j, x, dims, dtype, repr) {
+  data <- if (dtype == "bool") as.logical(x) else x
   matrix <- Matrix::sparseMatrix(
-    i = as.integer(triplets$i %||% integer()),
-    j = as.integer(triplets$j %||% integer()),
+    i = as.integer(i %||% integer()),
+    j = as.integer(j %||% integer()),
     x = data %||% (if (dtype == "bool") logical() else double()),
     dims = dims,
     index1 = FALSE,
-    repr = "R"
+    repr = repr
   )
   if (dtype %in% c("bool", "float64")) {
     matrix

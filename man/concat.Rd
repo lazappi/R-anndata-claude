@@ -13,7 +13,8 @@ concat(
   label = NULL,
   keys = NULL,
   index_unique = NULL,
-  fill_value = NULL
+  fill_value = NULL,
+  pairwise = FALSE
 )
 }
 \arguments{
@@ -40,6 +41,9 @@ Merge strategies section.}
 
 \item{fill_value}{The value for entries an outer join introduces, see the
 Arrays section.}
+
+\item{pairwise}{Whether to combine the pairwise mapping of the concatenated
+axis, see the Aligned mappings section.}
 }
 \value{
 An \code{AnnData}.
@@ -99,10 +103,28 @@ annotation data frames (or of \code{uns} lists) and returns a data frame or name
 list (or a list).
 }
 
-\section{Not yet supported}{
+\section{Aligned mappings}{
 
-The aligned mappings \code{obsm}, \code{varm}, \code{obsp} and \code{varp}, \code{pairwise} and \code{raw}
-of the result are not combined yet.
+The mapping of the concatenated axis (\code{obsm} for \code{axis = "obs"}) is
+concatenated for the keys every object has (inner join) or all keys (outer
+join).
+Arrays of different widths are cut to the narrowest on an inner join and
+padded to the widest with \code{fill_value} on an outer join, and data frames are
+combined on their columns.
+The mapping of the other axis (\code{varm}) is reindexed to the result's names and
+selected with \code{merge}, so it is empty by default.
+With \code{pairwise = TRUE} the pairwise mapping of the concatenated axis (\code{obsp})
+is combined as a block diagonal CSR matrix, and otherwise it is empty.
+The pairwise mapping of the other axis (\code{varp}) follows \code{merge}.
+}
+
+\section{Raw}{
+
+When every object has \code{raw} its \code{X}, \code{var} and \code{varm} are concatenated with
+the same \code{axis}, \code{join} and other arguments, and the \code{var} columns and \code{varm}
+entries follow the rules for the other axis above.
+When only some objects have \code{raw} it is dropped with a warning of class
+\code{anndata_missing_raw_warning}.
 }
 
 \examples{
