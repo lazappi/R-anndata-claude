@@ -425,6 +425,11 @@ sparse_dataset <- function(group, ..., should_cache_indptr = TRUE) {
   }
   path <- node_path(group)
   encoding <- read_elem_attr(group, "encoding-type")
+  legacy <- has_h5sparse_attrs(group)
+  if (legacy) {
+    # Python's `get_format` and `get_shape` fall back to the h5sparse attributes
+    encoding <- h5sparse_encoding(group)
+  }
   if (!encoding %in% c("csr_matrix", "csc_matrix")) {
     abort_invalid_argument(
       "{.arg group} must be a {.val csr_matrix} or {.val csc_matrix} Element,
@@ -432,7 +437,11 @@ sparse_dataset <- function(group, ..., should_cache_indptr = TRUE) {
       call
     )
   }
-  shape <- read_shape_attr(group, path, call)
+  shape <- if (legacy) {
+    read_h5sparse_shape(group, path, call)
+  } else {
+    read_shape_attr(group, path, call)
+  }
   new_backed_x(
     list(handle = function() group),
     path,

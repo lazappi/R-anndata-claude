@@ -376,11 +376,33 @@ test_that("sparse_dataset gives a handle like Python's", {
   }
 })
 
-# Why: the legacy_attributes row (h5sparse attributes) is deferred to the
-# legacy-formats sub-project (human decision, backed/04). The test keeps the row
-# in the table, so the sub-project that adds legacy reading must pass it
-test_that("the legacy_attributes row is deferred to legacy-formats", {
-  expect_true("legacy_attributes" %in% names(backed_cases()$sparse_dataset))
+# Why: the legacy_attributes row, a group with h5sparse attributes and no
+# encoding, gives a handle that reads like Python's (legacy-formats/03)
+test_that("sparse_dataset reads a group with h5sparse attributes", {
+  row <- backed_cases()$sparse_dataset$legacy_attributes
+  store <- local_h5_store()
+  m <- methods::as(
+    methods::as(
+      matrix(as.numeric(1:12), nrow = 4, byrow = TRUE),
+      "CsparseMatrix"
+    ),
+    "RsparseMatrix"
+  )
+  group <- rhdf5::H5Gcreate(store, "X")
+  set_elem_attr(group, "h5sparse_format", "csr")
+  attr_write(group, "h5sparse_shape", c(4L, 3L), scalar = FALSE)
+  write_dataset(group, "data", set_dtype(m@x, "float32"))
+  write_dataset(group, "indices", set_dtype(m@j, "int32"))
+  write_dataset(group, "indptr", set_dtype(m@p, "int32"))
+
+  handle <- sparse_dataset(group)
+  expect_equal(handle$format, "csr")
+  expect_equal(dim(handle), c(4L, 3L))
+  expect_equal(
+    unname(as.matrix(drop_dtype(handle[]))),
+    table_matrix(row$value)
+  )
+  rhdf5::H5Gclose(group)
 })
 
 # Python's handle has no setter for shape and group (rows set_shape and

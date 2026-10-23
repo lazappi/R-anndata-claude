@@ -183,16 +183,16 @@ test_that("reading an unknown type or version raises a registry error", {
   expect_match(conditionMessage(cnd), "7.0.0", fixed = TRUE)
 })
 
-# Legacy layouts are out of scope (legacy-formats), so reading them must fail
-# with a classed error naming the path rather than a registry error
+# Legacy dataframes are not read yet (legacy-formats/04), so reading one must
+# fail with a classed error naming the path rather than a registry error
+# (unencoded Elements are read, see test-io-legacy.R)
 test_that("reading legacy elements raises a not-supported error", {
   local_io_registry()
   register_test_encoding()
   store <- local_h5_store()
-  make_encoded_group(store, "unencoded")
   make_encoded_group(store, "old_dataframe", "dataframe", "0.1.0")
 
-  for (name in c("unencoded", "old_dataframe")) {
+  for (name in c("old_dataframe")) {
     cnd <- expect_anndata_condition(
       read_elem(store, name),
       "anndata_legacy_format_error"

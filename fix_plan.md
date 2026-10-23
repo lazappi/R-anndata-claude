@@ -127,7 +127,7 @@ The human owns the order of the Queue.
 - [x] legacy-formats/01: legacy releases spike (`.scratch/legacy-formats/issues/01-legacy-releases-spike.md`)
 - [x] 🛑 Checkpoint (orchestrator): read `.scratch/legacy-formats/releases-spike.md`, finish the legacy-formats spec and write its tickets (ask the human only if there is no clear choice) (5 tickets 02-06, all `needs-triage`, awaiting human triage)
 - [x] legacy-formats/02: fixture generator and expectation table (`.scratch/legacy-formats/issues/02-legacy-fixtures.md`)
-- [ ] legacy-formats/03: unencoded Elements and h5sparse groups (`.scratch/legacy-formats/issues/03-unencoded-elements.md`)
+- [x] legacy-formats/03: unencoded Elements and h5sparse groups (`.scratch/legacy-formats/issues/03-unencoded-elements.md`), whole-fixture comparison moved to Discovered
 - [ ] legacy-formats/04: legacy dataframes and categories in uns (`.scratch/legacy-formats/issues/04-legacy-dataframes.md`)
 - [ ] legacy-formats/05: raw.X, raw.var and the neighbors move (`.scratch/legacy-formats/issues/05-legacy-raw-neighbors.md`)
 - [ ] legacy-formats/06: backed, lazy and real-world files (`.scratch/legacy-formats/issues/06-legacy-backed-lazy-real-world.md`)
@@ -174,6 +174,7 @@ The human owns the order of the Queue.
   The writer builds the enum in `R/io-values.R:78-82`, so check what rhdf5 2.57.20 does with enum attributes (`attr_write()` in the store layer), fix it so Python sees a bool, and look for other bool attributes and datasets hit the same way.
   `scripts/check.sh --tests` stopped at the failure limit, so other regressions may hide behind it: rerun the whole suite with `testthat::set_max_fails(Inf)` once this is fixed.
 
+- [ ] legacy-formats/03 leftover: after tickets 04 and 05, read the whole 0.6.22 and 0.7.8 fixtures (h5ad and zarr) to the `legacy_cases.json` values and warnings, then set ticket 03 to `done` and bump the version
 ## Blocked
 
 ## Follow-up

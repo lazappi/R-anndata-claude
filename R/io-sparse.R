@@ -111,6 +111,11 @@ read_sparse_elem <- function(elem, path, store) {
   call <- rlang::caller_env()
   csr <- identical(read_elem_attr(elem, "encoding-type"), "csr_matrix")
   shape <- read_shape_attr(elem, path, call)
+  read_sparse_parts(csr, shape, path, store, call)
+}
+
+# Reads `data`, `indices` and `indptr` below `path` as a matrix of `shape`
+read_sparse_parts <- function(csr, shape, path, store, call) {
   if (length(shape) != 2L) {
     abort_io_registry(
       "Cannot read {.path {path}}, its {.field shape} must have length 2.",

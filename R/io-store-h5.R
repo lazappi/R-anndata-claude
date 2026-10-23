@@ -22,6 +22,9 @@ h5_backend <- function() {
     node_close = rhdf5::H5Oclose,
     group_create = rhdf5::H5Gcreate,
     group_root = function(store) rhdf5::H5Gopen(store, "/"),
+    is_group = function(node) {
+      rhdf5::H5Iget_type(node) %in% c("H5I_GROUP", "H5I_FILE")
+    },
     group_members = function(node) rhdf5::h5ls(node, recursive = FALSE)$name,
     member_exists = rhdf5::H5Lexists,
     member_delete = rhdf5::H5Ldelete,

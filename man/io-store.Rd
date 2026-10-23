@@ -8,6 +8,7 @@
 \alias{node_open}
 \alias{node_close}
 \alias{group_create}
+\alias{is_group}
 \alias{group_members}
 \alias{member_exists}
 \alias{member_delete}
@@ -33,6 +34,8 @@ node_open(store, path)
 node_close(node)
 
 group_create(store, key)
+
+is_group(node)
 
 group_members(node)
 

@@ -30,6 +30,9 @@ zarr_backend <- function() {
     node_close = function(node) invisible(NULL),
     group_create = zarr_group_create,
     group_root = function(store) zarr_node(store$root, "/", store$version),
+    is_group = function(node) {
+      identical(zarr_meta(zarr_dir(node), node$version)$kind, "group")
+    },
     group_members = zarr_group_members,
     member_exists = zarr_member_exists,
     member_delete = zarr_member_delete,

@@ -125,7 +125,15 @@ read_elem_object <- function(elem, store, call = rlang::caller_env()) {
   version <- read_elem_attr(elem, "encoding-version")
 
   if (type == "" && version == "") {
-    abort_legacy(path, "an unencoded Element", call = call)
+    if (identical(path, "/")) {
+      # An unencoded root is an AnnData without a warning, as in `read_h5ad()`,
+      # but without `obs` there is nothing to read
+      if (!"obs" %in% group_members(elem)) {
+        abort_legacy(path, "an unencoded Element", call = call)
+      }
+      return(read_anndata_elem(elem, path, store))
+    }
+    return(read_unencoded_elem(elem, path, store, call))
   }
   if (type == "dataframe" && version == "0.1.0") {
     abort_legacy(path, "a dataframe of version 0.1.0", call = call)

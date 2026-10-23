@@ -1,10 +1,3 @@
-legacy_table <- function() {
-  jsonlite::fromJSON(
-    fixture_path("legacy_cases.json"),
-    simplifyVector = FALSE
-  )
-}
-
 # Guards the committed expectations (and the generator of the fixtures) against
 # drifting from what Python 0.13.4 reads
 test_that("the committed legacy expectations match Python", {

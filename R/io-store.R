@@ -81,6 +81,9 @@ group_create <- function(store, key) {
 group_root <- function(store) store_backend(store)$group_root(store)
 
 #' @rdname io-store
+is_group <- function(node) store_backend(node)$is_group(node)
+
+#' @rdname io-store
 group_members <- function(node) store_backend(node)$group_members(node)
 
 #' @rdname io-store
