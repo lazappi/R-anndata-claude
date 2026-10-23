@@ -8,9 +8,8 @@
 #' as a CSR or CSC matrix.
 #' A compound dataset with array-valued fields (old `obsm` and `varm`) is read
 #' as a list of matrices, one per field.
-#' rhdf5 cannot see the type of a compound member, so float32 fields of a
-#' compound `obs`, `var` or `uns` dataset read as float64, and a matrix field is
-#' only recorded as float32 when the size of the compound fixes the widths.
+#' The member types of a compound dataset come from the compiled helper (ADR
+#' 0008), so numeric fields keep their on-disk dtype records (such as float32).
 #' Writing always uses the current encodings.
 #'
 #' Legacy files also read with `read_h5ad(backed = )` (an unencoded dense `X`
@@ -64,10 +63,15 @@ read_dataframe_legacy <- function(store, path, call) {
     path = path,
     call = call
   )
-  fields <- lapply(table_read(store, path, call), rec_array_read_field)
-  for (name in intersect(table_int64_fields(store, path), names(fields))) {
-    fields[[name]] <- set_dtype(fields[[name]], "int64")
-  }
+  # The records give every numeric field its on-disk dtype (int64 and float32
+  # included), string records are not kept in dataframe columns
+  fields <- lapply(
+    table_read(store, path, call, records = TRUE),
+    function(field) {
+      field <- rec_array_read_field(field)
+      if (is.character(field)) drop_dtype(field) else field
+    }
+  )
   frame_from_parts(
     fields[-1L],
     plain_string(fields[[1L]]),
@@ -186,21 +190,6 @@ anndata_warn_unencoded <- function(path, call) {
   )
 }
 
-# The float widths (4 or 8 bytes) of the fields of a compound dataset that add
-# up to its size, since rhdf5 cannot tell the type of a member. Gives `NULL`
-# (all float64) when the widths are not determined by the size.
-compound_float_widths <- function(store, path, counts) {
-  if (length(counts) > 12L) {
-    return(NULL)
-  }
-  dset <- rhdf5::H5Dopen(store, path)
-  on.exit(rhdf5::H5Dclose(dset), add = TRUE)
-  size <- rhdf5::H5Tget_size(rhdf5::H5Dget_type(dset))
-  grid <- as.matrix(expand.grid(rep(list(c(4L, 8L)), length(counts))))
-  fits <- as.vector(grid %*% counts) == size
-  if (sum(fits) == 1L) grid[fits, ] else NULL
-}
-
 # Python's `read_dataset` for a compound dataset without encoding metadata:
 # a structured array. Fields with array values (the layout of old `obsm` and
 # `varm`) come out as matrices and the others as a rec-array
@@ -223,18 +212,22 @@ read_unencoded_compound <- function(store, path, call) {
   if (!any(vapply(fields, function(x) length(dim(x)) == 2L, logical(1)))) {
     return(read_rec_array_elem(NULL, path, store))
   }
-  counts <- vapply(
-    fields,
-    function(x) if (length(dim(x)) == 2L) dim(x)[[1L]] else 1L,
-    integer(1)
-  )
-  widths <- compound_float_widths(store, path, counts)
+  where <- h5_table_location(store, path)
+  rhdf5::H5Fflush(store)
+  members <- compound_members(where$file, where$dataset)
   for (i in seq_along(fields)) {
     if (length(dim(fields[[i]])) == 2L) {
       fields[[i]] <- t(fields[[i]])
-      if (!is.null(widths) && widths[[i]] == 4L) {
-        fields[[i]] <- set_dtype(fields[[i]], "float32")
-      }
+    }
+    if (members$class[[i]] %in% c("integer", "float")) {
+      fields[[i]] <- record_dtype(
+        fields[[i]],
+        h5_member_dtype(
+          members$class[[i]],
+          members$size[[i]],
+          members$sign[[i]]
+        )
+      )
     }
   }
   fields

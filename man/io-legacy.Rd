@@ -25,9 +25,8 @@ with the h5sparse attributes \code{h5sparse_format} and \code{h5sparse_shape} is
 as a CSR or CSC matrix.
 A compound dataset with array-valued fields (old \code{obsm} and \code{varm}) is read
 as a list of matrices, one per field.
-rhdf5 cannot see the type of a compound member, so float32 fields of a
-compound \code{obs}, \code{var} or \code{uns} dataset read as float64, and a matrix field is
-only recorded as float32 when the size of the compound fixes the widths.
+The member types of a compound dataset come from the compiled helper (ADR
+0008), so numeric fields keep their on-disk dtype records (such as float32).
 Writing always uses the current encodings.
 }
 \details{

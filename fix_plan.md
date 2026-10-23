@@ -133,7 +133,7 @@ The human owns the order of the Queue.
 - [x] legacy-formats/06: backed, lazy and real-world files (`.scratch/legacy-formats/issues/06-legacy-backed-lazy-real-world.md`)
 - [x] h5ad-io/16: compound type helper (`.scratch/h5ad-io/issues/16-compound-type-helper.md`)
 - [x] h5ad-io/15: rec-array field dtype fidelity (`.scratch/h5ad-io/issues/15-rec-array-dtype-fidelity.md`)
-- [ ] h5ad-io/17: legacy compound float32 fields (`.scratch/h5ad-io/issues/17-legacy-compound-float32.md`)
+- [x] h5ad-io/17: legacy compound float32 fields (`.scratch/h5ad-io/issues/17-legacy-compound-float32.md`)
 
 ## Discovered
 

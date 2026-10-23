@@ -37,8 +37,8 @@ download_pbmc3k <- function(.local_envir = parent.frame()) {
 # A file written by real-world tools (not our fixtures) must read, and writing
 # it again must give a file that is structurally equivalent to the original
 # and that Python can read.
-# The exceptions are the float32 fields of the legacy `obs` (h5ad-io/17) and
-# sparse indices stored unsorted (ADR 0006)
+# The exceptions are the rank_genes_groups fields and sparse indices stored
+# unsorted (ADR 0006)
 test_that("the PBMC 3k example file reads and round trips with equivalence", {
   skip_if_no_python()
   # The download is a legacy format (compound `/obsm` and `/varm`) that is read
@@ -57,9 +57,7 @@ test_that("the PBMC 3k example file reads and round trips with equivalence", {
   expect_equal(dim(adata$obsm[["X_pca"]]), c(2638L, 50L))
   expect_named(adata$varm, "PCs")
   expect_equal(dim(adata$varm[["PCs"]]), c(1838L, 50L))
-  # Reading the download or Python's rewrite gives the same object, except for
-  # the dtype records of the float32 compound fields of the legacy `obs`
-  # (rhdf5 cannot see the member types of a compound dataset)
+  # Reading the download or Python's rewrite gives the same object
   rewritten <- read_h5ad(original)
   expect_equal(adata$X, rewritten$X)
   expect_equal(adata$raw$X, rewritten$raw$X)
@@ -78,16 +76,14 @@ test_that("the PBMC 3k example file reads and round trips with equivalence", {
   written <- withr::local_tempfile(fileext = ".h5ad")
   write_h5ad(adata, written)
 
-  # The float32 `obs` columns of the legacy compound read as float64
-  # and the rank_genes_groups fields stay fixed-length strings (see above)
-  float32_obs <- c(
-    paste0("/obs/", c("percent_mito", "n_counts")),
-    paste0("/uns/rank_genes_groups/", c("names", "scores"))
-  )
+  # The rank_genes_groups fields stay fixed-length strings (see above)
   expect_all_equivalent(
     written,
     original,
-    rec_array_paths = float32_obs,
+    rec_array_paths = paste0(
+      "/uns/rank_genes_groups/",
+      c("names", "scores")
+    ),
     sorted_paths = c("/raw/X/data", "/raw/X/indices")
   )
   # Python reads the R-written file (the rewrite errors if it cannot)

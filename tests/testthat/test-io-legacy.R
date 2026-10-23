@@ -292,6 +292,40 @@ test_that("legacy obs and var read to the values in the table", {
   }
 })
 
+# Why: the compound `obs` and `var` of 0.6.22 must keep the on-disk dtype of
+# every numeric field (float32 and int64 included), as the helper reports it
+test_that("legacy compound obs and var keep their numeric dtype records", {
+  file <- "0.6.22-dense.h5ad"
+  frames <- read_legacy_elem(file, "/")$value
+  checked <- 0L
+  for (name in c("obs", "var")) {
+    members <- compound_members(
+      fixture_path(file.path("legacy", file)),
+      paste0("/", name)
+    )
+    frame <- frames[[name]]
+    for (i in which(members$class %in% c("integer", "float"))[-1L]) {
+      column <- frame[[members$name[[i]]]]
+      # Codes of categories become factors, which carry no numeric dtype
+      if (is.factor(column)) {
+        next
+      }
+      expected <- h5_member_dtype(
+        members$class[[i]],
+        members$size[[i]],
+        members$sign[[i]]
+      )
+      expect_identical(
+        get_dtype(column) %||% native_dtype(column),
+        expected,
+        info = paste(name, members$name[[i]])
+      )
+      checked <- checked + 1L
+    }
+  }
+  expect_gt(checked, 0L)
+})
+
 # Why: 0.6.22 kept categories in `uns` and `_clean_uns` removes them, leaving
 # the other members as Python does
 test_that("categories in uns are removed once they are applied", {
@@ -538,7 +572,7 @@ test_that("compound obsm and varm read as a mapping of matrices", {
   )
   expect_equal(dim(adata$obsm[["X_umap"]]), c(3L, 3L))
   expect_equal(adata$obsm[["X_umap"]][2, 3], 2.5, ignore_attr = TRUE)
-  # float32 is recorded when the compound size determines the field widths
+  # float32 is recorded from the member type
   expect_identical(get_dtype(adata$obsm[["X_pca"]]), "float32")
   expect_named(adata$varm, "PCs")
   expect_equal(dim(adata$varm[["PCs"]]), c(2L, 2L))
@@ -563,11 +597,10 @@ test_that("unencoded strings and compound datasets read as Python does", {
   # Array fields give matrices and the other fields stay vectors
   expect_equal(dim(uns$mixed$m), c(2L, 2L))
   expect_length(uns$mixed$s, 2L)
-  # Widths that the compound size does not determine leave no dtype record
-  expect_null(get_dtype(uns$ambiguous$p))
+  # Member types are read, so even widths the compound size cannot fix give a
+  # record (the old size-based guess left these without one)
   expect_equal(dim(uns$ambiguous$p), c(2L, 2L))
-  # Too many fields to try every width
-  expect_null(compound_float_widths(NULL, "/x", rep(1L, 13L)))
+  expect_identical(get_dtype(uns$ambiguous$p), "float32")
   # Complex numbers are the compound of `r` and `i`
   expect_identical(as.vector(uns$complex), c(1 + 2i, 3 + 4i))
 })

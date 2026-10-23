@@ -43,8 +43,7 @@ h5_backend <- function() {
     },
     null_write = h5_null_write,
     table_write = h5_table_write,
-    table_read = h5_table_read,
-    table_int64_fields = h5_table_int64_fields
+    table_read = h5_table_read
   )
 }
 
@@ -171,21 +170,6 @@ h5_null_write <- function(store, key) {
   dset <- rhdf5::H5Dcreate(store, key, "H5T_IEEE_F32LE", space)
   on.exit(rhdf5::H5Dclose(dset), add = TRUE, after = FALSE)
   invisible(NULL)
-}
-
-# The names of the int64 fields of a compound dataset, which `h5_table_read()`
-# gives as doubles. rhdf5 only tells them apart as `integer64` (it needs bit64,
-# without it no field is reported).
-h5_table_int64_fields <- function(store, path) {
-  dset <- rhdf5::H5Dopen(store, path)
-  on.exit(rhdf5::H5Dclose(dset), add = TRUE)
-  fields <- tryCatch(
-    suppressWarnings(suppressMessages(
-      rhdf5::H5Dread(dset, bit64conversion = "bit64")
-    )),
-    error = function(cnd) list()
-  )
-  names(fields)[vapply(fields, inherits, logical(1), "integer64")]
 }
 
 h5_table_read <- function(store, path, call, records = FALSE) {

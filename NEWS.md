@@ -1,5 +1,7 @@
 # anndata.claude (development version)
 
+- Numeric fields of legacy compound datasets (`obs`, `var`, `uns`, `obsm`) keep their on-disk dtype, such as float32.
+
 - Files from old anndata releases read their `obs` and `var` as Python does: compound datasets (anndata before 0.7), `dataframe` version 0.1.0 groups and categories kept in `uns` (`<col>_categories`), each with Python's `anndata_old_format_warning`.
 - Old files with `raw.X`, `raw.var` and `raw.varm` as root members read into `raw`, and `connectivities` and `distances` kept in `uns$neighbors` move to `obsp` with an `anndata_future_warning`.
 - Old files with `obsm` and `varm` stored as compound datasets (such as the PBMC 3k example of cellxgene) read as a matrix per field.
