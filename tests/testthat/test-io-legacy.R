@@ -24,14 +24,19 @@ read_legacy_elem <- function(file, path, env = parent.frame()) {
     withr::defer(rhdf5::h5closeAll(), envir = env)
   }
   warned <- character()
+  future <- character()
   value <- withCallingHandlers(
     read_elem(store, path),
     anndata_old_format_warning = function(cnd) {
       warned <<- c(warned, cnd$path)
       rlang::cnd_muffle(cnd)
+    },
+    anndata_future_warning = function(cnd) {
+      future <<- c(future, conditionMessage(cnd))
+      rlang::cnd_muffle(cnd)
     }
   )
-  list(value = value, warned = sort(warned))
+  list(value = value, warned = sort(warned), future = sort(future))
 }
 
 # The paths Python warned about under `prefix` (the Element itself and members)
@@ -392,6 +397,134 @@ test_that("dataframe 0.1.0 columns read categories through references", {
   expect_equal(levels(cat), c("a", "b", "c"))
   expect_false(is.ordered(cat))
   expect_equal(colnames(result$value), c("cat", "num", "str"))
+})
+
+legacy_raw_files <- c(
+  "0.6.22-dense.h5ad",
+  "0.6.22-sparse.h5ad",
+  "0.7.8-dense.h5ad",
+  "0.7.8-sparse.h5ad",
+  "0.7.8-dense.zarr",
+  "0.7.8-sparse.zarr"
+)
+
+# Why: the legacy `raw.X`/`raw.var`/`raw.varm` members of 0.6.22 and the raw
+# group of 0.7.8 must give the Raw values of the table, and 0.6.22 must raise
+# Python's old format warnings for them
+test_that("legacy raw reads to the values in the table", {
+  for (file in legacy_raw_files) {
+    result <- read_legacy_elem(file, "/")
+    expected <- legacy_table()$fixtures[[file]]$values$raw
+    raw <- result$value$raw
+    expect_false(is.null(raw), info = file)
+    expect_equal(dim(raw$X), unlist(expected$shape), info = file)
+    expect_equal(
+      unname(as.matrix(drop_dtype(raw$X))),
+      unname(table_matrix(expected$X$values)),
+      tolerance = 1e-6,
+      info = file
+    )
+    expect_equal(
+      rownames(raw$var),
+      as.character(unlist(expected$var$index)),
+      info = file
+    )
+    expect_equal(
+      unname(drop_dtype(raw$var$vnum)),
+      unlist(expected$var$columns$vnum$values),
+      info = file
+    )
+    expect_equal(
+      unname(drop_dtype(raw$varm$PCs)),
+      unname(table_dense(expected$varm$PCs)),
+      tolerance = 1e-6,
+      info = file
+    )
+    expect_equal(
+      frame_warnings(result$warned, "/raw.var"),
+      sort(c(
+        table_warned(file, "/raw.var"),
+        intersect(table_very_old(file), "/raw.var")
+      )),
+      info = file
+    )
+    for (prefix in c("/raw.X", "/raw.varm", "/raw")) {
+      expect_equal(
+        frame_warnings(result$warned, prefix),
+        table_warned(file, prefix),
+        info = paste(file, prefix)
+      )
+    }
+  }
+})
+
+# Why: a file with a `raw` group and `raw.X` is ambiguous and Python raises
+test_that("a store with both legacy and current raw is an error", {
+  store <- local_edited_legacy()
+  # Python's check looks at any `raw.` key, not only `raw.X`
+  group <- rhdf5::H5Gcreate(store, "raw.varm")
+  rhdf5::H5Gclose(group)
+  expect_anndata_condition(
+    suppressWarnings(read_elem(store, "/")),
+    "anndata_io_registry_error"
+  )
+})
+
+# Why: Python only moves 2-D values, so a 1-D `distances` and a `uns` with no
+# `neighbors` are left alone without a warning
+test_that("move_adjacency_matrices skips values that are not matrices", {
+  call <- rlang::current_env()
+  slots <- list(uns = list(neighbors = list(distances = 1:3, params = 1L)))
+  expect_no_warning(moved <- move_adjacency_matrices(slots, call))
+  expect_identical(moved, slots)
+  slots <- list(uns = list(a = 1L))
+  expect_no_warning(moved <- move_adjacency_matrices(slots, call))
+  expect_identical(moved, slots)
+})
+
+# Why: adjacency matrices kept in `uns[["neighbors"]]` move to `obsp` with
+# Python's FutureWarning, one per matrix, for every release and format
+test_that("neighbors matrices move from uns to obsp", {
+  files <- c(
+    "0.6.22-dense.h5ad",
+    "0.6.22-sparse.h5ad",
+    "0.7.8-dense.h5ad",
+    "0.10.9-neighbors.h5ad",
+    "0.10.9-neighbors.zarr"
+  )
+  for (file in files) {
+    result <- read_legacy_elem(file, "/")
+    expected <- legacy_table()$fixtures[[file]]$values
+    expect_setequal(names(result$value$obsp), names(expected$obsp))
+    expect_false(any(
+      c("connectivities", "distances") %in% names(result$value$uns$neighbors)
+    ))
+    for (key in names(expected$obsp)) {
+      expect_equal(
+        unname(as.matrix(drop_dtype(result$value$obsp[[key]]))),
+        unname(table_matrix(expected$obsp[[key]]$values)),
+        tolerance = 1e-6,
+        info = paste(file, key)
+      )
+    }
+    messages <- vapply(
+      legacy_table()$fixtures[[file]]$warnings,
+      function(w) if (w$category == "FutureWarning") w$message else "",
+      character(1)
+    )
+    keys <- sub(
+      "^Moving element from .uns\\['neighbors'\\]\\['(.*)'\\] to.*$",
+      "\\1",
+      messages[nzchar(messages)]
+    )
+    got <- sub(
+      "^Moving element from .uns\\['neighbors'\\]\\['(.*)'\\] to.*$",
+      "\\1",
+      result$future
+    )
+    expect_setequal(got, keys)
+    expect_length(got, length(keys))
+  }
 })
 
 # Why: an unencoded root is how every 0.6 and 0.7 file starts, and Python

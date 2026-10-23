@@ -267,6 +267,10 @@ read_anndata_elem <- function(elem, path, store) {
     }
     slots[key] <- list(value)
   }
+  if (identical(path, "/") && any(startsWith(members, "raw."))) {
+    slots$raw <- read_legacy_raw(store, members, slots, call)
+  }
+  slots <- move_adjacency_matrices(slots, call)
   # Python cleans `uns` for the file root only
   if (
     identical(path, "/") &&

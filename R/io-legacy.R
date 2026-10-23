@@ -111,6 +111,61 @@ clean_legacy_uns <- function(obs, var, uns, call) {
   list(obs = obs, var = var, uns = uns)
 }
 
+# Python's `_read_legacy_raw`: `raw.X`, `raw.var` and `raw.varm` as members of
+# the root, returned as the list `AnnData()` takes for `raw`
+read_legacy_raw <- function(store, members, slots, call) {
+  if (!is.null(slots$raw)) {
+    abort_io_registry(
+      "The store has both legacy and current raw formats.",
+      path = "/raw.X",
+      call = call
+    )
+  }
+  # Python only reads the legacy members when `raw.X` exists
+  if (!"raw.X" %in% members) {
+    return(NULL)
+  }
+  raw <- list()
+  for (name in c("X", "var", "varm")) {
+    key <- paste0("raw.", name)
+    if (!key %in% members) {
+      next
+    }
+    path <- paste0("/", key)
+    raw[name] <- list(
+      if (name == "var" && is_legacy_frame(store, path)) {
+        read_dataframe_legacy(store, path, call)
+      } else {
+        read_elem(store, path)
+      }
+    )
+  }
+  raw
+}
+
+# Python's `_move_adj_mtx`: 2-D `distances` and `connectivities` in
+# `uns[["neighbors"]]` move to `obsp` with a `FutureWarning`
+move_adjacency_matrices <- function(slots, call) {
+  if (!is.list(slots$uns$neighbors)) {
+    return(slots)
+  }
+  for (key in c("distances", "connectivities")) {
+    value <- slots$uns$neighbors[[key]]
+    if (length(dim(value)) != 2L) {
+      next
+    }
+    warn_future(
+      "Moving element from .uns['neighbors']['{key}'] to .obsp['{key}'].
+
+       This is where adjacency matrices should go now.",
+      call = call
+    )
+    slots$obsp[key] <- list(value)
+    slots$uns$neighbors[key] <- NULL
+  }
+  slots
+}
+
 #' @rdname io-legacy
 read_unencoded_elem <- function(elem, path, store, call) {
   anndata_warn(
