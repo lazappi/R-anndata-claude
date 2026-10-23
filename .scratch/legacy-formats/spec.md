@@ -1,6 +1,6 @@
 # Legacy formats
 
-Status: needs-triage
+Status: done
 
 Stub spec, to be grilled into a full spec before tickets are written.
 Sub-project 9 of the roadmap (`.scratch/roadmap/spec.md`).

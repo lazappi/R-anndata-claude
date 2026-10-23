@@ -1,6 +1,6 @@
 # Other formats
 
-Status: ready-for-agent
+Status: done
 
 Sub-project 10 of the roadmap (`.scratch/roadmap/spec.md`).
 Readers and writers for formats that cannot represent a full `AnnData`, matching Python's results.

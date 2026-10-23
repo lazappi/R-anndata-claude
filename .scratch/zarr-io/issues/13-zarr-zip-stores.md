@@ -1,6 +1,6 @@
 # zip stores
 
-Status: needs-triage
+Status: wontfix
 Type: task
 Blocked by: 08
 
@@ -15,3 +15,5 @@ Options include unzipping to a temporary directory for reading and the `zip` pac
 - `scripts/check.sh` passes
 
 ## Comments
+
+2026-10-23 (human): wontfix, zip stores are a store-level feature for Rarr rather than anndata, so revisit if Rarr supports them.

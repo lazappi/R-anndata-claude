@@ -50,8 +50,8 @@ A stub spec must be grilled into a full spec before tickets are written for it.
 | 6 | `zarr-io` | done (0.0.2) | `read_zarr()` / `write_zarr()` for zarr v2 and v3 | h5ad-io |
 | 7 | `backed` | done | Backed mode for h5ad | h5ad-io, views |
 | 8 | `lazy` | done | Lazy arrays and lazy reading | h5ad-io, backed |
-| 9 | `legacy-formats` | full | Reading files from before the current encodings | h5ad-io |
-| 10 | `other-formats` | full | csv, mtx, text, excel, umi_tools and hdf readers, `write_csvs()` (loom is out, deprecated in Python) | core-object |
+| 9 | `legacy-formats` | done (0.0.4) | Reading files from before the current encodings | h5ad-io |
+| 10 | `other-formats` | done | csv, mtx, text, excel, umi_tools and hdf readers, `write_csvs()` (loom is out, deprecated in Python) | core-object |
 | 11 | `experimental` | stub, low priority (experimental in Python, little effort) | `concat_on_disk`, `AnnCollection`, awkward arrays, `acc` accessors, extension namespaces | most of the above |
 
 The MVP is sub-projects 1 to 3, released as 0.0.1.

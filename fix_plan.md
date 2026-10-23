@@ -188,7 +188,7 @@ The human owns the order of the Queue.
   `scripts/check.sh --tests` stopped at the failure limit, so other regressions may hide behind it: rerun the whole suite with `testthat::set_max_fails(Inf)` once this is fixed.
 
 - [x] legacy-formats/03 leftover: after tickets 04 and 05, read the whole 0.6.22 and 0.7.8 fixtures (h5ad and zarr) to the `legacy_cases.json` values and warnings, then set ticket 03 to `done` and bump the version
-- [ ] `read_mtx()` rejects the `complex` field (scipy reads complex128 then `.astype(dtype)` discards the imaginary part with a `ComplexWarning`). Ask python-oracle and add support if wanted.
+- [x] wontfix (human, 2026-10-23: keep the error, Python silently drops the imaginary part): `read_mtx()` rejects the `complex` field (scipy reads complex128 then `.astype(dtype)` discards the imaginary part with a `ComplexWarning`). Ask python-oracle and add support if wanted.
 
 ## Blocked
 
@@ -196,4 +196,3 @@ The human owns the order of the Queue.
 
 Tickets that need triage before they can be queued.
 
-- zarr-io/13: zip stores (`.scratch/zarr-io/issues/13-zarr-zip-stores.md`)
