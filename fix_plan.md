@@ -144,7 +144,7 @@ The human owns the order of the Queue.
 - [x] other-formats/08: other formats documentation (`.scratch/other-formats/issues/08-other-formats-docs.md`)
 - [x] hardening/01: coverage pass (`.scratch/hardening/issues/01-coverage.md`)
 - [x] hardening/02: deviations vignette (`.scratch/hardening/issues/02-deviations-vignette.md`)
-- [ ] hardening/03: real-file benchmarks (`.scratch/hardening/issues/03-real-file-benchmarks.md`)
+- [x] hardening/03: real-file benchmarks (`.scratch/hardening/issues/03-real-file-benchmarks.md`)
 - [ ] hardening/04: examples for exported functions (`.scratch/hardening/issues/04-examples.md`)
 - [ ] hardening/05: pkgdown site (`.scratch/hardening/issues/05-pkgdown.md`)
 
@@ -194,6 +194,17 @@ The human owns the order of the Queue.
 
 - [x] legacy-formats/03 leftover: after tickets 04 and 05, read the whole 0.6.22 and 0.7.8 fixtures (h5ad and zarr) to the `legacy_cases.json` values and warnings, then set ticket 03 to `done` and bump the version
 - [x] wontfix (human, 2026-10-23: keep the error, Python silently drops the imaginary part): `read_mtx()` rejects the `complex` field (scipy reads complex128 then `.astype(dtype)` discards the imaginary part with a `ComplexWarning`). Ask python-oracle and add support if wanted.
+
+- [ ] Slow operations from `.scratch/hardening/benchmarks.md` (R seconds vs Python, ratio over 3), found by hardening/03.
+  Large file (cellxgene-vascular, 83k cells): `read_h5ad` 30.5 vs 5.8 (5.2x), `write_h5ad` 83.1 vs 15.6 (5.3x), `write_zarr` 128.9 vs 17.3 (7.5x), `backed_slice` 1.76 vs 0.44 (4.0x).
+  Small file (pbmc3k, 2.6k cells): `read_h5ad` 0.51 vs 0.09 (5.8x), `write_h5ad` 0.84 vs 0.09 (9.1x), `read_zarr` 1.11 vs 0.13 (8.4x), `backed_slice` 0.30 vs 0.05 (6.2x), `lazy_subset` 0.51 vs 0.13 (3.9x).
+  Profile (for example with `profvis`) and fix the biggest costs, `write_*` first. Small-file ratios may be fixed overhead.
+
+- [ ] `read_zarr()` of the 4 GB rewritten cellxgene-vascular store fails with "vector memory limit of 16.0 Gb reached" (Python reads it in 11.2s).
+  The session also held the AnnData read from h5ad, so rerun alone first (`Rscript scripts/benchmark-real-files.R run cellxgene-vascular 1` after dropping the earlier objects) to see whether the memory use is real.
+
+- [ ] pbmc3k written by R differs from Python's in the digests of `/raw/X/data` and `/raw/X/indices` (h5ad and zarr).
+  Probably ADR 0006 (legacy file with unsorted indices), but check whether R sorts differently from Python, and if so add `sorted_paths` handling to `benchmark_real_files.py`.
 
 ## Blocked
 

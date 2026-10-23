@@ -1,6 +1,6 @@
 # Real-file benchmarks
 
-Status: ready-for-agent
+Status: done
 Type: task
 Blocked by: none
 
@@ -23,3 +23,12 @@ Never run the large file inside the 10-minute check, and run each benchmark as i
 - `.scratch/hardening/benchmarks.md` records every operation for both files
 - Slow or failing operations are queued in `fix_plan.md`
 - The full check (`scripts/check.sh --package` and `--tests`) passes
+
+## Comments
+
+2026-10-23: Added `scripts/benchmark-real-files.R` (`run <name> <repeats>` per file, then `report`) and `tests/python/benchmark_real_files.py` (`time` and `compare` subcommands).
+Results are in `.scratch/hardening/benchmarks.md`, raw JSON in the git-ignored `.ralph/oracle/bench/`.
+Both downloads are legacy format, so the script rewrites them with Python first.
+R was 2.2 to 9.1 times slower than Python on every operation that finished and `read_zarr` of the large store failed with the 16 GB vector memory limit, all queued under Discovered in `fix_plan.md`.
+Written files are Structurally equivalent except two `/raw/X` digests of pbmc3k (probably ADR 0006 unsorted indices, unconfirmed).
+The large file took about 6 minutes for one run of the script, so keep it as its own command.
