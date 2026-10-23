@@ -1,0 +1,4 @@
+# only a comment
+ g1 g2
+c1 1 2
+c2 3 4

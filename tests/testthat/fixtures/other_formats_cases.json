@@ -1,0 +1,4808 @@
+{
+  "version": "0.13.4",
+  "readers": [
+    {
+      "name": "csv_header_rownames",
+      "reader": "read_csv",
+      "source": {
+        "kind": "file",
+        "file": "header_rownames.csv"
+      },
+      "args": {},
+      "warnings": [],
+      "result": {
+        "X": {
+          "kind": "dense",
+          "dtype": "float32",
+          "shape": [
+            2,
+            3
+          ],
+          "values": [
+            [
+              1.0,
+              2.0,
+              3.0
+            ],
+            [
+              4.0,
+              5.0,
+              6.0
+            ]
+          ]
+        },
+        "obs_names": [
+          "c1",
+          "c2"
+        ],
+        "var_names": [
+          "g1",
+          "g2",
+          "g3"
+        ],
+        "obs_names_dtype": "str",
+        "var_names_dtype": "str",
+        "obs_index_name": null,
+        "var_index_name": null,
+        "obs_columns": [],
+        "var_columns": []
+      }
+    },
+    {
+      "name": "csv_header_rownames_dtype",
+      "reader": "read_csv",
+      "source": {
+        "kind": "file",
+        "file": "header_rownames.csv"
+      },
+      "args": {
+        "dtype": "float64"
+      },
+      "warnings": [],
+      "result": {
+        "X": {
+          "kind": "dense",
+          "dtype": "float64",
+          "shape": [
+            2,
+            3
+          ],
+          "values": [
+            [
+              1.0,
+              2.0,
+              3.0
+            ],
+            [
+              4.0,
+              5.0,
+              6.0
+            ]
+          ]
+        },
+        "obs_names": [
+          "c1",
+          "c2"
+        ],
+        "var_names": [
+          "g1",
+          "g2",
+          "g3"
+        ],
+        "obs_names_dtype": "str",
+        "var_names_dtype": "str",
+        "obs_index_name": null,
+        "var_index_name": null,
+        "obs_columns": [],
+        "var_columns": []
+      }
+    },
+    {
+      "name": "csv_header_rownames_int",
+      "reader": "read_csv",
+      "source": {
+        "kind": "file",
+        "file": "header_rownames.csv"
+      },
+      "args": {
+        "dtype": "int32"
+      },
+      "warnings": [],
+      "result": {
+        "X": {
+          "kind": "dense",
+          "dtype": "int32",
+          "shape": [
+            2,
+            3
+          ],
+          "values": [
+            [
+              1,
+              2,
+              3
+            ],
+            [
+              4,
+              5,
+              6
+            ]
+          ]
+        },
+        "obs_names": [
+          "c1",
+          "c2"
+        ],
+        "var_names": [
+          "g1",
+          "g2",
+          "g3"
+        ],
+        "obs_names_dtype": "str",
+        "var_names_dtype": "str",
+        "obs_index_name": null,
+        "var_index_name": null,
+        "obs_columns": [],
+        "var_columns": []
+      }
+    },
+    {
+      "name": "csv_header_empty_corner",
+      "reader": "read_csv",
+      "source": {
+        "kind": "file",
+        "file": "header_empty_corner.csv"
+      },
+      "args": {},
+      "warnings": [],
+      "result": {
+        "X": {
+          "kind": "dense",
+          "dtype": "float32",
+          "shape": [
+            2,
+            2
+          ],
+          "values": [
+            [
+              1.5,
+              2.0
+            ],
+            [
+              3.0,
+              4.5
+            ]
+          ]
+        },
+        "obs_names": [
+          "c1",
+          "c2"
+        ],
+        "var_names": [
+          "g1",
+          "g2"
+        ],
+        "obs_names_dtype": "str",
+        "var_names_dtype": "str",
+        "obs_index_name": null,
+        "var_index_name": null,
+        "obs_columns": [],
+        "var_columns": []
+      }
+    },
+    {
+      "name": "csv_header_only",
+      "reader": "read_csv",
+      "source": {
+        "kind": "file",
+        "file": "header_only.csv"
+      },
+      "args": {},
+      "warnings": [],
+      "result": {
+        "X": {
+          "kind": "dense",
+          "dtype": "float32",
+          "shape": [
+            2,
+            3
+          ],
+          "values": [
+            [
+              1.0,
+              2.0,
+              3.0
+            ],
+            [
+              4.0,
+              5.0,
+              6.0
+            ]
+          ]
+        },
+        "obs_names": [
+          "0",
+          "1"
+        ],
+        "var_names": [
+          "g1",
+          "g2",
+          "g3"
+        ],
+        "obs_names_dtype": "str",
+        "var_names_dtype": "str",
+        "obs_index_name": null,
+        "var_index_name": null,
+        "obs_columns": [],
+        "var_columns": []
+      }
+    },
+    {
+      "name": "csv_rownames_only",
+      "reader": "read_csv",
+      "source": {
+        "kind": "file",
+        "file": "rownames_only.csv"
+      },
+      "args": {},
+      "warnings": [],
+      "result": {
+        "X": {
+          "kind": "dense",
+          "dtype": "float32",
+          "shape": [
+            3,
+            2
+          ],
+          "values": [
+            [
+              1.0,
+              2.0
+            ],
+            [
+              3.0,
+              4.0
+            ],
+            [
+              5.0,
+              6.0
+            ]
+          ]
+        },
+        "obs_names": [
+          "c1",
+          "c2",
+          "c3"
+        ],
+        "var_names": [
+          "0",
+          "1"
+        ],
+        "obs_names_dtype": "str",
+        "var_names_dtype": "str",
+        "obs_index_name": null,
+        "var_index_name": null,
+        "obs_columns": [],
+        "var_columns": []
+      }
+    },
+    {
+      "name": "csv_numbers",
+      "reader": "read_csv",
+      "source": {
+        "kind": "file",
+        "file": "numbers.csv"
+      },
+      "args": {},
+      "warnings": [],
+      "result": {
+        "X": {
+          "kind": "dense",
+          "dtype": "float32",
+          "shape": [
+            2,
+            3
+          ],
+          "values": [
+            [
+              1.0,
+              2.0,
+              3.0
+            ],
+            [
+              4.0,
+              5.0,
+              6.0
+            ]
+          ]
+        },
+        "obs_names": [
+          "0",
+          "1"
+        ],
+        "var_names": [
+          "0",
+          "1",
+          "2"
+        ],
+        "obs_names_dtype": "str",
+        "var_names_dtype": "str",
+        "obs_index_name": null,
+        "var_index_name": null,
+        "obs_columns": [],
+        "var_columns": []
+      }
+    },
+    {
+      "name": "csv_quoted",
+      "reader": "read_csv",
+      "source": {
+        "kind": "file",
+        "file": "quoted.csv"
+      },
+      "args": {},
+      "warnings": [],
+      "result": {
+        "X": {
+          "kind": "dense",
+          "dtype": "float32",
+          "shape": [
+            2,
+            2
+          ],
+          "values": [
+            [
+              1.0,
+              2.0
+            ],
+            [
+              3.0,
+              4.0
+            ]
+          ]
+        },
+        "obs_names": [
+          "c1",
+          "c2"
+        ],
+        "var_names": [
+          "g1",
+          "g2"
+        ],
+        "obs_names_dtype": "str",
+        "var_names_dtype": "str",
+        "obs_index_name": null,
+        "var_index_name": null,
+        "obs_columns": [],
+        "var_columns": []
+      }
+    },
+    {
+      "name": "csv_gz",
+      "reader": "read_csv",
+      "source": {
+        "kind": "file",
+        "file": "header_rownames.csv.gz"
+      },
+      "args": {},
+      "warnings": [],
+      "result": {
+        "X": {
+          "kind": "dense",
+          "dtype": "float32",
+          "shape": [
+            2,
+            3
+          ],
+          "values": [
+            [
+              1.0,
+              2.0,
+              3.0
+            ],
+            [
+              4.0,
+              5.0,
+              6.0
+            ]
+          ]
+        },
+        "obs_names": [
+          "c1",
+          "c2"
+        ],
+        "var_names": [
+          "g1",
+          "g2",
+          "g3"
+        ],
+        "obs_names_dtype": "str",
+        "var_names_dtype": "str",
+        "obs_index_name": null,
+        "var_index_name": null,
+        "obs_columns": [],
+        "var_columns": []
+      }
+    },
+    {
+      "name": "csv_bz2",
+      "reader": "read_csv",
+      "source": {
+        "kind": "file",
+        "file": "header_rownames.csv.bz2"
+      },
+      "args": {},
+      "warnings": [],
+      "result": {
+        "X": {
+          "kind": "dense",
+          "dtype": "float32",
+          "shape": [
+            2,
+            3
+          ],
+          "values": [
+            [
+              1.0,
+              2.0,
+              3.0
+            ],
+            [
+              4.0,
+              5.0,
+              6.0
+            ]
+          ]
+        },
+        "obs_names": [
+          "c1",
+          "c2"
+        ],
+        "var_names": [
+          "g1",
+          "g2",
+          "g3"
+        ],
+        "obs_names_dtype": "str",
+        "var_names_dtype": "str",
+        "obs_index_name": null,
+        "var_index_name": null,
+        "obs_columns": [],
+        "var_columns": []
+      }
+    },
+    {
+      "name": "csv_first_column_names",
+      "reader": "read_csv",
+      "source": {
+        "kind": "file",
+        "file": "numeric_first_column.csv"
+      },
+      "args": {
+        "first_column_names": true
+      },
+      "warnings": [],
+      "result": {
+        "X": {
+          "kind": "dense",
+          "dtype": "float32",
+          "shape": [
+            2,
+            2
+          ],
+          "values": [
+            [
+              2.0,
+              3.0
+            ],
+            [
+              5.0,
+              6.0
+            ]
+          ]
+        },
+        "obs_names": [
+          "1",
+          "4"
+        ],
+        "var_names": [
+          "g2",
+          "g3"
+        ],
+        "obs_names_dtype": "str",
+        "var_names_dtype": "str",
+        "obs_index_name": null,
+        "var_index_name": null,
+        "obs_columns": [],
+        "var_columns": []
+      }
+    },
+    {
+      "name": "csv_numeric_first_column",
+      "reader": "read_csv",
+      "source": {
+        "kind": "file",
+        "file": "numeric_first_column.csv"
+      },
+      "args": {},
+      "warnings": [],
+      "result": {
+        "X": {
+          "kind": "dense",
+          "dtype": "float32",
+          "shape": [
+            2,
+            3
+          ],
+          "values": [
+            [
+              1.0,
+              2.0,
+              3.0
+            ],
+            [
+              4.0,
+              5.0,
+              6.0
+            ]
+          ]
+        },
+        "obs_names": [
+          "0",
+          "1"
+        ],
+        "var_names": [
+          "g1",
+          "g2",
+          "g3"
+        ],
+        "obs_names_dtype": "str",
+        "var_names_dtype": "str",
+        "obs_index_name": null,
+        "var_index_name": null,
+        "obs_columns": [],
+        "var_columns": []
+      }
+    },
+    {
+      "name": "csv_single_row",
+      "reader": "read_csv",
+      "source": {
+        "kind": "file",
+        "file": "single_row.csv"
+      },
+      "args": {},
+      "warnings": [],
+      "result": {
+        "X": {
+          "kind": "dense",
+          "dtype": "float32",
+          "shape": [
+            1,
+            2
+          ],
+          "values": [
+            [
+              1.0,
+              2.0
+            ]
+          ]
+        },
+        "obs_names": [
+          "c1"
+        ],
+        "var_names": [
+          "g1",
+          "g2"
+        ],
+        "obs_names_dtype": "str",
+        "var_names_dtype": "str",
+        "obs_index_name": null,
+        "var_index_name": null,
+        "obs_columns": [],
+        "var_columns": []
+      }
+    },
+    {
+      "name": "csv_bad_value",
+      "reader": "read_csv",
+      "source": {
+        "kind": "file",
+        "file": "bad_value.csv"
+      },
+      "args": {},
+      "warnings": [],
+      "error": {
+        "class": "ValueError",
+        "message": "could not convert string to float: 'x'"
+      }
+    },
+    {
+      "name": "csv_no_delimiter",
+      "reader": "read_csv",
+      "source": {
+        "kind": "file",
+        "file": "no_delimiter.csv"
+      },
+      "args": {},
+      "warnings": [],
+      "error": {
+        "class": "ValueError",
+        "message": "Did not find delimiter ',' in first line."
+      }
+    },
+    {
+      "name": "csv_ragged",
+      "reader": "read_csv",
+      "source": {
+        "kind": "file",
+        "file": "ragged.csv"
+      },
+      "args": {},
+      "warnings": [],
+      "error": {
+        "class": "ValueError",
+        "message": "Length of first line (3) is different from length of last line (2)."
+      }
+    },
+    {
+      "name": "csv_header_no_data",
+      "reader": "read_csv",
+      "source": {
+        "kind": "file",
+        "file": "header_no_data.csv"
+      },
+      "args": {},
+      "warnings": [],
+      "error": {
+        "class": "IndexError",
+        "message": "list index out of range"
+      }
+    },
+    {
+      "name": "csv_empty",
+      "reader": "read_csv",
+      "source": {
+        "kind": "file",
+        "file": "empty.csv"
+      },
+      "args": {},
+      "warnings": [],
+      "error": {
+        "class": "IndexError",
+        "message": "list index out of range"
+      }
+    },
+    {
+      "name": "csv_semicolon_delimiter",
+      "reader": "read_csv",
+      "source": {
+        "kind": "file",
+        "file": "semicolon.data"
+      },
+      "args": {
+        "delimiter": ";"
+      },
+      "warnings": [],
+      "result": {
+        "X": {
+          "kind": "dense",
+          "dtype": "float32",
+          "shape": [
+            2,
+            2
+          ],
+          "values": [
+            [
+              1.0,
+              2.0
+            ],
+            [
+              3.0,
+              4.0
+            ]
+          ]
+        },
+        "obs_names": [
+          "c1",
+          "c2"
+        ],
+        "var_names": [
+          "g1",
+          "g2"
+        ],
+        "obs_names_dtype": "str",
+        "var_names_dtype": "str",
+        "obs_index_name": null,
+        "var_index_name": null,
+        "obs_columns": [],
+        "var_columns": []
+      }
+    },
+    {
+      "name": "csv_whitespace_delimiter_none",
+      "reader": "read_csv",
+      "source": {
+        "kind": "file",
+        "file": "whitespace.txt"
+      },
+      "args": {
+        "delimiter": null
+      },
+      "warnings": [],
+      "result": {
+        "X": {
+          "kind": "dense",
+          "dtype": "float32",
+          "shape": [
+            2,
+            2
+          ],
+          "values": [
+            [
+              1.0,
+              2.0
+            ],
+            [
+              3.0,
+              4.0
+            ]
+          ]
+        },
+        "obs_names": [
+          "c1",
+          "c2"
+        ],
+        "var_names": [
+          "g1",
+          "g2"
+        ],
+        "obs_names_dtype": "str",
+        "var_names_dtype": "str",
+        "obs_index_name": null,
+        "var_index_name": null,
+        "obs_columns": [],
+        "var_columns": []
+      }
+    },
+    {
+      "name": "text_comments",
+      "reader": "read_text",
+      "source": {
+        "kind": "file",
+        "file": "comments.txt"
+      },
+      "args": {},
+      "warnings": [],
+      "result": {
+        "X": {
+          "kind": "dense",
+          "dtype": "float32",
+          "shape": [
+            2,
+            3
+          ],
+          "values": [
+            [
+              1.0,
+              2.0,
+              3.0
+            ],
+            [
+              4.0,
+              5.0,
+              6.0
+            ]
+          ]
+        },
+        "obs_names": [
+          "0",
+          "1"
+        ],
+        "var_names": [
+          "g1",
+          "g2",
+          "g3"
+        ],
+        "obs_names_dtype": "str",
+        "var_names_dtype": "str",
+        "obs_index_name": null,
+        "var_index_name": null,
+        "obs_columns": [],
+        "var_columns": []
+      }
+    },
+    {
+      "name": "text_comments_header",
+      "reader": "read_text",
+      "source": {
+        "kind": "file",
+        "file": "comments_header.txt"
+      },
+      "args": {},
+      "warnings": [],
+      "result": {
+        "X": {
+          "kind": "dense",
+          "dtype": "float32",
+          "shape": [
+            2,
+            2
+          ],
+          "values": [
+            [
+              1.0,
+              2.0
+            ],
+            [
+              3.0,
+              4.0
+            ]
+          ]
+        },
+        "obs_names": [
+          "c1",
+          "c2"
+        ],
+        "var_names": [
+          "g1",
+          "g2"
+        ],
+        "obs_names_dtype": "str",
+        "var_names_dtype": "str",
+        "obs_index_name": null,
+        "var_index_name": null,
+        "obs_columns": [],
+        "var_columns": []
+      }
+    },
+    {
+      "name": "text_whitespace",
+      "reader": "read_text",
+      "source": {
+        "kind": "file",
+        "file": "whitespace.txt"
+      },
+      "args": {},
+      "warnings": [],
+      "result": {
+        "X": {
+          "kind": "dense",
+          "dtype": "float32",
+          "shape": [
+            2,
+            2
+          ],
+          "values": [
+            [
+              1.0,
+              2.0
+            ],
+            [
+              3.0,
+              4.0
+            ]
+          ]
+        },
+        "obs_names": [
+          "c1",
+          "c2"
+        ],
+        "var_names": [
+          "g1",
+          "g2"
+        ],
+        "obs_names_dtype": "str",
+        "var_names_dtype": "str",
+        "obs_index_name": null,
+        "var_index_name": null,
+        "obs_columns": [],
+        "var_columns": []
+      }
+    },
+    {
+      "name": "text_whitespace_gz",
+      "reader": "read_text",
+      "source": {
+        "kind": "file",
+        "file": "whitespace.txt.gz"
+      },
+      "args": {},
+      "warnings": [],
+      "result": {
+        "X": {
+          "kind": "dense",
+          "dtype": "float32",
+          "shape": [
+            2,
+            2
+          ],
+          "values": [
+            [
+              1.0,
+              2.0
+            ],
+            [
+              3.0,
+              4.0
+            ]
+          ]
+        },
+        "obs_names": [
+          "c1",
+          "c2"
+        ],
+        "var_names": [
+          "g1",
+          "g2"
+        ],
+        "obs_names_dtype": "str",
+        "var_names_dtype": "str",
+        "obs_index_name": null,
+        "var_index_name": null,
+        "obs_columns": [],
+        "var_columns": []
+      }
+    },
+    {
+      "name": "text_whitespace_bz2",
+      "reader": "read_text",
+      "source": {
+        "kind": "file",
+        "file": "whitespace.txt.bz2"
+      },
+      "args": {},
+      "warnings": [],
+      "result": {
+        "X": {
+          "kind": "dense",
+          "dtype": "float32",
+          "shape": [
+            2,
+            2
+          ],
+          "values": [
+            [
+              1.0,
+              2.0
+            ],
+            [
+              3.0,
+              4.0
+            ]
+          ]
+        },
+        "obs_names": [
+          "c1",
+          "c2"
+        ],
+        "var_names": [
+          "g1",
+          "g2"
+        ],
+        "obs_names_dtype": "str",
+        "var_names_dtype": "str",
+        "obs_index_name": null,
+        "var_index_name": null,
+        "obs_columns": [],
+        "var_columns": []
+      }
+    },
+    {
+      "name": "text_tabs",
+      "reader": "read_text",
+      "source": {
+        "kind": "file",
+        "file": "tabs.tab"
+      },
+      "args": {
+        "delimiter": "\t"
+      },
+      "warnings": [],
+      "result": {
+        "X": {
+          "kind": "dense",
+          "dtype": "float32",
+          "shape": [
+            2,
+            2
+          ],
+          "values": [
+            [
+              1.0,
+              2.0
+            ],
+            [
+              3.0,
+              4.0
+            ]
+          ]
+        },
+        "obs_names": [
+          "c1",
+          "c2"
+        ],
+        "var_names": [
+          "g1",
+          "g2"
+        ],
+        "obs_names_dtype": "str",
+        "var_names_dtype": "str",
+        "obs_index_name": null,
+        "var_index_name": null,
+        "obs_columns": [],
+        "var_columns": []
+      }
+    },
+    {
+      "name": "text_tabs_default_delimiter",
+      "reader": "read_text",
+      "source": {
+        "kind": "file",
+        "file": "tabs.tab"
+      },
+      "args": {},
+      "warnings": [],
+      "result": {
+        "X": {
+          "kind": "dense",
+          "dtype": "float32",
+          "shape": [
+            2,
+            2
+          ],
+          "values": [
+            [
+              1.0,
+              2.0
+            ],
+            [
+              3.0,
+              4.0
+            ]
+          ]
+        },
+        "obs_names": [
+          "c1",
+          "c2"
+        ],
+        "var_names": [
+          "g1",
+          "g2"
+        ],
+        "obs_names_dtype": "str",
+        "var_names_dtype": "str",
+        "obs_index_name": null,
+        "var_index_name": null,
+        "obs_columns": [],
+        "var_columns": []
+      }
+    },
+    {
+      "name": "text_semicolon",
+      "reader": "read_text",
+      "source": {
+        "kind": "file",
+        "file": "semicolon.data"
+      },
+      "args": {
+        "delimiter": ";"
+      },
+      "warnings": [],
+      "result": {
+        "X": {
+          "kind": "dense",
+          "dtype": "float32",
+          "shape": [
+            2,
+            2
+          ],
+          "values": [
+            [
+              1.0,
+              2.0
+            ],
+            [
+              3.0,
+              4.0
+            ]
+          ]
+        },
+        "obs_names": [
+          "c1",
+          "c2"
+        ],
+        "var_names": [
+          "g1",
+          "g2"
+        ],
+        "obs_names_dtype": "str",
+        "var_names_dtype": "str",
+        "obs_index_name": null,
+        "var_index_name": null,
+        "obs_columns": [],
+        "var_columns": []
+      }
+    },
+    {
+      "name": "text_semicolon_wrong_delimiter",
+      "reader": "read_text",
+      "source": {
+        "kind": "file",
+        "file": "semicolon.data"
+      },
+      "args": {
+        "delimiter": ","
+      },
+      "warnings": [],
+      "error": {
+        "class": "ValueError",
+        "message": "Did not find delimiter ',' in first line."
+      }
+    },
+    {
+      "name": "text_integer_names",
+      "reader": "read_text",
+      "source": {
+        "kind": "file",
+        "file": "integer_names.txt"
+      },
+      "args": {},
+      "warnings": [],
+      "result": {
+        "X": {
+          "kind": "dense",
+          "dtype": "float32",
+          "shape": [
+            2,
+            3
+          ],
+          "values": [
+            [
+              0.5,
+              0.25,
+              0.125
+            ],
+            [
+              4.0,
+              5.0,
+              6.0
+            ]
+          ]
+        },
+        "obs_names": [
+          "1",
+          "2"
+        ],
+        "var_names": [
+          "1",
+          "2",
+          "3"
+        ],
+        "obs_names_dtype": "str",
+        "var_names_dtype": "str",
+        "obs_index_name": null,
+        "var_index_name": null,
+        "obs_columns": [],
+        "var_columns": []
+      }
+    },
+    {
+      "name": "text_space_delimiter",
+      "reader": "read_text",
+      "source": {
+        "kind": "file",
+        "file": "whitespace.txt"
+      },
+      "args": {
+        "delimiter": " "
+      },
+      "warnings": [],
+      "error": {
+        "class": "ValueError",
+        "message": "could not convert string to float: ''"
+      }
+    },
+    {
+      "name": "text_first_column_names_false",
+      "reader": "read_text",
+      "source": {
+        "kind": "file",
+        "file": "rownames_only.csv"
+      },
+      "args": {
+        "delimiter": ",",
+        "first_column_names": false
+      },
+      "warnings": [],
+      "result": {
+        "X": {
+          "kind": "dense",
+          "dtype": "float32",
+          "shape": [
+            3,
+            2
+          ],
+          "values": [
+            [
+              1.0,
+              2.0
+            ],
+            [
+              3.0,
+              4.0
+            ],
+            [
+              5.0,
+              6.0
+            ]
+          ]
+        },
+        "obs_names": [
+          "c1",
+          "c2",
+          "c3"
+        ],
+        "var_names": [
+          "0",
+          "1"
+        ],
+        "obs_names_dtype": "str",
+        "var_names_dtype": "str",
+        "obs_index_name": null,
+        "var_index_name": null,
+        "obs_columns": [],
+        "var_columns": []
+      }
+    },
+    {
+      "name": "text_first_column_names_true",
+      "reader": "read_text",
+      "source": {
+        "kind": "file",
+        "file": "numbers.csv"
+      },
+      "args": {
+        "delimiter": ",",
+        "first_column_names": true
+      },
+      "warnings": [],
+      "result": {
+        "X": {
+          "kind": "dense",
+          "dtype": "float32",
+          "shape": [
+            2,
+            2
+          ],
+          "values": [
+            [
+              2.0,
+              3.0
+            ],
+            [
+              5.0,
+              6.0
+            ]
+          ]
+        },
+        "obs_names": [
+          "1",
+          "4"
+        ],
+        "var_names": [
+          "0",
+          "1"
+        ],
+        "obs_names_dtype": "str",
+        "var_names_dtype": "str",
+        "obs_index_name": null,
+        "var_index_name": null,
+        "obs_columns": [],
+        "var_columns": []
+      }
+    },
+    {
+      "name": "text_lines",
+      "reader": "read_text",
+      "source": {
+        "kind": "lines",
+        "lines": [
+          "  g1  g2",
+          "c1 1 2",
+          "",
+          "c2 3 4"
+        ]
+      },
+      "args": {},
+      "warnings": [],
+      "result": {
+        "X": {
+          "kind": "dense",
+          "dtype": "float32",
+          "shape": [
+            2,
+            2
+          ],
+          "values": [
+            [
+              1.0,
+              2.0
+            ],
+            [
+              3.0,
+              4.0
+            ]
+          ]
+        },
+        "obs_names": [
+          "c1",
+          "c2"
+        ],
+        "var_names": [
+          "g1",
+          "g2"
+        ],
+        "obs_names_dtype": "str",
+        "var_names_dtype": "str",
+        "obs_index_name": null,
+        "var_index_name": null,
+        "obs_columns": [],
+        "var_columns": []
+      }
+    },
+    {
+      "name": "csv_lines",
+      "reader": "read_csv",
+      "source": {
+        "kind": "lines",
+        "lines": [
+          "g1,g2",
+          "1,2",
+          "3,4\r\n"
+        ]
+      },
+      "args": {},
+      "warnings": [],
+      "result": {
+        "X": {
+          "kind": "dense",
+          "dtype": "float32",
+          "shape": [
+            2,
+            2
+          ],
+          "values": [
+            [
+              1.0,
+              2.0
+            ],
+            [
+              3.0,
+              4.0
+            ]
+          ]
+        },
+        "obs_names": [
+          "0",
+          "1"
+        ],
+        "var_names": [
+          "g1",
+          "g2"
+        ],
+        "obs_names_dtype": "str",
+        "var_names_dtype": "str",
+        "obs_index_name": null,
+        "var_index_name": null,
+        "obs_columns": [],
+        "var_columns": []
+      }
+    },
+    {
+      "name": "csv_lines_empty",
+      "reader": "read_csv",
+      "source": {
+        "kind": "lines",
+        "lines": []
+      },
+      "args": {},
+      "warnings": [],
+      "error": {
+        "class": "IndexError",
+        "message": "list index out of range"
+      }
+    },
+    {
+      "name": "mtx_integer",
+      "reader": "read_mtx",
+      "source": {
+        "kind": "file",
+        "file": "coordinate_integer.mtx"
+      },
+      "args": {},
+      "warnings": [],
+      "result": {
+        "X": {
+          "kind": "sparse",
+          "format": "csr",
+          "class": "csr_matrix",
+          "dtype": "float32",
+          "shape": [
+            3,
+            4
+          ],
+          "nnz": 4,
+          "values": [
+            [
+              5.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0,
+              7.0,
+              0.0
+            ],
+            [
+              2.0,
+              0.0,
+              0.0,
+              9.0
+            ]
+          ]
+        },
+        "obs_names": [
+          "0",
+          "1",
+          "2"
+        ],
+        "var_names": [
+          "0",
+          "1",
+          "2",
+          "3"
+        ],
+        "obs_names_dtype": "str",
+        "var_names_dtype": "str",
+        "obs_index_name": null,
+        "var_index_name": null,
+        "obs_columns": [],
+        "var_columns": []
+      }
+    },
+    {
+      "name": "mtx_integer_dtype_int64",
+      "reader": "read_mtx",
+      "source": {
+        "kind": "file",
+        "file": "coordinate_integer.mtx"
+      },
+      "args": {
+        "dtype": "int64"
+      },
+      "warnings": [],
+      "result": {
+        "X": {
+          "kind": "sparse",
+          "format": "csr",
+          "class": "csr_matrix",
+          "dtype": "int64",
+          "shape": [
+            3,
+            4
+          ],
+          "nnz": 4,
+          "values": [
+            [
+              5,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              7,
+              0
+            ],
+            [
+              2,
+              0,
+              0,
+              9
+            ]
+          ]
+        },
+        "obs_names": [
+          "0",
+          "1",
+          "2"
+        ],
+        "var_names": [
+          "0",
+          "1",
+          "2",
+          "3"
+        ],
+        "obs_names_dtype": "str",
+        "var_names_dtype": "str",
+        "obs_index_name": null,
+        "var_index_name": null,
+        "obs_columns": [],
+        "var_columns": []
+      }
+    },
+    {
+      "name": "mtx_real",
+      "reader": "read_mtx",
+      "source": {
+        "kind": "file",
+        "file": "coordinate_real.mtx"
+      },
+      "args": {},
+      "warnings": [],
+      "result": {
+        "X": {
+          "kind": "sparse",
+          "format": "csr",
+          "class": "csr_matrix",
+          "dtype": "float32",
+          "shape": [
+            2,
+            3
+          ],
+          "nnz": 3,
+          "values": [
+            [
+              1.5,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              -2.25,
+              3.0
+            ]
+          ]
+        },
+        "obs_names": [
+          "0",
+          "1"
+        ],
+        "var_names": [
+          "0",
+          "1",
+          "2"
+        ],
+        "obs_names_dtype": "str",
+        "var_names_dtype": "str",
+        "obs_index_name": null,
+        "var_index_name": null,
+        "obs_columns": [],
+        "var_columns": []
+      }
+    },
+    {
+      "name": "mtx_real_float64",
+      "reader": "read_mtx",
+      "source": {
+        "kind": "file",
+        "file": "coordinate_real.mtx"
+      },
+      "args": {
+        "dtype": "float64"
+      },
+      "warnings": [],
+      "result": {
+        "X": {
+          "kind": "sparse",
+          "format": "csr",
+          "class": "csr_matrix",
+          "dtype": "float64",
+          "shape": [
+            2,
+            3
+          ],
+          "nnz": 3,
+          "values": [
+            [
+              1.5,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              -2.25,
+              3.0
+            ]
+          ]
+        },
+        "obs_names": [
+          "0",
+          "1"
+        ],
+        "var_names": [
+          "0",
+          "1",
+          "2"
+        ],
+        "obs_names_dtype": "str",
+        "var_names_dtype": "str",
+        "obs_index_name": null,
+        "var_index_name": null,
+        "obs_columns": [],
+        "var_columns": []
+      }
+    },
+    {
+      "name": "mtx_pattern",
+      "reader": "read_mtx",
+      "source": {
+        "kind": "file",
+        "file": "coordinate_pattern.mtx"
+      },
+      "args": {},
+      "warnings": [],
+      "result": {
+        "X": {
+          "kind": "sparse",
+          "format": "csr",
+          "class": "csr_matrix",
+          "dtype": "float32",
+          "shape": [
+            2,
+            3
+          ],
+          "nnz": 3,
+          "values": [
+            [
+              1.0,
+              0.0,
+              1.0
+            ],
+            [
+              0.0,
+              1.0,
+              0.0
+            ]
+          ]
+        },
+        "obs_names": [
+          "0",
+          "1"
+        ],
+        "var_names": [
+          "0",
+          "1",
+          "2"
+        ],
+        "obs_names_dtype": "str",
+        "var_names_dtype": "str",
+        "obs_index_name": null,
+        "var_index_name": null,
+        "obs_columns": [],
+        "var_columns": []
+      }
+    },
+    {
+      "name": "mtx_symmetric",
+      "reader": "read_mtx",
+      "source": {
+        "kind": "file",
+        "file": "coordinate_symmetric.mtx"
+      },
+      "args": {},
+      "warnings": [],
+      "result": {
+        "X": {
+          "kind": "sparse",
+          "format": "csr",
+          "class": "csr_matrix",
+          "dtype": "float32",
+          "shape": [
+            3,
+            3
+          ],
+          "nnz": 5,
+          "values": [
+            [
+              1.0,
+              2.0,
+              0.0
+            ],
+            [
+              2.0,
+              0.0,
+              4.0
+            ],
+            [
+              0.0,
+              4.0,
+              0.0
+            ]
+          ]
+        },
+        "obs_names": [
+          "0",
+          "1",
+          "2"
+        ],
+        "var_names": [
+          "0",
+          "1",
+          "2"
+        ],
+        "obs_names_dtype": "str",
+        "var_names_dtype": "str",
+        "obs_index_name": null,
+        "var_index_name": null,
+        "obs_columns": [],
+        "var_columns": []
+      }
+    },
+    {
+      "name": "mtx_array",
+      "reader": "read_mtx",
+      "source": {
+        "kind": "file",
+        "file": "array_real.mtx"
+      },
+      "args": {},
+      "warnings": [],
+      "result": {
+        "X": {
+          "kind": "sparse",
+          "format": "csr",
+          "class": "csr_matrix",
+          "dtype": "float32",
+          "shape": [
+            2,
+            3
+          ],
+          "nnz": 4,
+          "values": [
+            [
+              1.0,
+              2.5,
+              0.0
+            ],
+            [
+              0.0,
+              3.0,
+              4.0
+            ]
+          ]
+        },
+        "obs_names": [
+          "0",
+          "1"
+        ],
+        "var_names": [
+          "0",
+          "1",
+          "2"
+        ],
+        "obs_names_dtype": "str",
+        "var_names_dtype": "str",
+        "obs_index_name": null,
+        "var_index_name": null,
+        "obs_columns": [],
+        "var_columns": []
+      }
+    },
+    {
+      "name": "mtx_empty",
+      "reader": "read_mtx",
+      "source": {
+        "kind": "file",
+        "file": "coordinate_empty.mtx"
+      },
+      "args": {},
+      "warnings": [],
+      "result": {
+        "X": {
+          "kind": "sparse",
+          "format": "csr",
+          "class": "csr_matrix",
+          "dtype": "float32",
+          "shape": [
+            2,
+            3
+          ],
+          "nnz": 0,
+          "values": [
+            [
+              0.0,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0,
+              0.0
+            ]
+          ]
+        },
+        "obs_names": [
+          "0",
+          "1"
+        ],
+        "var_names": [
+          "0",
+          "1",
+          "2"
+        ],
+        "obs_names_dtype": "str",
+        "var_names_dtype": "str",
+        "obs_index_name": null,
+        "var_index_name": null,
+        "obs_columns": [],
+        "var_columns": []
+      }
+    },
+    {
+      "name": "mtx_large_integer",
+      "reader": "read_mtx",
+      "source": {
+        "kind": "file",
+        "file": "coordinate_large_integer.mtx"
+      },
+      "args": {},
+      "warnings": [],
+      "result": {
+        "X": {
+          "kind": "sparse",
+          "format": "csr",
+          "class": "csr_matrix",
+          "dtype": "float32",
+          "shape": [
+            1,
+            2
+          ],
+          "nnz": 2,
+          "values": [
+            [
+              16777216.0,
+              3.0
+            ]
+          ]
+        },
+        "obs_names": [
+          "0"
+        ],
+        "var_names": [
+          "0",
+          "1"
+        ],
+        "obs_names_dtype": "str",
+        "var_names_dtype": "str",
+        "obs_index_name": null,
+        "var_index_name": null,
+        "obs_columns": [],
+        "var_columns": []
+      }
+    },
+    {
+      "name": "mtx_large_integer_float64",
+      "reader": "read_mtx",
+      "source": {
+        "kind": "file",
+        "file": "coordinate_large_integer.mtx"
+      },
+      "args": {
+        "dtype": "float64"
+      },
+      "warnings": [],
+      "result": {
+        "X": {
+          "kind": "sparse",
+          "format": "csr",
+          "class": "csr_matrix",
+          "dtype": "float64",
+          "shape": [
+            1,
+            2
+          ],
+          "nnz": 2,
+          "values": [
+            [
+              16777217.0,
+              3.0
+            ]
+          ]
+        },
+        "obs_names": [
+          "0"
+        ],
+        "var_names": [
+          "0",
+          "1"
+        ],
+        "obs_names_dtype": "str",
+        "var_names_dtype": "str",
+        "obs_index_name": null,
+        "var_index_name": null,
+        "obs_columns": [],
+        "var_columns": []
+      }
+    },
+    {
+      "name": "mtx_missing",
+      "reader": "read_mtx",
+      "source": {
+        "kind": "file",
+        "file": "does_not_exist.mtx"
+      },
+      "args": {},
+      "warnings": [],
+      "error": {
+        "class": "FileNotFoundError",
+        "message": "The source file does not exist: does_not_exist.mtx"
+      }
+    },
+    {
+      "name": "umi_tools",
+      "reader": "read_umi_tools",
+      "source": {
+        "kind": "file",
+        "file": "umi_tools.tsv"
+      },
+      "args": {},
+      "warnings": [],
+      "result": {
+        "X": {
+          "kind": "sparse",
+          "format": "csr",
+          "class": "csr_matrix",
+          "dtype": "int64",
+          "shape": [
+            3,
+            3
+          ],
+          "nnz": 5,
+          "values": [
+            [
+              1,
+              4,
+              2
+            ],
+            [
+              0,
+              3,
+              0
+            ],
+            [
+              5,
+              0,
+              0
+            ]
+          ]
+        },
+        "obs_names": [
+          "c1",
+          "c2",
+          "c3"
+        ],
+        "var_names": [
+          "g1",
+          "g2",
+          "g3"
+        ],
+        "obs_names_dtype": "str",
+        "var_names_dtype": "str",
+        "obs_index_name": "cell",
+        "var_index_name": "gene",
+        "obs_columns": [],
+        "var_columns": []
+      }
+    },
+    {
+      "name": "umi_tools_gz",
+      "reader": "read_umi_tools",
+      "source": {
+        "kind": "file",
+        "file": "umi_tools.tsv.gz"
+      },
+      "args": {},
+      "warnings": [],
+      "result": {
+        "X": {
+          "kind": "sparse",
+          "format": "csr",
+          "class": "csr_matrix",
+          "dtype": "int64",
+          "shape": [
+            3,
+            3
+          ],
+          "nnz": 5,
+          "values": [
+            [
+              1,
+              4,
+              2
+            ],
+            [
+              0,
+              3,
+              0
+            ],
+            [
+              5,
+              0,
+              0
+            ]
+          ]
+        },
+        "obs_names": [
+          "c1",
+          "c2",
+          "c3"
+        ],
+        "var_names": [
+          "g1",
+          "g2",
+          "g3"
+        ],
+        "obs_names_dtype": "str",
+        "var_names_dtype": "str",
+        "obs_index_name": "cell",
+        "var_index_name": "gene",
+        "obs_columns": [],
+        "var_columns": []
+      }
+    },
+    {
+      "name": "umi_tools_float",
+      "reader": "read_umi_tools",
+      "source": {
+        "kind": "file",
+        "file": "umi_tools.tsv"
+      },
+      "args": {
+        "dtype": "float32"
+      },
+      "warnings": [],
+      "result": {
+        "X": {
+          "kind": "sparse",
+          "format": "csr",
+          "class": "csr_matrix",
+          "dtype": "float32",
+          "shape": [
+            3,
+            3
+          ],
+          "nnz": 5,
+          "values": [
+            [
+              1.0,
+              4.0,
+              2.0
+            ],
+            [
+              0.0,
+              3.0,
+              0.0
+            ],
+            [
+              5.0,
+              0.0,
+              0.0
+            ]
+          ]
+        },
+        "obs_names": [
+          "c1",
+          "c2",
+          "c3"
+        ],
+        "var_names": [
+          "g1",
+          "g2",
+          "g3"
+        ],
+        "obs_names_dtype": "str",
+        "var_names_dtype": "str",
+        "obs_index_name": "cell",
+        "var_index_name": "gene",
+        "obs_columns": [],
+        "var_columns": []
+      }
+    },
+    {
+      "name": "umi_tools_extra_column",
+      "reader": "read_umi_tools",
+      "source": {
+        "kind": "file",
+        "file": "umi_tools_extra_column.tsv"
+      },
+      "args": {},
+      "warnings": [],
+      "result": {
+        "X": {
+          "kind": "sparse",
+          "format": "csr",
+          "class": "csr_matrix",
+          "dtype": "int64",
+          "shape": [
+            1,
+            1
+          ],
+          "nnz": 1,
+          "values": [
+            [
+              2
+            ]
+          ]
+        },
+        "obs_names": [
+          "c1"
+        ],
+        "var_names": [
+          "g1"
+        ],
+        "obs_names_dtype": "str",
+        "var_names_dtype": "str",
+        "obs_index_name": "cell",
+        "var_index_name": "gene",
+        "obs_columns": [],
+        "var_columns": []
+      }
+    },
+    {
+      "name": "hdf_names",
+      "reader": "read_hdf",
+      "source": {
+        "kind": "file",
+        "file": "hdf_names.h5"
+      },
+      "args": {
+        "key": "data"
+      },
+      "warnings": [],
+      "result": {
+        "X": {
+          "kind": "dense",
+          "dtype": "float64",
+          "shape": [
+            2,
+            3
+          ],
+          "values": [
+            [
+              0.5,
+              1.5,
+              2.5
+            ],
+            [
+              3.5,
+              4.5,
+              5.5
+            ]
+          ]
+        },
+        "obs_names": [
+          "r1",
+          "r2"
+        ],
+        "var_names": [
+          "a",
+          "b",
+          "c"
+        ],
+        "obs_names_dtype": "object",
+        "var_names_dtype": "object",
+        "obs_index_name": null,
+        "var_index_name": null,
+        "obs_columns": [],
+        "var_columns": []
+      }
+    },
+    {
+      "name": "hdf_plain",
+      "reader": "read_hdf",
+      "source": {
+        "kind": "file",
+        "file": "hdf_plain.h5"
+      },
+      "args": {
+        "key": "data"
+      },
+      "warnings": [],
+      "result": {
+        "X": {
+          "kind": "dense",
+          "dtype": "float32",
+          "shape": [
+            2,
+            3
+          ],
+          "values": [
+            [
+              0.5,
+              1.5,
+              2.5
+            ],
+            [
+              3.5,
+              4.5,
+              5.5
+            ]
+          ]
+        },
+        "obs_names": [
+          "0",
+          "1"
+        ],
+        "var_names": [
+          "0",
+          "1",
+          "2"
+        ],
+        "obs_names_dtype": "str",
+        "var_names_dtype": "str",
+        "obs_index_name": null,
+        "var_index_name": null,
+        "obs_columns": [],
+        "var_columns": []
+      }
+    },
+    {
+      "name": "hdf_integer",
+      "reader": "read_hdf",
+      "source": {
+        "kind": "file",
+        "file": "hdf_integer.h5"
+      },
+      "args": {
+        "key": "data"
+      },
+      "warnings": [],
+      "result": {
+        "X": {
+          "kind": "dense",
+          "dtype": "int64",
+          "shape": [
+            3,
+            2
+          ],
+          "values": [
+            [
+              0,
+              1
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              4,
+              5
+            ]
+          ]
+        },
+        "obs_names": [
+          "0",
+          "1",
+          "2"
+        ],
+        "var_names": [
+          "0",
+          "1"
+        ],
+        "obs_names_dtype": "str",
+        "var_names_dtype": "str",
+        "obs_index_name": null,
+        "var_index_name": null,
+        "obs_columns": [],
+        "var_columns": []
+      }
+    },
+    {
+      "name": "hdf_row_names_only",
+      "reader": "read_hdf",
+      "source": {
+        "kind": "file",
+        "file": "hdf_two_keys.h5"
+      },
+      "args": {
+        "key": "a"
+      },
+      "warnings": [],
+      "result": {
+        "X": {
+          "kind": "dense",
+          "dtype": "float64",
+          "shape": [
+            2,
+            3
+          ],
+          "values": [
+            [
+              0.5,
+              1.5,
+              2.5
+            ],
+            [
+              3.5,
+              4.5,
+              5.5
+            ]
+          ]
+        },
+        "obs_names": [
+          "r1",
+          "r2"
+        ],
+        "var_names": [
+          "0",
+          "1",
+          "2"
+        ],
+        "obs_names_dtype": "object",
+        "var_names_dtype": "str",
+        "obs_index_name": null,
+        "var_index_name": null,
+        "obs_columns": [],
+        "var_columns": []
+      }
+    },
+    {
+      "name": "hdf_row_names_mismatch",
+      "reader": "read_hdf",
+      "source": {
+        "kind": "file",
+        "file": "hdf_two_keys.h5"
+      },
+      "args": {
+        "key": "b"
+      },
+      "warnings": [],
+      "result": {
+        "X": {
+          "kind": "dense",
+          "dtype": "int32",
+          "shape": [
+            2,
+            2
+          ],
+          "values": [
+            [
+              0,
+              1
+            ],
+            [
+              2,
+              3
+            ]
+          ]
+        },
+        "obs_names": [
+          "r1",
+          "r2"
+        ],
+        "var_names": [
+          "0",
+          "1"
+        ],
+        "obs_names_dtype": "object",
+        "var_names_dtype": "str",
+        "obs_index_name": null,
+        "var_index_name": null,
+        "obs_columns": [],
+        "var_columns": []
+      }
+    },
+    {
+      "name": "hdf_empty_key",
+      "reader": "read_hdf",
+      "source": {
+        "kind": "file",
+        "file": "hdf_names.h5"
+      },
+      "args": {
+        "key": ""
+      },
+      "warnings": [],
+      "error": {
+        "class": "ValueError",
+        "message": "The file hdf_names.h5 stores the following sheets:\n['col_names', 'data', 'row_names']\nCall read/read_hdf5 with one of them."
+      }
+    },
+    {
+      "name": "hdf_missing_key",
+      "reader": "read_hdf",
+      "source": {
+        "kind": "file",
+        "file": "hdf_names.h5"
+      },
+      "args": {
+        "key": "nope"
+      },
+      "warnings": [],
+      "error": {
+        "class": "KeyError",
+        "message": "\"Unable to synchronously open object (object 'nope' doesn't exist)\""
+      }
+    },
+    {
+      "name": "excel_counts",
+      "reader": "read_excel",
+      "source": {
+        "kind": "file",
+        "file": "sheets.xlsx"
+      },
+      "args": {
+        "sheet": "counts"
+      },
+      "warnings": [],
+      "result": {
+        "X": {
+          "kind": "dense",
+          "dtype": "object",
+          "shape": [
+            3,
+            2
+          ],
+          "values": [
+            [
+              1.0,
+              4.0
+            ],
+            [
+              2.5,
+              5.0
+            ],
+            [
+              3.0,
+              6.5
+            ]
+          ]
+        },
+        "obs_names": [
+          "c1",
+          "c2",
+          "c3"
+        ],
+        "var_names": [
+          "g1",
+          "g2"
+        ],
+        "obs_names_dtype": "str",
+        "var_names_dtype": "str",
+        "obs_index_name": "cell",
+        "var_index_name": null,
+        "obs_columns": [],
+        "var_columns": []
+      }
+    },
+    {
+      "name": "excel_counts_by_index",
+      "reader": "read_excel",
+      "source": {
+        "kind": "file",
+        "file": "sheets.xlsx"
+      },
+      "args": {
+        "sheet": 0
+      },
+      "warnings": [],
+      "result": {
+        "X": {
+          "kind": "dense",
+          "dtype": "object",
+          "shape": [
+            3,
+            2
+          ],
+          "values": [
+            [
+              1.0,
+              4.0
+            ],
+            [
+              2.5,
+              5.0
+            ],
+            [
+              3.0,
+              6.5
+            ]
+          ]
+        },
+        "obs_names": [
+          "c1",
+          "c2",
+          "c3"
+        ],
+        "var_names": [
+          "g1",
+          "g2"
+        ],
+        "obs_names_dtype": "str",
+        "var_names_dtype": "str",
+        "obs_index_name": "cell",
+        "var_index_name": null,
+        "obs_columns": [],
+        "var_columns": []
+      }
+    },
+    {
+      "name": "excel_integer_labels",
+      "reader": "read_excel",
+      "source": {
+        "kind": "file",
+        "file": "sheets.xlsx"
+      },
+      "args": {
+        "sheet": "integer_labels"
+      },
+      "warnings": [],
+      "result": {
+        "X": {
+          "kind": "dense",
+          "dtype": "int64",
+          "shape": [
+            2,
+            2
+          ],
+          "values": [
+            [
+              1,
+              3
+            ],
+            [
+              2,
+              4
+            ]
+          ]
+        },
+        "obs_names": [
+          "10",
+          "20"
+        ],
+        "var_names": [
+          "a",
+          "b"
+        ],
+        "obs_names_dtype": "str",
+        "var_names_dtype": "str",
+        "obs_index_name": "id",
+        "var_index_name": null,
+        "obs_columns": [],
+        "var_columns": []
+      }
+    },
+    {
+      "name": "excel_numeric_headers",
+      "reader": "read_excel",
+      "source": {
+        "kind": "file",
+        "file": "sheets.xlsx"
+      },
+      "args": {
+        "sheet": "numeric_headers"
+      },
+      "warnings": [],
+      "result": {
+        "X": {
+          "kind": "dense",
+          "dtype": "object",
+          "shape": [
+            2,
+            2
+          ],
+          "values": [
+            [
+              1,
+              3
+            ],
+            [
+              2,
+              4
+            ]
+          ]
+        },
+        "obs_names": [
+          "x",
+          "y"
+        ],
+        "var_names": [
+          "1",
+          "2"
+        ],
+        "obs_names_dtype": "str",
+        "var_names_dtype": "str",
+        "obs_index_name": "cell",
+        "var_index_name": null,
+        "obs_columns": [],
+        "var_columns": []
+      }
+    },
+    {
+      "name": "excel_integer_values",
+      "reader": "read_excel",
+      "source": {
+        "kind": "file",
+        "file": "sheets.xlsx"
+      },
+      "args": {
+        "sheet": "integer_values"
+      },
+      "warnings": [],
+      "result": {
+        "X": {
+          "kind": "dense",
+          "dtype": "object",
+          "shape": [
+            2,
+            2
+          ],
+          "values": [
+            [
+              1,
+              3
+            ],
+            [
+              2,
+              4
+            ]
+          ]
+        },
+        "obs_names": [
+          "x",
+          "y"
+        ],
+        "var_names": [
+          "a",
+          "b"
+        ],
+        "obs_names_dtype": "str",
+        "var_names_dtype": "str",
+        "obs_index_name": "cell",
+        "var_index_name": null,
+        "obs_columns": [],
+        "var_columns": []
+      }
+    },
+    {
+      "name": "excel_dtype_ignored",
+      "reader": "read_excel",
+      "source": {
+        "kind": "file",
+        "file": "sheets.xlsx"
+      },
+      "args": {
+        "sheet": "counts",
+        "dtype": "int32"
+      },
+      "warnings": [],
+      "result": {
+        "X": {
+          "kind": "dense",
+          "dtype": "object",
+          "shape": [
+            3,
+            2
+          ],
+          "values": [
+            [
+              1.0,
+              4.0
+            ],
+            [
+              2.5,
+              5.0
+            ],
+            [
+              3.0,
+              6.5
+            ]
+          ]
+        },
+        "obs_names": [
+          "c1",
+          "c2",
+          "c3"
+        ],
+        "var_names": [
+          "g1",
+          "g2"
+        ],
+        "obs_names_dtype": "str",
+        "var_names_dtype": "str",
+        "obs_index_name": "cell",
+        "var_index_name": null,
+        "obs_columns": [],
+        "var_columns": []
+      }
+    },
+    {
+      "name": "excel_missing_sheet",
+      "reader": "read_excel",
+      "source": {
+        "kind": "file",
+        "file": "sheets.xlsx"
+      },
+      "args": {
+        "sheet": "nope"
+      },
+      "warnings": [],
+      "error": {
+        "class": "ValueError",
+        "message": "Worksheet named 'nope' not found"
+      }
+    },
+    {
+      "name": "excel_integer_labels_unrestricted",
+      "reader": "read_excel",
+      "source": {
+        "kind": "file",
+        "file": "sheets.xlsx"
+      },
+      "args": {
+        "sheet": "integer_labels"
+      },
+      "warnings": [],
+      "result": {
+        "X": {
+          "kind": "dense",
+          "dtype": "int64",
+          "shape": [
+            2,
+            2
+          ],
+          "values": [
+            [
+              1,
+              3
+            ],
+            [
+              2,
+              4
+            ]
+          ]
+        },
+        "obs_names": [
+          10,
+          20
+        ],
+        "var_names": [
+          "a",
+          "b"
+        ],
+        "obs_names_dtype": "int64",
+        "var_names_dtype": "str",
+        "obs_index_name": "id",
+        "var_index_name": null,
+        "obs_columns": [],
+        "var_columns": []
+      }
+    }
+  ],
+  "write_csvs": {
+    "adatas": {
+      "dense": {
+        "X": {
+          "kind": "dense",
+          "values": [
+            [
+              1.0,
+              2.0,
+              3.0
+            ],
+            [
+              4.0,
+              5.0,
+              6.5
+            ]
+          ]
+        },
+        "obs_names": [
+          "c1",
+          "c2"
+        ],
+        "var_names": [
+          "g1",
+          "g2",
+          "g3"
+        ],
+        "obs": {
+          "group": [
+            "a",
+            "b"
+          ],
+          "n": [
+            1,
+            2
+          ]
+        },
+        "var": {
+          "score": [
+            0.5,
+            1.5,
+            2.5
+          ]
+        },
+        "obsm": {
+          "X_pca": [
+            [
+              1.0,
+              2.0
+            ],
+            [
+              3.0,
+              4.0
+            ]
+          ]
+        },
+        "varm": {
+          "loadings": [
+            [
+              0.1
+            ],
+            [
+              0.2
+            ],
+            [
+              0.3
+            ]
+          ]
+        },
+        "uns": {}
+      },
+      "sparse": {
+        "X": {
+          "kind": "sparse",
+          "values": [
+            [
+              0.0,
+              2.0,
+              0.0
+            ],
+            [
+              4.0,
+              0.0,
+              6.5
+            ]
+          ]
+        },
+        "obs_names": [
+          "c1",
+          "c2"
+        ],
+        "var_names": [
+          "g1",
+          "g2",
+          "g3"
+        ],
+        "obs": {
+          "group": [
+            "a",
+            "b"
+          ]
+        },
+        "var": {},
+        "obsm": {},
+        "varm": {},
+        "uns": {}
+      },
+      "no_x": {
+        "X": null,
+        "obs_names": [
+          "c1",
+          "c2"
+        ],
+        "var_names": [
+          "g1",
+          "g2"
+        ],
+        "obs": {
+          "n": [
+            1,
+            2
+          ]
+        },
+        "var": {},
+        "obsm": {},
+        "varm": {},
+        "uns": {}
+      },
+      "uns_values": {
+        "X": {
+          "kind": "dense",
+          "values": [
+            [
+              1.0,
+              2.0
+            ],
+            [
+              3.0,
+              4.0
+            ]
+          ]
+        },
+        "obs_names": [
+          "c1",
+          "c2"
+        ],
+        "var_names": [
+          "g1",
+          "g2"
+        ],
+        "obs": {},
+        "var": {},
+        "obsm": {},
+        "varm": {},
+        "uns": {
+          "scalar_int": {
+            "kind": "scalar",
+            "value": 3
+          },
+          "scalar_float": {
+            "kind": "scalar",
+            "value": 2.5
+          },
+          "scalar_string": {
+            "kind": "scalar",
+            "value": "hello"
+          },
+          "vector": {
+            "kind": "vector",
+            "value": [
+              1,
+              2,
+              3
+            ]
+          },
+          "string_vector": {
+            "kind": "vector",
+            "value": [
+              "a",
+              "b"
+            ]
+          },
+          "matrix": {
+            "kind": "matrix",
+            "value": [
+              [
+                1.0,
+                2.0
+              ],
+              [
+                3.0,
+                4.0
+              ]
+            ]
+          }
+        }
+      },
+      "uns_sparse": {
+        "X": {
+          "kind": "dense",
+          "values": [
+            [
+              1.0,
+              2.0
+            ],
+            [
+              3.0,
+              4.0
+            ]
+          ]
+        },
+        "obs_names": [
+          "c1",
+          "c2"
+        ],
+        "var_names": [
+          "g1",
+          "g2"
+        ],
+        "obs": {},
+        "var": {},
+        "obsm": {},
+        "varm": {},
+        "uns": {
+          "first_sparse": {
+            "kind": "sparse",
+            "value": [
+              [
+                0,
+                1
+              ],
+              [
+                2,
+                0
+              ]
+            ]
+          },
+          "second_sparse": {
+            "kind": "sparse",
+            "value": [
+              [
+                1,
+                0
+              ],
+              [
+                0,
+                1
+              ]
+            ]
+          },
+          "kept": {
+            "kind": "scalar",
+            "value": 1
+          }
+        }
+      },
+      "uns_unwritable": {
+        "X": {
+          "kind": "dense",
+          "values": [
+            [
+              1.0,
+              2.0
+            ],
+            [
+              3.0,
+              4.0
+            ]
+          ]
+        },
+        "obs_names": [
+          "c1",
+          "c2"
+        ],
+        "var_names": [
+          "g1",
+          "g2"
+        ],
+        "obs": {},
+        "var": {},
+        "obsm": {},
+        "varm": {},
+        "uns": {
+          "cube": {
+            "kind": "array3",
+            "value": [
+              [
+                [
+                  1,
+                  2
+                ],
+                [
+                  3,
+                  4
+                ]
+              ],
+              [
+                [
+                  5,
+                  6
+                ],
+                [
+                  7,
+                  8
+                ]
+              ]
+            ]
+          },
+          "kept": {
+            "kind": "scalar",
+            "value": 1
+          }
+        }
+      },
+      "uns_nested": {
+        "X": {
+          "kind": "dense",
+          "values": [
+            [
+              1.0,
+              2.0
+            ],
+            [
+              3.0,
+              4.0
+            ]
+          ]
+        },
+        "obs_names": [
+          "c1",
+          "c2"
+        ],
+        "var_names": [
+          "g1",
+          "g2"
+        ],
+        "obs": {},
+        "var": {},
+        "obsm": {},
+        "varm": {},
+        "uns": {
+          "params": {
+            "kind": "dict",
+            "value": {
+              "a": 1,
+              "b": 2.5
+            }
+          },
+          "deep": {
+            "kind": "dict",
+            "value": {
+              "a": {
+                "b": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    "cases": [
+      {
+        "name": "dense_default",
+        "adata": "dense",
+        "dirname": "out",
+        "args": {},
+        "warnings": [],
+        "files": {
+          "out/obs.csv": {
+            "header": true,
+            "index": [
+              "c1",
+              "c2"
+            ],
+            "columns": [
+              "group",
+              "n"
+            ],
+            "values": [
+              [
+                "a",
+                1
+              ],
+              [
+                "b",
+                2
+              ]
+            ],
+            "dtypes": [
+              "str",
+              "int64"
+            ],
+            "text": ",group,n\nc1,a,1\nc2,b,2\n"
+          },
+          "out/obsm.csv": {
+            "header": true,
+            "index": [
+              0,
+              1
+            ],
+            "columns": [
+              "X_pca1",
+              "X_pca2"
+            ],
+            "values": [
+              [
+                1.0,
+                2.0
+              ],
+              [
+                3.0,
+                4.0
+              ]
+            ],
+            "dtypes": [
+              "float64",
+              "float64"
+            ],
+            "text": "X_pca1,X_pca2\n1.0,2.0\n3.0,4.0\n"
+          },
+          "out/var.csv": {
+            "header": true,
+            "index": [
+              "g1",
+              "g2",
+              "g3"
+            ],
+            "columns": [
+              "score"
+            ],
+            "values": [
+              [
+                0.5
+              ],
+              [
+                1.5
+              ],
+              [
+                2.5
+              ]
+            ],
+            "dtypes": [
+              "float64"
+            ],
+            "text": ",score\ng1,0.5\ng2,1.5\ng3,2.5\n"
+          },
+          "out/varm.csv": {
+            "header": true,
+            "index": [
+              0,
+              1,
+              2
+            ],
+            "columns": [
+              "loadings1"
+            ],
+            "values": [
+              [
+                0.1
+              ],
+              [
+                0.2
+              ],
+              [
+                0.3
+              ]
+            ],
+            "dtypes": [
+              "float64"
+            ],
+            "text": "loadings1\n0.1\n0.2\n0.3\n"
+          }
+        }
+      },
+      {
+        "name": "dense_skip_data",
+        "adata": "dense",
+        "dirname": "out",
+        "args": {
+          "skip_data": true
+        },
+        "warnings": [],
+        "files": {
+          "out/obs.csv": {
+            "header": true,
+            "index": [
+              "c1",
+              "c2"
+            ],
+            "columns": [
+              "group",
+              "n"
+            ],
+            "values": [
+              [
+                "a",
+                1
+              ],
+              [
+                "b",
+                2
+              ]
+            ],
+            "dtypes": [
+              "str",
+              "int64"
+            ],
+            "text": ",group,n\nc1,a,1\nc2,b,2\n"
+          },
+          "out/obsm.csv": {
+            "header": true,
+            "index": [
+              0,
+              1
+            ],
+            "columns": [
+              "X_pca1",
+              "X_pca2"
+            ],
+            "values": [
+              [
+                1.0,
+                2.0
+              ],
+              [
+                3.0,
+                4.0
+              ]
+            ],
+            "dtypes": [
+              "float64",
+              "float64"
+            ],
+            "text": "X_pca1,X_pca2\n1.0,2.0\n3.0,4.0\n"
+          },
+          "out/var.csv": {
+            "header": true,
+            "index": [
+              "g1",
+              "g2",
+              "g3"
+            ],
+            "columns": [
+              "score"
+            ],
+            "values": [
+              [
+                0.5
+              ],
+              [
+                1.5
+              ],
+              [
+                2.5
+              ]
+            ],
+            "dtypes": [
+              "float64"
+            ],
+            "text": ",score\ng1,0.5\ng2,1.5\ng3,2.5\n"
+          },
+          "out/varm.csv": {
+            "header": true,
+            "index": [
+              0,
+              1,
+              2
+            ],
+            "columns": [
+              "loadings1"
+            ],
+            "values": [
+              [
+                0.1
+              ],
+              [
+                0.2
+              ],
+              [
+                0.3
+              ]
+            ],
+            "dtypes": [
+              "float64"
+            ],
+            "text": "loadings1\n0.1\n0.2\n0.3\n"
+          }
+        }
+      },
+      {
+        "name": "dense_with_data",
+        "adata": "dense",
+        "dirname": "out",
+        "args": {
+          "skip_data": false
+        },
+        "warnings": [],
+        "files": {
+          "out/X.csv": {
+            "header": false,
+            "index": [
+              0,
+              1
+            ],
+            "columns": [
+              "0",
+              "1",
+              "2"
+            ],
+            "values": [
+              [
+                1.0,
+                2.0,
+                3.0
+              ],
+              [
+                4.0,
+                5.0,
+                6.5
+              ]
+            ],
+            "dtypes": [
+              "float64",
+              "float64",
+              "float64"
+            ],
+            "text": "1.0,2.0,3.0\n4.0,5.0,6.5\n"
+          },
+          "out/obs.csv": {
+            "header": true,
+            "index": [
+              "c1",
+              "c2"
+            ],
+            "columns": [
+              "group",
+              "n"
+            ],
+            "values": [
+              [
+                "a",
+                1
+              ],
+              [
+                "b",
+                2
+              ]
+            ],
+            "dtypes": [
+              "str",
+              "int64"
+            ],
+            "text": ",group,n\nc1,a,1\nc2,b,2\n"
+          },
+          "out/obsm.csv": {
+            "header": true,
+            "index": [
+              0,
+              1
+            ],
+            "columns": [
+              "X_pca1",
+              "X_pca2"
+            ],
+            "values": [
+              [
+                1.0,
+                2.0
+              ],
+              [
+                3.0,
+                4.0
+              ]
+            ],
+            "dtypes": [
+              "float64",
+              "float64"
+            ],
+            "text": "X_pca1,X_pca2\n1.0,2.0\n3.0,4.0\n"
+          },
+          "out/var.csv": {
+            "header": true,
+            "index": [
+              "g1",
+              "g2",
+              "g3"
+            ],
+            "columns": [
+              "score"
+            ],
+            "values": [
+              [
+                0.5
+              ],
+              [
+                1.5
+              ],
+              [
+                2.5
+              ]
+            ],
+            "dtypes": [
+              "float64"
+            ],
+            "text": ",score\ng1,0.5\ng2,1.5\ng3,2.5\n"
+          },
+          "out/varm.csv": {
+            "header": true,
+            "index": [
+              0,
+              1,
+              2
+            ],
+            "columns": [
+              "loadings1"
+            ],
+            "values": [
+              [
+                0.1
+              ],
+              [
+                0.2
+              ],
+              [
+                0.3
+              ]
+            ],
+            "dtypes": [
+              "float64"
+            ],
+            "text": "loadings1\n0.1\n0.2\n0.3\n"
+          }
+        }
+      },
+      {
+        "name": "dense_with_data_tab",
+        "adata": "dense",
+        "dirname": "out",
+        "args": {
+          "skip_data": false,
+          "sep": "\t"
+        },
+        "warnings": [],
+        "files": {
+          "out/X.csv": {
+            "header": false,
+            "index": [
+              0,
+              1
+            ],
+            "columns": [
+              "0",
+              "1",
+              "2"
+            ],
+            "values": [
+              [
+                1.0,
+                2.0,
+                3.0
+              ],
+              [
+                4.0,
+                5.0,
+                6.5
+              ]
+            ],
+            "dtypes": [
+              "float64",
+              "float64",
+              "float64"
+            ],
+            "text": "1.0\t2.0\t3.0\n4.0\t5.0\t6.5\n"
+          },
+          "out/obs.csv": {
+            "header": true,
+            "index": [
+              "c1",
+              "c2"
+            ],
+            "columns": [
+              "group",
+              "n"
+            ],
+            "values": [
+              [
+                "a",
+                1
+              ],
+              [
+                "b",
+                2
+              ]
+            ],
+            "dtypes": [
+              "str",
+              "int64"
+            ],
+            "text": "\tgroup\tn\nc1\ta\t1\nc2\tb\t2\n"
+          },
+          "out/obsm.csv": {
+            "header": true,
+            "index": [
+              0,
+              1
+            ],
+            "columns": [
+              "X_pca1",
+              "X_pca2"
+            ],
+            "values": [
+              [
+                1.0,
+                2.0
+              ],
+              [
+                3.0,
+                4.0
+              ]
+            ],
+            "dtypes": [
+              "float64",
+              "float64"
+            ],
+            "text": "X_pca1\tX_pca2\n1.0\t2.0\n3.0\t4.0\n"
+          },
+          "out/var.csv": {
+            "header": true,
+            "index": [
+              "g1",
+              "g2",
+              "g3"
+            ],
+            "columns": [
+              "score"
+            ],
+            "values": [
+              [
+                0.5
+              ],
+              [
+                1.5
+              ],
+              [
+                2.5
+              ]
+            ],
+            "dtypes": [
+              "float64"
+            ],
+            "text": "\tscore\ng1\t0.5\ng2\t1.5\ng3\t2.5\n"
+          },
+          "out/varm.csv": {
+            "header": true,
+            "index": [
+              0,
+              1,
+              2
+            ],
+            "columns": [
+              "loadings1"
+            ],
+            "values": [
+              [
+                0.1
+              ],
+              [
+                0.2
+              ],
+              [
+                0.3
+              ]
+            ],
+            "dtypes": [
+              "float64"
+            ],
+            "text": "loadings1\n0.1\n0.2\n0.3\n"
+          }
+        }
+      },
+      {
+        "name": "sparse_skip_data",
+        "adata": "sparse",
+        "dirname": "out",
+        "args": {},
+        "warnings": [],
+        "files": {
+          "out/obs.csv": {
+            "header": true,
+            "index": [
+              "c1",
+              "c2"
+            ],
+            "columns": [
+              "group"
+            ],
+            "values": [
+              [
+                "a"
+              ],
+              [
+                "b"
+              ]
+            ],
+            "dtypes": [
+              "str"
+            ],
+            "text": ",group\nc1,a\nc2,b\n"
+          },
+          "out/obsm.csv": {
+            "header": true,
+            "index": false,
+            "error": {
+              "class": "EmptyDataError",
+              "message": "No columns to parse from file"
+            },
+            "text": "\n\n\n"
+          },
+          "out/var.csv": {
+            "header": true,
+            "index": [
+              "g1",
+              "g2",
+              "g3"
+            ],
+            "columns": [],
+            "values": [
+              [],
+              [],
+              []
+            ],
+            "dtypes": [],
+            "text": "\"\"\ng1\ng2\ng3\n"
+          },
+          "out/varm.csv": {
+            "header": true,
+            "index": false,
+            "error": {
+              "class": "EmptyDataError",
+              "message": "No columns to parse from file"
+            },
+            "text": "\n\n\n\n"
+          }
+        }
+      },
+      {
+        "name": "sparse_with_data",
+        "adata": "sparse",
+        "dirname": "out",
+        "args": {
+          "skip_data": false
+        },
+        "warnings": [],
+        "files": {
+          "out/X.csv": {
+            "header": false,
+            "index": [
+              0,
+              1
+            ],
+            "columns": [
+              "0",
+              "1",
+              "2"
+            ],
+            "values": [
+              [
+                0.0,
+                2.0,
+                0.0
+              ],
+              [
+                4.0,
+                0.0,
+                6.5
+              ]
+            ],
+            "dtypes": [
+              "float64",
+              "float64",
+              "float64"
+            ],
+            "text": "0.0,2.0,0.0\n4.0,0.0,6.5\n"
+          },
+          "out/obs.csv": {
+            "header": true,
+            "index": [
+              "c1",
+              "c2"
+            ],
+            "columns": [
+              "group"
+            ],
+            "values": [
+              [
+                "a"
+              ],
+              [
+                "b"
+              ]
+            ],
+            "dtypes": [
+              "str"
+            ],
+            "text": ",group\nc1,a\nc2,b\n"
+          },
+          "out/obsm.csv": {
+            "header": true,
+            "index": false,
+            "error": {
+              "class": "EmptyDataError",
+              "message": "No columns to parse from file"
+            },
+            "text": "\n\n\n"
+          },
+          "out/var.csv": {
+            "header": true,
+            "index": [
+              "g1",
+              "g2",
+              "g3"
+            ],
+            "columns": [],
+            "values": [
+              [],
+              [],
+              []
+            ],
+            "dtypes": [],
+            "text": "\"\"\ng1\ng2\ng3\n"
+          },
+          "out/varm.csv": {
+            "header": true,
+            "index": false,
+            "error": {
+              "class": "EmptyDataError",
+              "message": "No columns to parse from file"
+            },
+            "text": "\n\n\n\n"
+          }
+        }
+      },
+      {
+        "name": "no_x_skip_data",
+        "adata": "no_x",
+        "dirname": "out",
+        "args": {},
+        "warnings": [],
+        "files": {
+          "out/obs.csv": {
+            "header": true,
+            "index": [
+              "c1",
+              "c2"
+            ],
+            "columns": [
+              "n"
+            ],
+            "values": [
+              [
+                1
+              ],
+              [
+                2
+              ]
+            ],
+            "dtypes": [
+              "int64"
+            ],
+            "text": ",n\nc1,1\nc2,2\n"
+          },
+          "out/obsm.csv": {
+            "header": true,
+            "index": false,
+            "error": {
+              "class": "EmptyDataError",
+              "message": "No columns to parse from file"
+            },
+            "text": "\n\n\n"
+          },
+          "out/var.csv": {
+            "header": true,
+            "index": [
+              "g1",
+              "g2"
+            ],
+            "columns": [],
+            "values": [
+              [],
+              []
+            ],
+            "dtypes": [],
+            "text": "\"\"\ng1\ng2\n"
+          },
+          "out/varm.csv": {
+            "header": true,
+            "index": false,
+            "error": {
+              "class": "EmptyDataError",
+              "message": "No columns to parse from file"
+            },
+            "text": "\n\n\n"
+          }
+        }
+      },
+      {
+        "name": "no_x_with_data",
+        "adata": "no_x",
+        "dirname": "out",
+        "args": {
+          "skip_data": false
+        },
+        "warnings": [],
+        "files": {
+          "out/X.csv": {
+            "header": false,
+            "index": false,
+            "error": {
+              "class": "EmptyDataError",
+              "message": "No columns to parse from file"
+            },
+            "text": ""
+          },
+          "out/obs.csv": {
+            "header": true,
+            "index": [
+              "c1",
+              "c2"
+            ],
+            "columns": [
+              "n"
+            ],
+            "values": [
+              [
+                1
+              ],
+              [
+                2
+              ]
+            ],
+            "dtypes": [
+              "int64"
+            ],
+            "text": ",n\nc1,1\nc2,2\n"
+          },
+          "out/obsm.csv": {
+            "header": true,
+            "index": false,
+            "error": {
+              "class": "EmptyDataError",
+              "message": "No columns to parse from file"
+            },
+            "text": "\n\n\n"
+          },
+          "out/var.csv": {
+            "header": true,
+            "index": [
+              "g1",
+              "g2"
+            ],
+            "columns": [],
+            "values": [
+              [],
+              []
+            ],
+            "dtypes": [],
+            "text": "\"\"\ng1\ng2\n"
+          },
+          "out/varm.csv": {
+            "header": true,
+            "index": false,
+            "error": {
+              "class": "EmptyDataError",
+              "message": "No columns to parse from file"
+            },
+            "text": "\n\n\n"
+          }
+        }
+      },
+      {
+        "name": "csv_dirname",
+        "adata": "dense",
+        "dirname": "out.csv",
+        "args": {},
+        "warnings": [],
+        "files": {
+          "out/obs.csv": {
+            "header": true,
+            "index": [
+              "c1",
+              "c2"
+            ],
+            "columns": [
+              "group",
+              "n"
+            ],
+            "values": [
+              [
+                "a",
+                1
+              ],
+              [
+                "b",
+                2
+              ]
+            ],
+            "dtypes": [
+              "str",
+              "int64"
+            ],
+            "text": ",group,n\nc1,a,1\nc2,b,2\n"
+          },
+          "out/obsm.csv": {
+            "header": true,
+            "index": [
+              0,
+              1
+            ],
+            "columns": [
+              "X_pca1",
+              "X_pca2"
+            ],
+            "values": [
+              [
+                1.0,
+                2.0
+              ],
+              [
+                3.0,
+                4.0
+              ]
+            ],
+            "dtypes": [
+              "float64",
+              "float64"
+            ],
+            "text": "X_pca1,X_pca2\n1.0,2.0\n3.0,4.0\n"
+          },
+          "out/var.csv": {
+            "header": true,
+            "index": [
+              "g1",
+              "g2",
+              "g3"
+            ],
+            "columns": [
+              "score"
+            ],
+            "values": [
+              [
+                0.5
+              ],
+              [
+                1.5
+              ],
+              [
+                2.5
+              ]
+            ],
+            "dtypes": [
+              "float64"
+            ],
+            "text": ",score\ng1,0.5\ng2,1.5\ng3,2.5\n"
+          },
+          "out/varm.csv": {
+            "header": true,
+            "index": [
+              0,
+              1,
+              2
+            ],
+            "columns": [
+              "loadings1"
+            ],
+            "values": [
+              [
+                0.1
+              ],
+              [
+                0.2
+              ],
+              [
+                0.3
+              ]
+            ],
+            "dtypes": [
+              "float64"
+            ],
+            "text": "loadings1\n0.1\n0.2\n0.3\n"
+          }
+        }
+      },
+      {
+        "name": "nested_dirname",
+        "adata": "dense",
+        "dirname": "a/b/out",
+        "args": {},
+        "warnings": [],
+        "files": {
+          "a/b/out/obs.csv": {
+            "header": true,
+            "index": [
+              "c1",
+              "c2"
+            ],
+            "columns": [
+              "group",
+              "n"
+            ],
+            "values": [
+              [
+                "a",
+                1
+              ],
+              [
+                "b",
+                2
+              ]
+            ],
+            "dtypes": [
+              "str",
+              "int64"
+            ],
+            "text": ",group,n\nc1,a,1\nc2,b,2\n"
+          },
+          "a/b/out/obsm.csv": {
+            "header": true,
+            "index": [
+              0,
+              1
+            ],
+            "columns": [
+              "X_pca1",
+              "X_pca2"
+            ],
+            "values": [
+              [
+                1.0,
+                2.0
+              ],
+              [
+                3.0,
+                4.0
+              ]
+            ],
+            "dtypes": [
+              "float64",
+              "float64"
+            ],
+            "text": "X_pca1,X_pca2\n1.0,2.0\n3.0,4.0\n"
+          },
+          "a/b/out/var.csv": {
+            "header": true,
+            "index": [
+              "g1",
+              "g2",
+              "g3"
+            ],
+            "columns": [
+              "score"
+            ],
+            "values": [
+              [
+                0.5
+              ],
+              [
+                1.5
+              ],
+              [
+                2.5
+              ]
+            ],
+            "dtypes": [
+              "float64"
+            ],
+            "text": ",score\ng1,0.5\ng2,1.5\ng3,2.5\n"
+          },
+          "a/b/out/varm.csv": {
+            "header": true,
+            "index": [
+              0,
+              1,
+              2
+            ],
+            "columns": [
+              "loadings1"
+            ],
+            "values": [
+              [
+                0.1
+              ],
+              [
+                0.2
+              ],
+              [
+                0.3
+              ]
+            ],
+            "dtypes": [
+              "float64"
+            ],
+            "text": "loadings1\n0.1\n0.2\n0.3\n"
+          }
+        }
+      },
+      {
+        "name": "uns_values",
+        "adata": "uns_values",
+        "dirname": "out",
+        "args": {},
+        "warnings": [],
+        "files": {
+          "out/obs.csv": {
+            "header": true,
+            "index": [
+              "c1",
+              "c2"
+            ],
+            "columns": [],
+            "values": [
+              [],
+              []
+            ],
+            "dtypes": [],
+            "text": "\"\"\nc1\nc2\n"
+          },
+          "out/obsm.csv": {
+            "header": true,
+            "index": false,
+            "error": {
+              "class": "EmptyDataError",
+              "message": "No columns to parse from file"
+            },
+            "text": "\n\n\n"
+          },
+          "out/uns/matrix.csv": {
+            "header": false,
+            "index": [
+              0,
+              1
+            ],
+            "columns": [
+              "0",
+              "1"
+            ],
+            "values": [
+              [
+                1.0,
+                2.0
+              ],
+              [
+                3.0,
+                4.0
+              ]
+            ],
+            "dtypes": [
+              "float64",
+              "float64"
+            ],
+            "text": "1.0,2.0\n3.0,4.0\n"
+          },
+          "out/uns/scalar_float.csv": {
+            "header": false,
+            "index": [
+              0
+            ],
+            "columns": [
+              "0"
+            ],
+            "values": [
+              [
+                2.5
+              ]
+            ],
+            "dtypes": [
+              "float64"
+            ],
+            "text": "2.5\n"
+          },
+          "out/uns/scalar_int.csv": {
+            "header": false,
+            "index": [
+              0
+            ],
+            "columns": [
+              "0"
+            ],
+            "values": [
+              [
+                3
+              ]
+            ],
+            "dtypes": [
+              "int64"
+            ],
+            "text": "3\n"
+          },
+          "out/uns/scalar_string.csv": {
+            "header": false,
+            "index": [
+              0
+            ],
+            "columns": [
+              "0"
+            ],
+            "values": [
+              [
+                "hello"
+              ]
+            ],
+            "dtypes": [
+              "str"
+            ],
+            "text": "hello\n"
+          },
+          "out/uns/string_vector.csv": {
+            "header": false,
+            "index": [
+              0,
+              1
+            ],
+            "columns": [
+              "0"
+            ],
+            "values": [
+              [
+                "a"
+              ],
+              [
+                "b"
+              ]
+            ],
+            "dtypes": [
+              "str"
+            ],
+            "text": "a\nb\n"
+          },
+          "out/uns/vector.csv": {
+            "header": false,
+            "index": [
+              0,
+              1,
+              2
+            ],
+            "columns": [
+              "0"
+            ],
+            "values": [
+              [
+                1
+              ],
+              [
+                2
+              ],
+              [
+                3
+              ]
+            ],
+            "dtypes": [
+              "int64"
+            ],
+            "text": "1\n2\n3\n"
+          },
+          "out/var.csv": {
+            "header": true,
+            "index": [
+              "g1",
+              "g2"
+            ],
+            "columns": [],
+            "values": [
+              [],
+              []
+            ],
+            "dtypes": [],
+            "text": "\"\"\ng1\ng2\n"
+          },
+          "out/varm.csv": {
+            "header": true,
+            "index": false,
+            "error": {
+              "class": "EmptyDataError",
+              "message": "No columns to parse from file"
+            },
+            "text": "\n\n\n"
+          }
+        }
+      },
+      {
+        "name": "uns_values_tab",
+        "adata": "uns_values",
+        "dirname": "out",
+        "args": {
+          "sep": ";"
+        },
+        "warnings": [],
+        "files": {
+          "out/obs.csv": {
+            "header": true,
+            "index": [
+              "c1",
+              "c2"
+            ],
+            "columns": [],
+            "values": [
+              [],
+              []
+            ],
+            "dtypes": [],
+            "text": "\"\"\nc1\nc2\n"
+          },
+          "out/obsm.csv": {
+            "header": true,
+            "index": false,
+            "error": {
+              "class": "EmptyDataError",
+              "message": "No columns to parse from file"
+            },
+            "text": "\n\n\n"
+          },
+          "out/uns/matrix.csv": {
+            "header": false,
+            "index": [
+              0,
+              1
+            ],
+            "columns": [
+              "0",
+              "1"
+            ],
+            "values": [
+              [
+                1.0,
+                2.0
+              ],
+              [
+                3.0,
+                4.0
+              ]
+            ],
+            "dtypes": [
+              "float64",
+              "float64"
+            ],
+            "text": "1.0;2.0\n3.0;4.0\n"
+          },
+          "out/uns/scalar_float.csv": {
+            "header": false,
+            "index": [
+              0
+            ],
+            "columns": [
+              "0"
+            ],
+            "values": [
+              [
+                2.5
+              ]
+            ],
+            "dtypes": [
+              "float64"
+            ],
+            "text": "2.5\n"
+          },
+          "out/uns/scalar_int.csv": {
+            "header": false,
+            "index": [
+              0
+            ],
+            "columns": [
+              "0"
+            ],
+            "values": [
+              [
+                3
+              ]
+            ],
+            "dtypes": [
+              "int64"
+            ],
+            "text": "3\n"
+          },
+          "out/uns/scalar_string.csv": {
+            "header": false,
+            "index": [
+              0
+            ],
+            "columns": [
+              "0"
+            ],
+            "values": [
+              [
+                "hello"
+              ]
+            ],
+            "dtypes": [
+              "str"
+            ],
+            "text": "hello\n"
+          },
+          "out/uns/string_vector.csv": {
+            "header": false,
+            "index": [
+              0,
+              1
+            ],
+            "columns": [
+              "0"
+            ],
+            "values": [
+              [
+                "a"
+              ],
+              [
+                "b"
+              ]
+            ],
+            "dtypes": [
+              "str"
+            ],
+            "text": "a\nb\n"
+          },
+          "out/uns/vector.csv": {
+            "header": false,
+            "index": [
+              0,
+              1,
+              2
+            ],
+            "columns": [
+              "0"
+            ],
+            "values": [
+              [
+                1
+              ],
+              [
+                2
+              ],
+              [
+                3
+              ]
+            ],
+            "dtypes": [
+              "int64"
+            ],
+            "text": "1\n2\n3\n"
+          },
+          "out/var.csv": {
+            "header": true,
+            "index": [
+              "g1",
+              "g2"
+            ],
+            "columns": [],
+            "values": [
+              [],
+              []
+            ],
+            "dtypes": [],
+            "text": "\"\"\ng1\ng2\n"
+          },
+          "out/varm.csv": {
+            "header": true,
+            "index": false,
+            "error": {
+              "class": "EmptyDataError",
+              "message": "No columns to parse from file"
+            },
+            "text": "\n\n\n"
+          }
+        }
+      },
+      {
+        "name": "uns_sparse",
+        "adata": "uns_sparse",
+        "dirname": "out",
+        "args": {},
+        "warnings": [
+          {
+            "class": "WriteWarning",
+            "message": "Omitting to write sparse annotation."
+          }
+        ],
+        "files": {
+          "out/obs.csv": {
+            "header": true,
+            "index": [
+              "c1",
+              "c2"
+            ],
+            "columns": [],
+            "values": [
+              [],
+              []
+            ],
+            "dtypes": [],
+            "text": "\"\"\nc1\nc2\n"
+          },
+          "out/obsm.csv": {
+            "header": true,
+            "index": false,
+            "error": {
+              "class": "EmptyDataError",
+              "message": "No columns to parse from file"
+            },
+            "text": "\n\n\n"
+          },
+          "out/uns/kept.csv": {
+            "header": false,
+            "index": [
+              0
+            ],
+            "columns": [
+              "0"
+            ],
+            "values": [
+              [
+                1
+              ]
+            ],
+            "dtypes": [
+              "int64"
+            ],
+            "text": "1\n"
+          },
+          "out/var.csv": {
+            "header": true,
+            "index": [
+              "g1",
+              "g2"
+            ],
+            "columns": [],
+            "values": [
+              [],
+              []
+            ],
+            "dtypes": [],
+            "text": "\"\"\ng1\ng2\n"
+          },
+          "out/varm.csv": {
+            "header": true,
+            "index": false,
+            "error": {
+              "class": "EmptyDataError",
+              "message": "No columns to parse from file"
+            },
+            "text": "\n\n\n"
+          }
+        }
+      },
+      {
+        "name": "uns_unwritable",
+        "adata": "uns_unwritable",
+        "dirname": "out",
+        "args": {},
+        "warnings": [
+          {
+            "class": "WriteWarning",
+            "message": "Omitting to write 'cube' of type <class 'ValueError'>."
+          }
+        ],
+        "files": {
+          "out/obs.csv": {
+            "header": true,
+            "index": [
+              "c1",
+              "c2"
+            ],
+            "columns": [],
+            "values": [
+              [],
+              []
+            ],
+            "dtypes": [],
+            "text": "\"\"\nc1\nc2\n"
+          },
+          "out/obsm.csv": {
+            "header": true,
+            "index": false,
+            "error": {
+              "class": "EmptyDataError",
+              "message": "No columns to parse from file"
+            },
+            "text": "\n\n\n"
+          },
+          "out/uns/kept.csv": {
+            "header": false,
+            "index": [
+              0
+            ],
+            "columns": [
+              "0"
+            ],
+            "values": [
+              [
+                1
+              ]
+            ],
+            "dtypes": [
+              "int64"
+            ],
+            "text": "1\n"
+          },
+          "out/var.csv": {
+            "header": true,
+            "index": [
+              "g1",
+              "g2"
+            ],
+            "columns": [],
+            "values": [
+              [],
+              []
+            ],
+            "dtypes": [],
+            "text": "\"\"\ng1\ng2\n"
+          },
+          "out/varm.csv": {
+            "header": true,
+            "index": false,
+            "error": {
+              "class": "EmptyDataError",
+              "message": "No columns to parse from file"
+            },
+            "text": "\n\n\n"
+          }
+        }
+      },
+      {
+        "name": "uns_nested",
+        "adata": "uns_nested",
+        "dirname": "out",
+        "args": {},
+        "warnings": [],
+        "files": {
+          "out/obs.csv": {
+            "header": true,
+            "index": [
+              "c1",
+              "c2"
+            ],
+            "columns": [],
+            "values": [
+              [],
+              []
+            ],
+            "dtypes": [],
+            "text": "\"\"\nc1\nc2\n"
+          },
+          "out/obsm.csv": {
+            "header": true,
+            "index": false,
+            "error": {
+              "class": "EmptyDataError",
+              "message": "No columns to parse from file"
+            },
+            "text": "\n\n\n"
+          },
+          "out/uns/deep.csv": {
+            "header": false,
+            "index": [
+              0
+            ],
+            "columns": [
+              "0"
+            ],
+            "values": [
+              [
+                "{'a': {'b': 1}}"
+              ]
+            ],
+            "dtypes": [
+              "str"
+            ],
+            "text": "{'a': {'b': 1}}\n"
+          },
+          "out/uns/params.csv": {
+            "header": false,
+            "index": [
+              0
+            ],
+            "columns": [
+              "0"
+            ],
+            "values": [
+              [
+                "{'a': 1, 'b': 2.5}"
+              ]
+            ],
+            "dtypes": [
+              "str"
+            ],
+            "text": "\"{'a': 1, 'b': 2.5}\"\n"
+          },
+          "out/var.csv": {
+            "header": true,
+            "index": [
+              "g1",
+              "g2"
+            ],
+            "columns": [],
+            "values": [
+              [],
+              []
+            ],
+            "dtypes": [],
+            "text": "\"\"\ng1\ng2\n"
+          },
+          "out/varm.csv": {
+            "header": true,
+            "index": false,
+            "error": {
+              "class": "EmptyDataError",
+              "message": "No columns to parse from file"
+            },
+            "text": "\n\n\n"
+          }
+        }
+      }
+    ]
+  }
+}

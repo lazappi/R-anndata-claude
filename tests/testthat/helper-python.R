@@ -45,6 +45,7 @@ generator_inputs <- function() {
     "make_unique_cases.py" = character(),
     "repr_cases.py" = character(),
     "concat_cases.py" = character(),
+    "other_formats_cases.py" = character(),
     "legacy_cases.py" = "legacy_fixtures.py"
   )
 }

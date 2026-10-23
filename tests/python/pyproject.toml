@@ -15,6 +15,8 @@ dependencies = [
     "fast-array-utils>=1.2.3",
     # needed by anndata.experimental.read_lazy (lazy_cases.py)
     "xarray>=2026.9.0",
+    # needed by pandas.read_excel (other_formats_cases.py)
+    "openpyxl",
 ]
 
 [tool.uv]
