@@ -1,5 +1,7 @@
 # anndata.claude (development version)
 
+* `read_hdf()` reads a dataset of an HDF5 file into the X of an `AnnData` like Python, using the `row_names` and `col_names` datasets as `obs` and `var` names when present.
+
 * `read_text()` and `read_csv()` read delimited text into an `AnnData` like Python, from a path (plain, `.gz` or `.bz2`), a connection or a character vector of lines, with numpy `dtype` strings (default `"float32"`).
 
 * `read_mtx()` reads Matrix Market files (coordinate or array, integer, real or pattern, `.gz` or `.bz2`) into an `AnnData` with a CSR X like Python, with numpy `dtype` strings (default `"float32"`).

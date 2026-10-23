@@ -139,7 +139,7 @@ The human owns the order of the Queue.
 - [x] other-formats/03: read_text() and read_csv() (`.scratch/other-formats/issues/03-read-text-csv.md`)
 - [x] other-formats/04: read_mtx() (`.scratch/other-formats/issues/04-read-mtx.md`)
 - [x] other-formats/05: read_umi_tools() (`.scratch/other-formats/issues/05-read-umi-tools.md`)
-- [ ] other-formats/06: read_hdf() (`.scratch/other-formats/issues/06-read-hdf.md`)
+- [x] other-formats/06: read_hdf() (`.scratch/other-formats/issues/06-read-hdf.md`)
 - [ ] other-formats/07: read_excel() (`.scratch/other-formats/issues/07-read-excel.md`)
 - [ ] other-formats/08: other formats documentation (`.scratch/other-formats/issues/08-other-formats-docs.md`)
 
