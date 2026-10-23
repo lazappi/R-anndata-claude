@@ -53,6 +53,7 @@ A stub spec must be grilled into a full spec before tickets are written for it.
 | 9 | `legacy-formats` | done (0.0.4) | Reading files from before the current encodings | h5ad-io |
 | 10 | `other-formats` | done | csv, mtx, text, excel, umi_tools and hdf readers, `write_csvs()` (loom is out, deprecated in Python) | core-object |
 | 11 | `experimental` | stub, low priority (experimental in Python, little effort) | `concat_on_disk`, `AnnCollection`, awkward arrays, `acc` accessors, extension namespaces | most of the above |
+| 12 | `hardening` | full | Coverage, deviations vignette, real-file benchmarks, examples and pkgdown | all but experimental |
 
 The MVP is sub-projects 1 to 3, released as 0.0.1.
 Next: `zarr-io`, then `views`, `backed` and `lazy`, then the rest (h5ad-io/15, full rec-array fidelity, after `lazy`).
