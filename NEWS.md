@@ -1,5 +1,8 @@
 # anndata.claude (development version)
 
+* `read_excel()` reads an `.xlsx` sheet into an `AnnData` like Python (first column `obs` names, first row `var` names) using readxl (a suggested package).
+  `dtype` is ignored as in Python and names are always strings.
+
 * `read_hdf()` reads a dataset of an HDF5 file into the X of an `AnnData` like Python, using the `row_names` and `col_names` datasets as `obs` and `var` names when present.
 
 * `read_text()` and `read_csv()` read delimited text into an `AnnData` like Python, from a path (plain, `.gz` or `.bz2`), a connection or a character vector of lines, with numpy `dtype` strings (default `"float32"`).
