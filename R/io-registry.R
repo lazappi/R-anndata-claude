@@ -95,11 +95,6 @@ abort_legacy <- function(path, what, call = rlang::caller_env()) {
   )
 }
 
-# Used by the dataframe reader (ticket 09) when a column is stored the old way
-abort_legacy_categorical <- function(path, call = rlang::caller_env()) {
-  abort_legacy(path, "an old-style categorical", call = call)
-}
-
 abort_awkward <- function(path, call = rlang::caller_env()) {
   abort_not_supported(
     c(
@@ -134,9 +129,6 @@ read_elem_object <- function(elem, store, call = rlang::caller_env()) {
       return(read_anndata_elem(elem, path, store))
     }
     return(read_unencoded_elem(elem, path, store, call))
-  }
-  if (type == "dataframe" && version == "0.1.0") {
-    abort_legacy(path, "a dataframe of version 0.1.0", call = call)
   }
   if (type == "awkward-array") {
     abort_awkward(path, call = call)

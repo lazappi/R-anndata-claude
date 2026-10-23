@@ -43,6 +43,74 @@ read_h5sparse_shape <- function(elem, path, call) {
   as.vector(attr_read(elem, "h5sparse_shape"))
 }
 
+# Python's `read_dataframe_legacy`: a dataframe stored as a compound dataset
+# whose first field is the index
+read_dataframe_legacy <- function(store, path, call) {
+  anndata_warn(
+    "{.path {path}} was written with a very old version of AnnData.
+     Consider rewriting it.",
+    "anndata_old_format_warning",
+    path = path,
+    call = call
+  )
+  fields <- lapply(table_read(store, path, call), rec_array_read_field)
+  for (name in intersect(table_int64_fields(store, path), names(fields))) {
+    fields[[name]] <- set_dtype(fields[[name]], "int64")
+  }
+  frame_from_parts(
+    fields[-1L],
+    plain_string(fields[[1L]]),
+    names(fields)[[1L]]
+  )
+}
+
+# Whether `path` is the legacy compound layout (a dataset) and not a dataframe
+# Element (a group), as in Python's `read_dataframe`
+is_legacy_frame <- function(store, path) {
+  node <- node_open(store, path)
+  on.exit(node_close(node), add = TRUE)
+  !is_group(node)
+}
+
+# Python's `_clean_uns`: categories kept in `uns[["<col>_categories"]]` become
+# the levels of the `obs` and `var` column of that name, and the key is removed
+clean_legacy_uns <- function(obs, var, uns, call) {
+  drop <- character()
+  for (key in names(uns) %||% character()) {
+    if (!endsWith(key, "_categories")) {
+      next
+    }
+    name <- gsub("_categories", "", key, fixed = TRUE)
+    categories <- as.vector(drop_dtype(uns[[key]]))
+    for (frame in c("obs", "var")) {
+      ann <- if (frame == "obs") obs else var
+      if (!name %in% names(ann)) {
+        next
+      }
+      codes <- drop_dtype(ann[[name]])
+      # Python's hack to find the axis the categories were stored for
+      if (!is.numeric(codes) || !isTRUE(all(codes < length(categories)))) {
+        next
+      }
+      ann[[name]] <- categorical_from_parts(
+        codes,
+        categories,
+        FALSE,
+        paste0("/", frame, "/", name),
+        call
+      )
+      if (frame == "obs") {
+        obs <- ann
+      } else {
+        var <- ann
+      }
+      drop <- c(drop, key)
+    }
+  }
+  uns[unique(drop)] <- NULL
+  list(obs = obs, var = var, uns = uns)
+}
+
 #' @rdname io-legacy
 read_unencoded_elem <- function(elem, path, store, call) {
   anndata_warn(

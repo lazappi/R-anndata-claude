@@ -148,6 +148,13 @@ table_read <- function(store, path, call = rlang::caller_env()) {
   store_backend(store)$table_read(store, path, call)
 }
 
+# The names of int64 fields of a compound dataset (none for a backend without
+# the operation), whose values `table_read()` gives as doubles
+table_int64_fields <- function(store, path) {
+  fn <- store_backend(store)$table_int64_fields
+  if (is.null(fn)) character() else fn(store, path)
+}
+
 #' @rdname io-store
 read_elem_attr <- function(elem, name) {
   if (!attr_exists(elem, name)) {

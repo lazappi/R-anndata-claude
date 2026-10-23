@@ -377,13 +377,14 @@ test_that("an integer index is written as it was only while names match", {
   )
 })
 
-# Legacy layouts have their own classed error from the registry
-test_that("a dataframe 0.1.0 group raises the legacy error", {
+# Why: a dataframe 0.1.0 is read (see test-io-legacy.R), so a group missing its
+# attributes must fail like a version 0.2.0 one, not as a legacy layout
+test_that("a dataframe 0.1.0 group without attributes raises", {
   store <- local_h5_store()
   make_encoded_group(store, "x", "dataframe", "0.1.0")
   err <- expect_anndata_condition(
     read_elem(store, "x"),
-    "anndata_legacy_format_error"
+    "anndata_io_registry_error"
   )
   expect_identical(err$path, "/x")
 })

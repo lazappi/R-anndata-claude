@@ -183,46 +183,21 @@ test_that("reading an unknown type or version raises a registry error", {
   expect_match(conditionMessage(cnd), "7.0.0", fixed = TRUE)
 })
 
-# Legacy dataframes are not read yet (legacy-formats/04), so reading one must
-# fail with a classed error naming the path rather than a registry error
-# (unencoded Elements are read, see test-io-legacy.R)
-test_that("reading legacy elements raises a not-supported error", {
-  local_io_registry()
-  register_test_encoding()
-  store <- local_h5_store()
-  make_encoded_group(store, "old_dataframe", "dataframe", "0.1.0")
-
-  for (name in c("old_dataframe")) {
-    cnd <- expect_anndata_condition(
-      read_elem(store, name),
-      "anndata_legacy_format_error"
-    )
-    expect_s3_class(cnd, "anndata_not_supported_error")
-    expect_s3_class(cnd, "anndata_error")
-    expect_equal(cnd$path, paste0("/", name))
-    expect_match(conditionMessage(cnd), paste0("/", name), fixed = TRUE)
-    expect_match(conditionMessage(cnd), "not yet supported", fixed = TRUE)
-  }
-  # The message names the layout without leftover cli markup
+# An unreadable legacy layout must fail with a classed error naming the path
+# and the layout rather than a registry error (dataframes and unencoded
+# Elements are read, see test-io-legacy.R)
+test_that("an unreadable legacy layout raises a not-supported error", {
   cnd <- expect_anndata_condition(
-    read_elem(store, "old_dataframe"),
-    "anndata_legacy_format_error"
-  )
-  expect_match(conditionMessage(cnd), "dataframe", fixed = TRUE)
-  expect_match(conditionMessage(cnd), "0.1.0", fixed = TRUE)
-  expect_no_match(conditionMessage(cnd), "{", fixed = TRUE)
-})
-
-# Old categorical storage is detected inside the dataframe reader (ticket 09),
-# which calls this helper
-test_that("the old categorical helper raises a legacy error naming the path", {
-  cnd <- expect_anndata_condition(
-    abort_legacy_categorical("/obs/cell_type"),
+    abort_legacy("/raw.X", "a legacy raw layout"),
     "anndata_legacy_format_error"
   )
   expect_s3_class(cnd, "anndata_not_supported_error")
-  expect_match(conditionMessage(cnd), "/obs/cell_type", fixed = TRUE)
+  expect_s3_class(cnd, "anndata_error")
+  expect_equal(cnd$path, "/raw.X")
+  expect_match(conditionMessage(cnd), "/raw.X", fixed = TRUE)
+  expect_match(conditionMessage(cnd), "legacy raw layout", fixed = TRUE)
   expect_match(conditionMessage(cnd), "not yet supported", fixed = TRUE)
+  expect_no_match(conditionMessage(cnd), "{", fixed = TRUE)
 })
 
 # awkward-array belongs to the experimental sub-project

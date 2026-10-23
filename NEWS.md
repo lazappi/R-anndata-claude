@@ -1,5 +1,7 @@
 # anndata.claude (development version)
 
+- Files from old anndata releases read their `obs` and `var` as Python does: compound datasets (anndata before 0.7), `dataframe` version 0.1.0 groups and categories kept in `uns` (`<col>_categories`), each with Python's `anndata_old_format_warning`.
+
 # anndata.claude 0.0.3
 
 Third milestone: backed mode, lazy reading and concatenation.

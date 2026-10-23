@@ -244,6 +244,10 @@ read_anndata_elem <- function(elem, path, store) {
   for (key in intersect(anndata_slot_keys, members)) {
     key_path <- paste0(prefix, key)
     value <- NULL
+    if (key %in% c("obs", "var") && is_legacy_frame(store, key_path)) {
+      # Backwards compat: a compound dataset is a dataframe of anndata < 0.7
+      value <- read_dataframe_legacy(store, key_path, call)
+    }
     if (key == "X" && !is.null(read_state$backed)) {
       # In backed mode X and raw X stay on disk
       value <- backed_x_elem(read_state$backed, key_path, store, call)
@@ -262,6 +266,15 @@ read_anndata_elem <- function(elem, path, store) {
       value <- dense_as_sparse(value, key_path, call)
     }
     slots[key] <- list(value)
+  }
+  # Python cleans `uns` for the file root only
+  if (
+    identical(path, "/") &&
+      "obs" %in% members &&
+      is_legacy_frame(store, paste0(prefix, "obs"))
+  ) {
+    cleaned <- clean_legacy_uns(slots$obs, slots$var, slots$uns, call)
+    slots[names(cleaned)] <- cleaned
   }
   # Higher-dimensional X and layers violate the spec, so the constructor
   # refuses them and they are set afterwards, which only warns as Python does

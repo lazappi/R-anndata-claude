@@ -203,6 +203,63 @@ frame_from_parts <- function(columns, index, index_key) {
   df
 }
 
+# The path a `categories` attribute of a version 0.1.0 column points to, an
+# HDF5 object reference in h5ad and a path relative to the parent in zarr
+legacy_categories_path <- function(node, path) {
+  reference <- attr_read(node, "categories")
+  if (inherits(reference, "H5Ref")) {
+    target <- rhdf5::H5Rdereference(reference, node)
+    on.exit(rhdf5::H5Dclose(target), add = TRUE)
+    return(rhdf5::H5Iget_name(target))
+  }
+  parent <- sub("/[^/]*$", "", path)
+  paste0(parent, "/", as.character(reference))
+}
+
+# Python's `read_series`: a column of a version 0.1.0 dataframe, a categorical
+# when it has a `categories` attribute
+read_series <- function(store, path, call) {
+  node <- node_open(store, path)
+  on.exit(node_close(node), add = TRUE)
+  if (!attr_exists(node, "categories")) {
+    return(read_elem(store, path))
+  }
+  categories_path <- legacy_categories_path(node, path)
+  categories_node <- node_open(store, categories_path)
+  on.exit(node_close(categories_node), add = TRUE)
+  ordered <- identical(read_elem_attr(categories_node, "ordered"), "TRUE")
+  categories <- read_elem(store, categories_path)
+  codes <- read_elem(store, path)
+  categorical_from_parts(codes, categories, ordered, path, call)
+}
+
+read_dataframe_01_elem <- function(elem, path, store) {
+  call <- rlang::caller_env()
+  col_names <- read_attr_strings(elem, "column-order", path, call)
+  index_key <- read_attr_strings(elem, "_index", path, call)
+  read_column <- function(name) {
+    column <- read_series(store, paste0(path, "/", name), call)
+    dim(column) <- NULL
+    plain_string(column)
+  }
+  columns <- lapply(col_names, read_column)
+  names(columns) <- col_names
+  index <- read_column(index_key)
+  n <- length(index)
+  for (i in seq_along(columns)) {
+    if (length(columns[[i]]) != n) {
+      abort_io_registry(
+        "Cannot read {.path {path}}, column {.val {col_names[[i]]}} has
+         length {length(columns[[i]])} and the index has length {n}.",
+        path = path,
+        call = call
+      )
+    }
+  }
+  frame_from_parts(columns, index, index_key)
+}
+
 register_writer("DataFrame", "dataframe", "0.2.0", write_dataframe)
 register_writer("data.frame", "dataframe", "0.2.0", write_dataframe)
 register_reader("dataframe", "0.2.0", read_dataframe_elem)
+register_reader("dataframe", "0.1.0", read_dataframe_01_elem)

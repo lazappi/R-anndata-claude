@@ -241,6 +241,159 @@ test_that("unencoded Elements are written back with current encodings", {
   expect_equal(dim(back$scalar), 1L)
 })
 
+# The paths Python gave a "very old version" warning for (compound datasets)
+table_very_old <- function(file) {
+  messages <- vapply(
+    legacy_table()$fixtures[[file]]$warnings,
+    function(w) w$message,
+    character(1)
+  )
+  old <- messages[grepl("was written with a very old version", messages)]
+  sort(sub("^'(.*)' was written.*$", "\\1", old))
+}
+
+# The paths under a prefix that warned in R, whichever message Python used
+frame_warnings <- function(paths, prefix) {
+  sort(paths[paths == prefix | startsWith(paths, paste0(prefix, "/"))])
+}
+
+legacy_frame_files <- c(
+  "0.6.22-dense.h5ad",
+  "0.6.22-sparse.h5ad",
+  "0.7.8-dense.h5ad",
+  "0.7.8-sparse.h5ad",
+  "0.7.8-dense.zarr",
+  "0.7.8-sparse.zarr"
+)
+
+# Why: obs and var of every legacy layout (a compound dataset in 0.6.22 and a
+# dataframe 0.1.0 group in 0.7.8, for h5ad and zarr) must read to the index,
+# index name, column order, categories and values Python gave, and Python's
+# warnings for the frames and their members must be raised
+test_that("legacy obs and var read to the values in the table", {
+  for (file in legacy_frame_files) {
+    result <- read_legacy_elem(file, "/")
+    values <- legacy_table()$fixtures[[file]]$values
+    for (name in c("obs", "var")) {
+      expect_matches_table_frame(
+        result$value[[name]],
+        values[[name]],
+        paste(file, name)
+      )
+      expect_identical(
+        frame_index_name(result$value[[name]]),
+        values[[name]]$index_name,
+        info = paste(file, name)
+      )
+      prefix <- paste0("/", name)
+      expected <- sort(c(
+        table_warned(file, prefix),
+        intersect(table_very_old(file), prefix)
+      ))
+      expect_equal(
+        frame_warnings(result$warned, prefix),
+        expected,
+        info = paste(file, name)
+      )
+    }
+  }
+})
+
+# Why: 0.6.22 kept categories in `uns` and `_clean_uns` removes them, leaving
+# the other members as Python does
+test_that("categories in uns are removed once they are applied", {
+  for (file in c("0.6.22-dense.h5ad", "0.6.22-sparse.h5ad")) {
+    uns <- read_legacy_elem(file, "/")$value$uns
+    expect_setequal(
+      names(uns),
+      names(legacy_table()$fixtures[[file]]$values$uns)
+    )
+    expect_false(any(endsWith(names(uns), "_categories")))
+  }
+})
+
+# Why: `_clean_uns` only applies categories where every code is in range and
+# leaves other keys alone, which is how Python finds the axis they were for
+test_that("clean_legacy_uns applies categories only where the codes fit", {
+  obs <- S4Vectors::DataFrame(
+    a = c(0L, 1L, 2L),
+    b = c(0L, 5L, 1L),
+    row.names = c("x", "y", "z")
+  )
+  var <- S4Vectors::DataFrame(a = c(0L, 1L), row.names = c("p", "q"))
+  uns <- list(
+    a_categories = c("u", "v", "w"),
+    b_categories = c("u", "v"),
+    other = 1L
+  )
+  cleaned <- clean_legacy_uns(obs, var, uns, rlang::current_env())
+  expect_equal(as.character(cleaned$obs$a), c("u", "v", "w"))
+  expect_equal(as.character(cleaned$var$a), c("u", "v"))
+  expect_equal(cleaned$obs$b, c(0L, 5L, 1L))
+  expect_equal(names(cleaned$uns), c("b_categories", "other"))
+})
+
+# Why: Python wraps a single category kept in `uns` in a list
+test_that("clean_legacy_uns accepts a single category", {
+  obs <- S4Vectors::DataFrame(a = c(0L, 0L), row.names = c("x", "y"))
+  cleaned <- clean_legacy_uns(
+    obs,
+    NULL,
+    list(a_categories = "only"),
+    rlang::current_env()
+  )
+  expect_equal(as.character(cleaned$obs$a), c("only", "only"))
+  expect_length(cleaned$uns, 0L)
+})
+
+# A copy of the 0.7.8 h5ad fixture opened for editing
+local_edited_legacy <- function(env = parent.frame()) {
+  path <- withr::local_tempfile(fileext = ".h5ad", .local_envir = env)
+  file.copy(fixture_path("legacy/0.7.8-dense.h5ad"), path)
+  store <- rhdf5::H5Fopen(path)
+  withr::defer(rhdf5::h5closeAll(), envir = env)
+  store
+}
+
+# Why: the `ordered` flag on the categories of a dataframe 0.1.0 column decides
+# whether the factor is ordered, as in Python's `read_series`
+test_that("dataframe 0.1.0 reads ordered categories", {
+  store <- local_edited_legacy()
+  node <- rhdf5::H5Oopen(store, "obs/__categories/cat")
+  rhdf5::H5Adelete(node, "ordered")
+  attr_write(node, "ordered", TRUE)
+  rhdf5::H5Oclose(node)
+  df <- suppressWarnings(read_elem(store, "/obs"))
+  expect_s3_class(df$cat, "ordered")
+  expect_false(is.ordered(df$str))
+})
+
+# Why: a column that is shorter than the index is a corrupt file and must be a
+# classed error naming the dataframe
+test_that("dataframe 0.1.0 with a short column raises", {
+  store <- local_edited_legacy()
+  rhdf5::H5Ldelete(store, "obs/num")
+  group <- rhdf5::H5Gopen(store, "obs")
+  write_dataset(group, "num", as_array(c(1, 2)))
+  rhdf5::H5Gclose(group)
+  err <- expect_anndata_condition(
+    suppressWarnings(read_elem(store, "/obs")),
+    "anndata_io_registry_error"
+  )
+  expect_identical(err$path, "/obs")
+})
+
+# Why: the categories of a dataframe 0.1.0 column are found through an HDF5
+# object reference and the `ordered` flag of the categories decides the class
+test_that("dataframe 0.1.0 columns read categories through references", {
+  result <- read_legacy_elem("0.7.8-dense.h5ad", "/obs")
+  cat <- result$value$cat
+  expect_s3_class(cat, "factor")
+  expect_equal(levels(cat), c("a", "b", "c"))
+  expect_false(is.ordered(cat))
+  expect_equal(colnames(result$value), c("cat", "num", "str"))
+})
+
 # Why: an unencoded root is how every 0.6 and 0.7 file starts, and Python
 # reads it without a warning for the root itself, but a root with no obs gives
 # nothing to build an AnnData from
