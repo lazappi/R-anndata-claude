@@ -13,8 +13,8 @@
 #' (zstd by default).
 #' Reading handles those codecs with zstd, gzip, blosc or no compression, and
 #' the chunk grid of any size.
-#' Unlike HDF5, zarr keeps the field dtypes (zarr-io/14, ADR 0005 applies to
-#' HDF5 only).
+#' zarr keeps the field dtypes (zarr-io/14), as HDF5 does (see
+#' [io-store-h5-table]), and ignores the string records of HDF5.
 #' Reading records the dtype of each column that is not the R type, as for plain
 #' arrays: the numeric name (`"uint8"`, `"float32"`, ...) and for strings
 #' `"<type>:<length_bytes>"` unless it is the `fixed_length_utf32` width that
@@ -52,6 +52,8 @@ zarr_field_kinds <- c(
   float64 = "float",
   bool = "bool"
 )
+
+zarr_string_kinds <- c("fixed_length_utf32", "null_terminated_bytes")
 
 # The name and byte width of each field of a `struct` data type
 zarr_struct_fields <- function(meta, path, call, version = 3L) {
@@ -409,7 +411,7 @@ zarr_string_record <- function(values, type, size) {
   set_dtype(values, paste0(type, ":", size))
 }
 
-zarr_table_read <- function(store, path, call) {
+zarr_table_read <- function(store, path, call, records = FALSE) {
   array <- zarr_array_meta(store, path)
   node_path <- array$node$path
   if (!identical(array$dtype, "struct")) {
@@ -447,6 +449,10 @@ zarr_field_bytes <- function(column, name, path, call) {
   column <- drop_dtype(column)
   if (is.character(column)) {
     parts <- strsplit(record %||% "", ":", fixed = TRUE)[[1L]]
+    # A record of HDF5 (`"h5_fixed_ascii:3"`) is not a zarr string type
+    if (length(parts) != 2L || !parts[[1L]] %in% zarr_string_kinds) {
+      parts <- character()
+    }
     kind <- if (length(parts) == 2L) parts[[1L]] else "fixed_length_utf32"
     # A recorded width is widened when the values no longer fit
     size <- max(

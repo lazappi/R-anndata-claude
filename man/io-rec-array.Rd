@@ -32,32 +32,29 @@ The R value is a \code{data.frame} with the extra class \code{anndata_rec_array}
 (made by \code{new_rec_array()}), which keeps the field names, field order and
 field values.
 
-\strong{Deviation from Python:} rhdf5 cannot inspect or build the fields of a
-compound type, so field dtypes are not preserved (ADR 0005).
-Reading turns integer fields of any width into \code{integer} (or \code{double} when
-they do not fit, read through \code{bit64conversion = "double"}), floats into
-\code{double}, \code{u1} fields into \code{integer}, booleans into \code{logical} and fixed or
-variable-length strings into \code{character}.
-Writing produces int32, float64 and fixed-length string fields, the only
-ones rhdf5's compound writer supports.
-String fields are sized to the longest value in bytes, and logical and \code{raw}
-fields are written as int32.
-Python reads the result with the same field names, order and values, but
-not the same field dtypes.
+Field dtypes are kept (ADR 0008, the field types come from a compiled
+helper because rhdf5 cannot see or build compound types).
+A field read from HDF5 or zarr carries an On-disk dtype record, unless it
+has the R type, and writing restores it.
+Integer fields are read as \code{integer} (or \code{double} when they do not fit)
+with the record \code{"uint8"}, \code{"int64"} and so on, \code{f4} fields as \code{double}
+with the record \code{"float32"}, and booleans as \code{logical}.
+Strings are \code{character}, with the record \code{"h5_fixed_ascii:<bytes>"},
+\code{"h5_fixed_utf8:<bytes>"} or \code{"h5_vlen_ascii"} unless they are
+variable-length UTF-8 as h5py writes text (zarr records
+\code{"<type>:<length_bytes>"}).
+Fields without a record are written as int32, float64, bool and
+variable-length UTF-8 strings, which Python reads with any text.
+A recorded string width is widened when the text no longer fits, and a
+fixed-length or ASCII record becomes variable-length UTF-8 for non-ASCII
+text, as does a fixed-length UTF-8 record, because anndata cannot read
+either as a fixed-length field.
 Integer and string fields cannot hold \code{NA}, so writing one raises
-\code{anndata_io_registry_error}, as does a rec-array with no rows.
-Python's \code{anndata} decodes fixed-length strings as ASCII and fails to read
-any other text, so a string field with non-ASCII text also raises
-\code{anndata_io_registry_error} rather than write a file Python cannot read
-(zarr stores strings as UTF-32, so it has no such limit).
-zarr keeps field dtypes (zarr-io/14): a field read from zarr carries an
-On-disk dtype record, unless it has the R type, and writing restores it, so
-the paragraphs above describe HDF5 only.
-Writing to zarr also keeps \code{logical} fields as bool and accepts a rec-array
-with no rows.
-Non-ASCII text is read without problems.
-Rec-arrays are never compressed (zarr uses zstd), so \code{dataset_kwargs} has no
-effect on them except \code{shards} in zarr.
+\code{anndata_io_registry_error}.
+A rec-array with no rows is written, and \code{compression = "gzip"} in
+\code{dataset_kwargs} compresses an HDF5 rec-array (zarr uses \code{compressors}).
+\strong{Deviation from Python:} \code{"lzf"} is not available to the helper, so an
+HDF5 rec-array is written uncompressed under it.
 Integers of 2^53 or more raise \code{anndata_dtype_overflow_error} on read.
 }
 \keyword{internal}

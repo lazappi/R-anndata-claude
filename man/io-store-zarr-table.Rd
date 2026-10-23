@@ -34,8 +34,8 @@ little-endian, with strings as \code{fixed_length_utf32} (zero padded) or
 (zstd by default).
 Reading handles those codecs with zstd, gzip, blosc or no compression, and
 the chunk grid of any size.
-Unlike HDF5, zarr keeps the field dtypes (zarr-io/14, ADR 0005 applies to
-HDF5 only).
+zarr keeps the field dtypes (zarr-io/14), as HDF5 does (see
+\link{io-store-h5-table}), and ignores the string records of HDF5.
 Reading records the dtype of each column that is not the R type, as for plain
 arrays: the numeric name (\code{"uint8"}, \code{"float32"}, ...) and for strings
 \code{"<type>:<length_bytes>"} unless it is the \code{fixed_length_utf32} width that

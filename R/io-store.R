@@ -33,6 +33,8 @@
 #' @param call The call reported by errors.
 #' @param dataset_kwargs A list of dataset creation options.
 #' @param frame A data frame of numeric, logical and character columns.
+#' @param records Whether `table_read()` records the field dtypes (HDF5 only,
+#'   zarr always does).
 #'
 #' @name io-store
 #' @keywords internal
@@ -144,8 +146,13 @@ table_write <- function(
 }
 
 #' @rdname io-store
-table_read <- function(store, path, call = rlang::caller_env()) {
-  store_backend(store)$table_read(store, path, call)
+table_read <- function(
+  store,
+  path,
+  call = rlang::caller_env(),
+  records = FALSE
+) {
+  store_backend(store)$table_read(store, path, call, records)
 }
 
 # The names of int64 fields of a compound dataset (none for a backend without

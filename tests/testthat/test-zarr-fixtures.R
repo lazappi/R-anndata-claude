@@ -205,7 +205,7 @@ test_that("zarr stores are equivalent to the h5ad fixtures of the same case", {
   for (i in seq_along(shared)) {
     a <- h5_tree(h5[[i]])
     b <- h5_tree(zarr[[i]])
-    # rec-arrays keep their field dtypes in zarr and not in HDF5 (ADR 0005)
+    # HDF5 and zarr describe a rec-array's compound dtype differently
     is_rec <- vapply(
       b,
       function(node) {

@@ -123,13 +123,7 @@ test_that("cross-format: h5ad to zarr matches Python's conversion", {
     write_zarr(read_h5ad(h5ad[[i]]), written[[i]])
   }
   converted <- python_rewrite_h5ad(unname(h5ad), ext = ".zarr")
-  # The exemption stays because R reads the rec-array from HDF5, which has lost
-  # the field dtypes (ADR 0005), while Python converts the original dtypes
-  expect_all_equivalent(
-    written,
-    converted,
-    rec_array_paths = "/uns/O_recarray"
-  )
+  expect_all_equivalent(written, converted)
 })
 
 test_that("cross-format: zarr to h5ad matches Python's conversion", {
@@ -143,10 +137,5 @@ test_that("cross-format: zarr to h5ad matches Python's conversion", {
     write_h5ad(read_zarr(zarr[[i]]), written[[i]])
   }
   converted <- python_rewrite_h5ad(unname(zarr), ext = ".h5ad")
-  # The exemption stays because the file R writes is HDF5 (ADR 0005)
-  expect_all_equivalent(
-    written,
-    converted,
-    rec_array_paths = "/uns/O_recarray"
-  )
+  expect_all_equivalent(written, converted)
 })

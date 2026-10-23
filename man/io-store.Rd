@@ -61,7 +61,7 @@ table_write(
   call = rlang::caller_env()
 )
 
-table_read(store, path, call = rlang::caller_env())
+table_read(store, path, call = rlang::caller_env(), records = FALSE)
 
 read_elem_attr(elem, name)
 
@@ -90,6 +90,9 @@ scalars and \code{dtype = "int64"} writes an int64 array.}
 \item{frame}{A data frame of numeric, logical and character columns.}
 
 \item{dataset_kwargs}{A list of dataset creation options.}
+
+\item{records}{Whether \code{table_read()} records the field dtypes (HDF5 only,
+zarr always does).}
 }
 \description{
 The backend-neutral layer between the encodings and a storage format.

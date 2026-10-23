@@ -2,8 +2,8 @@
 
 Usage: rec_array_values.py <file> <dataset>
 
-Used to compare rec-arrays by field names, order and values only, because R
-cannot keep field dtypes (ADR 0005).
+Used to compare rec-arrays by field names, order and values only, ignoring
+field dtypes (such as the legacy fixed-length strings Python rewrites).
 """
 
 import json

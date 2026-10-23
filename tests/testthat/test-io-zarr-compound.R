@@ -35,8 +35,8 @@ compound_zarr_cases <- function(variant = "v3") {
   paths[keep & !grepl("^anndata_|int64_big", names(paths))]
 }
 
-# A rec-array without the On-disk dtype records of its fields, which HDF5
-# does not keep and Python changes (a rewrite turns `S` fields into `U`)
+# A rec-array without the On-disk dtype records of its fields, which differ
+# between HDF5 and zarr and which Python changes (a rewrite turns `S` into `U`)
 without_records <- function(value) {
   if (!inherits(value, "anndata_rec_array")) {
     return(value)
@@ -68,7 +68,8 @@ test_that("the compound zarr fixtures are found", {
 
 test_that("Python -> R: compound Elements read as in h5ad", {
   # The zarr and h5ad fixtures of a case hold the same Element, so the HDF5
-  # reading is the expected value
+  # reading is the expected value (rec-array string records differ by format,
+  # the HDF5 records are tested in test-io-rec-array.R)
   checked <- 0L
   for (variant in c("v3", "v2", "v3_unsharded", "v3_unconsolidated")) {
     cases <- compound_zarr_cases(variant)
@@ -80,7 +81,7 @@ test_that("Python -> R: compound Elements read as in h5ad", {
       actual <- read_elem(zarr_open(cases[[case]]), "x")
       expect_identical(
         without_records(actual),
-        expected,
+        without_records(expected),
         label = paste(variant, case)
       )
       checked <- checked + 1L

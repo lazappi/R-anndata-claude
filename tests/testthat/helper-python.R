@@ -277,8 +277,10 @@ python_rewrite <- function(files, ext = ".h5", .local_envir = parent.frame()) {
 
 # Lists every path and property that differs between two h5_tree() results
 #
-# `rec_array_paths` are datasets whose field dtypes are exempt (ADR 0005), so
-# their `dtype` and `digest` are not compared, and nothing else is relaxed
+# `rec_array_paths` are compound datasets whose field dtypes are exempt (legacy
+# float32 fields, h5ad-io/17, fixed-length strings Python rewrites, and the
+# HDF5 and zarr layouts), so their `dtype` and `digest` are not compared, and
+# nothing else is relaxed
 #
 # `sorted_paths` are sparse `data` and `indices` datasets that may be stored
 # unsorted in the second file (ADR 0006), so only their `digest` is skipped

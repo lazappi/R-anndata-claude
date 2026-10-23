@@ -173,12 +173,6 @@ h5_null_write <- function(store, key) {
   invisible(NULL)
 }
 
-h5_table_write <- function(store, key, frame, dataset_kwargs, call) {
-  # `level = 0` stops rhdf5 compressing, and a chunk is required to write
-  rhdf5::h5writeDataset(frame, store, key, level = 0L, chunk = nrow(frame))
-  invisible(NULL)
-}
-
 # The names of the int64 fields of a compound dataset, which `h5_table_read()`
 # gives as doubles. rhdf5 only tells them apart as `integer64` (it needs bit64,
 # without it no field is reported).
@@ -194,12 +188,16 @@ h5_table_int64_fields <- function(store, path) {
   names(fields)[vapply(fields, inherits, logical(1), "integer64")]
 }
 
-h5_table_read <- function(store, path, call) {
+h5_table_read <- function(store, path, call, records = FALSE) {
   dset <- rhdf5::H5Dopen(store, path)
   on.exit(rhdf5::H5Dclose(dset), add = TRUE)
   # rhdf5 only warns when a 64-bit value reaches 2^53 and is no longer exact
-  withCallingHandlers(
+  values <- withCallingHandlers(
     suppressMessages(rhdf5::H5Dread(dset, bit64conversion = "double")),
     warning = function(w) abort_dtype_precision(path, "int64", call)
   )
+  if (records) {
+    values <- h5_table_records(store, path, values)
+  }
+  values
 }

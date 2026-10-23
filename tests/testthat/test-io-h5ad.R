@@ -149,21 +149,9 @@ test_that("R rewrites every h5ad fixture equivalent to Python", {
     write_h5ad(read_adata_fixture(name), written[[name]])
   }
   originals <- adata_fixture_files()
-  # The realistic objects hold a rec-array whose field dtypes are exempt
-  # (ADR 0005), so its values are compared separately
-  expect_all_equivalent(
-    unname(written),
-    originals,
-    rec_array_paths = "/uns/O_recarray"
-  )
+  # The realistic objects hold a rec-array, whose field dtypes are kept
+  expect_all_equivalent(unname(written), originals)
   expect_python_equal(unname(written), originals)
-  for (name in grep("^realistic", adata_fixture_names, value = TRUE)) {
-    expect_rec_array_values_equal(
-      written[[name]],
-      fixture_path(file.path("h5ad", paste0(name, ".h5ad"))),
-      "/uns/O_recarray"
-    )
-  }
 })
 
 # R -> Python -> R: Python reads and rewrites what R writes, and R reads that

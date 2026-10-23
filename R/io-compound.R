@@ -76,16 +76,31 @@ compound_field <- function(
 #' @param dataset Name of the dataset inside the file.
 #' @param fields A list of `compound_field()` specifications of equal length.
 #' @param level Gzip level, 0 for none.
+#' @param chunk Rows per chunk when compressed, the guess of h5py by default.
 #' @noRd
-compound_write <- function(path, dataset, fields, level = 0L) {
+compound_write <- function(path, dataset, fields, level = 0L, chunk = NULL) {
   nrow <- if (length(fields) == 0L) 0L else length(fields[[1L]]$values)
+  if (is.null(chunk)) {
+    # Variable-length strings count as 16 bytes, as in h5py's guess
+    sizes <- vapply(
+      fields,
+      function(f) {
+        if (isTRUE(f$variable)) 16L else max(f$size, 1L, na.rm = TRUE)
+      },
+      integer(1)
+    )
+    chunk <- guess_chunk(nrow, max(sum(sizes), 1L))
+  }
+  # A chunk cannot exceed a fixed-size dataset (h5py has no chunks at 0 rows)
+  chunk <- max(min(chunk, nrow), 1L)
   invisible(.Call(
     c_compound_write,
     path.expand(path),
     dataset,
     unname(fields),
     nrow,
-    as.integer(level)
+    as.integer(level),
+    as.double(chunk)
   ))
 }
 

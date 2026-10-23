@@ -334,9 +334,10 @@ static void put_number(char *dst, const char *cls, int size, int is_signed,
 }
 
 /* fields is a list of field lists (name, class, size, signed, variable, utf8,
- * values). level is the gzip level (0 for none). */
+ * values). level is the gzip level (0 for none) and chunk the rows per chunk
+ * when compressed. */
 SEXP c_compound_write(SEXP path, SEXP dataset, SEXP fields, SEXP nrow_,
-                      SEXP level_) {
+                      SEXP level_, SEXP chunk_) {
   char err[ERR_LEN] = "";
   hid_t file = -1, file_type = -1, mem_type = -1, space = -1, dcpl = -1,
         dset = -1;
@@ -456,8 +457,7 @@ SEXP c_compound_write(SEXP path, SEXP dataset, SEXP fields, SEXP nrow_,
   space = H5Screate_simple(1, dims, NULL);
   dcpl = H5Pcreate(H5P_DATASET_CREATE);
   if (level > 0) {
-    hsize_t chunk[1] = {nrow > 0 ? (hsize_t)(nrow < 1048576 ? nrow : 1048576)
-                                 : 1};
+    hsize_t chunk[1] = {(hsize_t)asReal(chunk_)};
     H5Pset_chunk(dcpl, 1, chunk);
     H5Pset_deflate(dcpl, (unsigned)level);
   }
@@ -509,7 +509,7 @@ done:
 
 static const R_CallMethodDef call_methods[] = {
     {"c_compound_members", (DL_FUNC)&c_compound_members, 2},
-    {"c_compound_write", (DL_FUNC)&c_compound_write, 5},
+    {"c_compound_write", (DL_FUNC)&c_compound_write, 6},
     {NULL, NULL, 0}};
 
 void R_init_anndata_claude(DllInfo *dll) {

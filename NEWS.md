@@ -4,6 +4,7 @@
 - Old files with `raw.X`, `raw.var` and `raw.varm` as root members read into `raw`, and `connectivities` and `distances` kept in `uns$neighbors` move to `obsp` with an `anndata_future_warning`.
 - Old files with `obsm` and `varm` stored as compound datasets (such as the PBMC 3k example of cellxgene) read as a matrix per field.
   rhdf5 cannot see compound member types, so float32 fields of a compound `obs` or `var` read as float64.
+- rec-arrays in h5ad keep their field dtypes (integer widths and signedness, float32, bool, fixed-length and variable-length strings) on read and write, text is written as variable-length UTF-8 like h5py, and rec-arrays with no rows or `compression = "gzip"` can be written (`"lzf"` writes them uncompressed).
 - Old files read in backed mode (`read_h5ad(backed = "r")`) with their unencoded dense or h5sparse `X` left on disk.
   `read_lazy()` reads only current encodings like Python and no longer moves `uns$neighbors` matrices to `obsp`.
 
