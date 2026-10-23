@@ -210,6 +210,37 @@ combined$obs
 `merge` and `uns_merge` choose which annotations of the other axis and which `uns` entries are kept (`"same"`, `"unique"`, `"first"` or `"only"`, or a function).
 Views and backed objects can be concatenated, and objects from `read_lazy()` give a lazy result.
 
+## Other formats
+
+`read_text()` and `read_csv()` read delimited text, from a path or a character vector of lines.
+The first column holds the `obs` names when it is not numeric and `dtype` (default `"float32"`) sets the type of X.
+
+```{r read-csv}
+lines <- c("cell,g1,g2", "c1,1,2", "c2,3,4")
+read_csv(lines)$to_df()
+```
+
+`read_mtx()` (Matrix Market), `read_umi_tools()`, `read_hdf()` and `read_excel()` (needs readxl) read other sources, and all return an `AnnData`.
+`read_umi_tools()` gives a sparse X with sorted names.
+
+```{r read-umi}
+path <- tempfile(fileext = ".tsv")
+writeLines(
+  c("gene\tcell\tcount", "g2\tc2\t3", "g1\tc1\t1", "g3\tc1\t2"),
+  path
+)
+read_umi_tools(path)
+```
+
+`write_csvs()` writes `obs`, `var`, `obsm`, `varm` and `uns` (and X with `skip_data = FALSE`) as csv files that pandas reads the same as Python's output.
+
+```{r write-csvs}
+dir <- tempfile("csvs")
+write_csvs(adata, dir)
+list.files(dir, recursive = TRUE)
+unlink(dir, recursive = TRUE)
+```
+
 ## Move a zarr store to Python and back
 
 Python anndata reads and writes the same store.
