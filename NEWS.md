@@ -1,5 +1,7 @@
 # anndata.claude (development version)
 
+* `read_text()` and `read_csv()` read delimited text into an `AnnData` like Python, from a path (plain, `.gz` or `.bz2`), a connection or a character vector of lines, with numpy `dtype` strings (default `"float32"`).
+
 * `write_csvs()` and `adata$write_csvs()` write `obs`, `var`, `obsm`, `varm`, `uns` (and X with `skip_data = FALSE`) as csv files that pandas reads the same as Python's, with Python's `anndata_write_warning` for sparse and unwritable `uns` values.
   A dict in `uns` is written as Python's `repr`, which supports strings, scalars, nested dicts and 1-d arrays that fit on one line.
 

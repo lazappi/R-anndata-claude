@@ -136,7 +136,7 @@ The human owns the order of the Queue.
 - [x] h5ad-io/17: legacy compound float32 fields (`.scratch/h5ad-io/issues/17-legacy-compound-float32.md`)
 - [x] other-formats/01: other formats table (`.scratch/other-formats/issues/01-other-formats-table.md`)
 - [x] other-formats/02: write_csvs() (`.scratch/other-formats/issues/02-write-csvs.md`)
-- [ ] other-formats/03: read_text() and read_csv() (`.scratch/other-formats/issues/03-read-text-csv.md`)
+- [x] other-formats/03: read_text() and read_csv() (`.scratch/other-formats/issues/03-read-text-csv.md`)
 - [ ] other-formats/04: read_mtx() (`.scratch/other-formats/issues/04-read-mtx.md`)
 - [ ] other-formats/05: read_umi_tools() (`.scratch/other-formats/issues/05-read-umi-tools.md`)
 - [ ] other-formats/06: read_hdf() (`.scratch/other-formats/issues/06-read-hdf.md`)
