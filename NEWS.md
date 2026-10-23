@@ -5,6 +5,8 @@
 * `read_mtx()` reads Matrix Market files (coordinate or array, integer, real or pattern, `.gz` or `.bz2`) into an `AnnData` with a CSR X like Python, with numpy `dtype` strings (default `"float32"`).
   Complex fields are not supported.
 
+* `read_umi_tools()` reads a umi_tools count table (plain or `.gz`) into an `AnnData` with a CSR X and sorted `obs` and `var` names like Python.
+
 * `write_csvs()` and `adata$write_csvs()` write `obs`, `var`, `obsm`, `varm`, `uns` (and X with `skip_data = FALSE`) as csv files that pandas reads the same as Python's, with Python's `anndata_write_warning` for sparse and unwritable `uns` values.
   A dict in `uns` is written as Python's `repr`, which supports strings, scalars, nested dicts and 1-d arrays that fit on one line.
 
