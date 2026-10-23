@@ -60,6 +60,13 @@ read_elem_lazy <- function(store, path = "/", chunks = NULL) {
 #' memory.
 #' It matches Python's `read_lazy()`.
 #'
+#' Like Python it only reads the current encodings, so files from old anndata
+#' releases (such as an unencoded `X`, a `dataframe` version 0.1.0 or `raw.X`)
+#' raise an `anndata_error`, and `uns$neighbors` matrices are not moved to
+#' `obsp`.
+#' Use [read_h5ad()] or [read_zarr()] for those files, which raise
+#' `anndata_old_format_warning` (Python's `OldFormatWarning`).
+#'
 #' `r lifecycle::badge("experimental")`
 #'
 #' @param store An h5ad file or a zarr directory, given as a path or as an open

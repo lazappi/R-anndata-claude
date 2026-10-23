@@ -1,15 +1,3 @@
-legacy_zarr_dir <- local({
-  dir <- NULL
-  function() {
-    if (is.null(dir)) {
-      dir <<- tempfile("legacy-zarr")
-      dir.create(dir)
-      utils::untar(fixture_path("legacy-zarr-fixtures.tar.gz"), exdir = dir)
-    }
-    dir
-  }
-})
-
 # Reads the Element at `path` of a legacy fixture, returning the value and the
 # paths of the old format warnings raised (each is muffled, as Python records
 # them without stopping)

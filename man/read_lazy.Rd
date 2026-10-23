@@ -25,6 +25,13 @@ memory.
 It matches Python's \code{read_lazy()}.
 }
 \details{
+Like Python it only reads the current encodings, so files from old anndata
+releases (such as an unencoded \code{X}, a \code{dataframe} version 0.1.0 or \code{raw.X})
+raise an \code{anndata_error}, and \code{uns$neighbors} matrices are not moved to
+\code{obsp}.
+Use \code{\link[=read_h5ad]{read_h5ad()}} or \code{\link[=read_zarr]{read_zarr()}} for those files, which raise
+\code{anndata_old_format_warning} (Python's \code{OldFormatWarning}).
+
 \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
 }
 \examples{

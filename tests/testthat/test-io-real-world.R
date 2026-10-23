@@ -34,8 +34,9 @@ download_pbmc3k <- function(.local_envir = parent.frame()) {
 # comparison would fail on them) and sparse indices stored unsorted (ADR 0006)
 test_that("the PBMC 3k example file reads and round trips with equivalence", {
   skip_if_no_python()
-  # The download uses a legacy format (not yet supported), so Python rewrites
-  # it with the current encodings and that file is the original
+  # The download uses a legacy format (its compound `/obsm` is not yet
+  # supported, see legacy-formats/06), so Python rewrites it with the current
+  # encodings and that file is the original
   original <- python_rewrite_h5ad(download_pbmc3k())
 
   adata <- read_h5ad(original)

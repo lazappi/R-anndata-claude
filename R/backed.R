@@ -334,13 +334,46 @@ backed_dtype <- function(store, path) {
   h5_dtype(store, path)
 }
 
+# The encoding, shape and data path of an X without encoding metadata (a dense
+# dataset or an h5sparse group), or `NULL` for anything else
+backed_legacy_x <- function(elem, path, call) {
+  if (!is_group(elem)) {
+    space <- rhdf5::H5Dget_space(elem)
+    on.exit(rhdf5::H5Sclose(space), add = TRUE)
+    anndata_warn_unencoded(path, call)
+    return(list(
+      encoding = "array",
+      shape = rev(rhdf5::H5Sget_simple_extent_dims(space)$size),
+      data_path = path
+    ))
+  }
+  if (!has_h5sparse_attrs(elem)) {
+    return(NULL)
+  }
+  anndata_warn_unencoded(path, call)
+  list(
+    encoding = h5sparse_encoding(elem),
+    shape = read_h5sparse_shape(elem, path, call),
+    data_path = paste0(path, "/data")
+  )
+}
+
 # A `backed_x` for the Element at `path`, or `NULL` when it is not a numeric
 # array or sparse matrix with a shape, which then is read into memory
 backed_x_elem <- function(manager, path, store, call) {
   elem <- node_open(store, path)
   on.exit(node_close(elem), add = TRUE)
   encoding <- read_elem_attr(elem, "encoding-type")
-  if (identical(encoding, "array")) {
+  if (!nzchar(encoding)) {
+    # Legacy X without encoding metadata: a dense dataset or an h5sparse group
+    legacy <- backed_legacy_x(elem, path, call)
+    if (is.null(legacy)) {
+      return(NULL)
+    }
+    encoding <- legacy$encoding
+    shape <- legacy$shape
+    data_path <- legacy$data_path
+  } else if (identical(encoding, "array")) {
     space <- rhdf5::H5Dget_space(elem)
     on.exit(rhdf5::H5Sclose(space), add = TRUE, after = FALSE)
     shape <- rev(rhdf5::H5Sget_simple_extent_dims(space)$size)

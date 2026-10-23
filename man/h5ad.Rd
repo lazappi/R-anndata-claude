@@ -80,6 +80,11 @@ dimensions.
 \code{store_type} is \code{NULL}, \code{"h5"} or \code{"zarr"} and does not change the result,
 because every Element that can be written to one store can be written to
 the other.
+
+Files from old anndata releases are read too (also in backed mode), each
+Element written without encoding metadata raising
+\code{anndata_old_format_warning} (Python's \code{OldFormatWarning}) and writing
+always uses the current encodings (see \code{\link[=read_lazy]{read_lazy()}} for lazy reading).
 }
 \examples{
 adata <- AnnData(matrix(as.numeric(1:6), nrow = 3))

@@ -8,6 +8,12 @@
 #' as a CSR or CSC matrix.
 #' Writing always uses the current encodings.
 #'
+#' Legacy files also read with `read_h5ad(backed = )` (an unencoded dense `X`
+#' or h5sparse `X` stays on disk) and rewrite to the current encodings.
+#' `read_lazy()` follows Python and only reads the current encodings, so it
+#' raises for the legacy layouts, and it does not move `uns$neighbors` matrices
+#' to `obsp`.
+#'
 #' @param elem An open group or dataset handle.
 #' @param path Path of the Element.
 #' @param store The store `elem` was opened from.
@@ -166,14 +172,18 @@ move_adjacency_matrices <- function(slots, call) {
   slots
 }
 
-#' @rdname io-legacy
-read_unencoded_elem <- function(elem, path, store, call) {
+anndata_warn_unencoded <- function(path, call) {
   anndata_warn(
     "Element {.path {path}} was written without encoding metadata.",
     "anndata_old_format_warning",
     path = path,
     call = call
   )
+}
+
+#' @rdname io-legacy
+read_unencoded_elem <- function(elem, path, store, call) {
+  anndata_warn_unencoded(path, call)
   if (!is_group(elem)) {
     return(read_values_with_shape(store, path, scalar = FALSE))
   }

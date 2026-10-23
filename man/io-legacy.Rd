@@ -25,4 +25,11 @@ with the h5sparse attributes \code{h5sparse_format} and \code{h5sparse_shape} is
 as a CSR or CSC matrix.
 Writing always uses the current encodings.
 }
+\details{
+Legacy files also read with \code{read_h5ad(backed = )} (an unencoded dense \code{X}
+or h5sparse \code{X} stays on disk) and rewrite to the current encodings.
+\code{read_lazy()} follows Python and only reads the current encodings, so it
+raises for the legacy layouts, and it does not move \code{uns$neighbors} matrices
+to \code{obsp}.
+}
 \keyword{internal}

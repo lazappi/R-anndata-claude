@@ -1,6 +1,6 @@
 # legacy-formats: unencoded Elements and h5sparse groups
 
-Status: in-progress
+Status: done
 Type: task
 Blocked by: 02
 
@@ -29,3 +29,4 @@ Read Elements written without encoding metadata, as `read_basic` does (`methods.
 - `sparse_dataset()` accepts h5sparse groups (`shape` preferred over `h5sparse_shape`, as Python): the `legacy_attributes` row passes (test in `test-backed-sparse.R`)
 - `test-io-legacy.R` reads Elements of the 0.6.22 and 0.7.8 fixtures (h5ad and zarr) and compares values and warned paths to the table. `legacy_table()` moved to `helper-legacy.R`
 - Not met yet: reading whole fixtures to the table values needs `obs`/`var` (dataframe 0.1.0 and compound datasets, ticket 04) and `raw.*` (ticket 05), so whole-file comparison is left to those tickets. Remaining here: nothing else known, so mark done once 04 and 05 let whole files read
+- 2026-10-23 (ticket 06 run): tickets 04 and 05 are done and `test-io-legacy.R` compares every part of the 0.6.22, 0.7.8 and 0.10.9 fixtures (X, layers, obsm, varm, uns, obs, var, raw, obsp, warnings) to the table, and `test-io-legacy-modes.R` reads whole files. Marked done

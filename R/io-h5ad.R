@@ -19,6 +19,11 @@
 #' because every Element that can be written to one store can be written to
 #' the other.
 #'
+#' Files from old anndata releases are read too (also in backed mode), each
+#' Element written without encoding metadata raising
+#' `anndata_old_format_warning` (Python's `OldFormatWarning`) and writing
+#' always uses the current encodings (see [read_lazy()] for lazy reading).
+#'
 #' @param filename Path of the `.h5ad` file.
 #' @param backed `NULL` or `FALSE` to read everything into memory, `"r"` or
 #'   `"r+"` to keep `X` and `raw$X` on disk (read-only or read-write, see
