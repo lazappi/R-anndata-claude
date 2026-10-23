@@ -131,6 +131,9 @@ The human owns the order of the Queue.
 - [x] legacy-formats/04: legacy dataframes and categories in uns (`.scratch/legacy-formats/issues/04-legacy-dataframes.md`)
 - [x] legacy-formats/05: raw.X, raw.var and the neighbors move (`.scratch/legacy-formats/issues/05-legacy-raw-neighbors.md`)
 - [x] legacy-formats/06: backed, lazy and real-world files (`.scratch/legacy-formats/issues/06-legacy-backed-lazy-real-world.md`)
+- [ ] h5ad-io/16: compound type helper (`.scratch/h5ad-io/issues/16-compound-type-helper.md`)
+- [ ] h5ad-io/15: rec-array field dtype fidelity (`.scratch/h5ad-io/issues/15-rec-array-dtype-fidelity.md`)
+- [ ] h5ad-io/17: legacy compound float32 fields (`.scratch/h5ad-io/issues/17-legacy-compound-float32.md`)
 
 ## Discovered
 
@@ -144,7 +147,7 @@ The human owns the order of the Queue.
 
 - [x] `format.AnnData` does not escape control characters in keys as Python's `repr` does (`\n`, `\t`), see `quote_key()` in `R/printing.R`
 
-- [ ] Legacy compound `obs`/`var`/`uns` datasets read float32 fields as float64 because rhdf5 cannot see member types (legacy-formats/06). Needs a way to read compound member types (C-level access or another package), then drop the `float32_obs` exemption in `test-io-real-world.R`.
+- [x] (moved to h5ad-io/17) Legacy compound `obs`/`var`/`uns` datasets read float32 fields as float64 because rhdf5 cannot see member types (legacy-formats/06). Needs a way to read compound member types (C-level access or another package), then drop the `float32_obs` exemption in `test-io-real-world.R`.
 
 - [x] The cellxgene PBMC 3k file (the real-world test download) is in a legacy format that `read_h5ad()` rejects (`anndata_legacy_format_error`, unencoded root Element), so the test reads a Python rewrite of it, reading the original needs the `legacy-formats` sub-project
 
@@ -184,4 +187,3 @@ The human owns the order of the Queue.
 Tickets that need triage before they can be queued.
 
 - zarr-io/13: zip stores (`.scratch/zarr-io/issues/13-zarr-zip-stores.md`)
-- h5ad-io/15: rec-array field dtype fidelity (`.scratch/h5ad-io/issues/15-rec-array-dtype-fidelity.md`), after the MVP

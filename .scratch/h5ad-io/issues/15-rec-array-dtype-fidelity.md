@@ -1,8 +1,8 @@
 # rec-array field dtype fidelity
 
-Status: needs-triage
+Status: ready-for-agent
 Type: task
-Blocked by: 08
+Blocked by: 16
 
 ## What
 
@@ -28,6 +28,12 @@ The same helper could also replace the fragile workarounds found by the spike (t
 - Non-ASCII rec-arrays, compressed rec-arrays and rec-arrays with no rows are written and round trip
 - The rec-array relaxation in the test helpers and the deviation notes in the documentation are removed
 - ADR 0005 is superseded
-- `scripts/check.sh` passes
+- The full check (`scripts/check.sh --package` and `--tests`) passes
+
+## Decisions (human, 2026-10-23)
+
+- Option 2, a compiled helper linked against Rhdf5lib (ADR 0008), built in h5ad-io/16.
+  Use it for every rec-array read and write in h5ad, and replace the other spike workarounds only where the helper is simpler.
+- Update the rec-array section of `.scratch/h5ad-io/spec.md` is done by the orchestrator, so follow ADR 0008 here.
 
 ## Comments

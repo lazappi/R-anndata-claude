@@ -122,17 +122,12 @@ The governing rule is that R writes what the reference environment writes for th
 
 ## rec-array
 
-rhdf5 cannot inspect or build compound field types, so `rec-array` field dtypes are not preserved (ADR 0005).
-Within that limit, compatibility is maximised:
+rec-arrays keep their exact field dtypes through the compiled compound-type helper (ADR 0008, which supersedes ADR 0005), built in h5ad-io/16 and used in h5ad-io/15:
 
-- A `rec-array` is read into an R structure that keeps field names, field order and values (a `data.frame` with a marker class is the expected choice)
-- Writing that structure produces a `rec-array` that Python reads, with the same field names, order and values.
-  Fields are int32, float64 or fixed-length strings, as rhdf5's compound writer allows.
-  Fixed-length string fields are sized to the longest value in bytes, so non-ASCII text survives.
-- The deviation is documented in the help for reading and writing, and in the vignette
-- Round-trip tests for `rec-array` check that the values of every field are equal in every direction.
-  Structural equivalence is relaxed for `rec-array` field types only, and the relaxation is explicit in the test helper so it cannot hide other differences.
-- Full field dtype fidelity is the follow-up ticket h5ad-io/15
+- A `rec-array` is read into a `data.frame` with a marker class, keeping field names, order, values and each field's On-disk dtype (integer widths and sign, float32, bool, fixed or variable-length strings)
+- Writing it produces the same compound type h5py writes, including variable-length UTF-8 fields, non-ASCII text, compression and rec-arrays with no rows
+- Round trips are Structurally equivalent with no rec-array relaxation in the test helpers
+- Legacy compound datasets (h5ad-io/17) read their fields with their real types too
 
 ## Public functions
 
