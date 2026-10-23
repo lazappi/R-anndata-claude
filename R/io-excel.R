@@ -14,6 +14,11 @@
 #' Names are always strings, even with the setting `restrict_index_types` off
 #' (Python then keeps the type of the labels).
 #'
+#' @section Deviations from Python:
+#' Python's `object` X (text in the first column) has no R form, so X is
+#' numeric, and names are always strings.
+#' See `vignette("deviations")` for the full list.
+#'
 #' @param filename A path to the `.xlsx` file.
 #' @param sheet The name of the sheet, or its position as a zero-based whole
 #'   number (as Python).

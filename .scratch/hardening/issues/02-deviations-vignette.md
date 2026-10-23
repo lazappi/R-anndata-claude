@@ -1,6 +1,6 @@
 # Deviations vignette
 
-Status: ready-for-agent
+Status: done
 Type: task
 Blocked by: none
 
@@ -14,3 +14,12 @@ If the help pages can share a marker (such as a `@section Deviations:`), add a t
 
 - The vignette builds and covers every deviation found
 - The full check (`scripts/check.sh --package` and `--tests`) passes
+
+## Comments
+
+2026-10-23: Added `vignettes/deviations.Rmd` grouped by area with a ticket or ADR for each entry, and linked it from the main vignette.
+Marker convention: help pages with a deviation have `@section Deviations from Python:` ending with a `vignette("deviations")` link (`AnnData`, `concat`, `io-rec-array`, `lazy-dense`, `read_excel`, `read_lazy`, `read_elem_lazy`, `anndata-index`).
+The vignette names each marked page as `` `?name` ``, and `test-deviations.R` checks both directions plus the link.
+Adding a deviation: add the section to its help page and an entry (with the `?name` line) to the vignette.
+The test cannot check that every deviation inside a page is listed, only the page.
+The zarr rec-array single chunk (zarr-io/14) is listed but was not re-verified against the current code.

@@ -8,6 +8,10 @@
 #' Zero, `NA`, unknown names, out-of-range positions and mixed signs raise an
 #' `anndata_index_error`.
 #'
+#' @section Deviations from Python:
+#' The indices above.
+#' See `vignette("deviations")` for the full list.
+#'
 #' @param i An index, or `NULL` to keep the whole axis.
 #' @param names The names along the axis.
 #' @param what Description of the axis used in error messages.

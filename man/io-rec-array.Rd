@@ -53,8 +53,13 @@ Integer and string fields cannot hold \code{NA}, so writing one raises
 \code{anndata_io_registry_error}.
 A rec-array with no rows is written, and \code{compression = "gzip"} in
 \code{dataset_kwargs} compresses an HDF5 rec-array (zarr uses \code{compressors}).
-\strong{Deviation from Python:} \code{"lzf"} is not available to the helper, so an
-HDF5 rec-array is written uncompressed under it.
 Integers of 2^53 or more raise \code{anndata_dtype_overflow_error} on read.
 }
+\section{Deviations from Python}{
+
+\code{"lzf"} is not available to the compound helper, so an HDF5 rec-array is
+written uncompressed under it.
+See \code{vignette("deviations")} for the full list.
+}
+
 \keyword{internal}

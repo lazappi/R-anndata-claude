@@ -19,6 +19,11 @@
 #' the same Element, including `NA` and the On-disk dtype records.
 #' The store stays open while any lazy object that uses it exists.
 #'
+#' @section Deviations from Python:
+#' `store` is a path or an open store handle, because R has no element object
+#' like h5py's.
+#' See `vignette("deviations")` for the full list.
+#'
 #' @param store An h5ad file or a zarr directory (v3 or v2), given as a path or
 #'   as an open store handle.
 #' @param path Path of the Element within the store.
@@ -68,6 +73,12 @@ read_elem_lazy <- function(store, path = "/", chunks = NULL) {
 #' `anndata_old_format_warning` (Python's `OldFormatWarning`).
 #'
 #' `r lifecycle::badge("experimental")`
+#'
+#' @section Deviations from Python:
+#' Arrays inside `uns` are read into memory (Python keeps them as dask arrays),
+#' `t()` of a lazy `AnnData` stays lazy (it fails in Python) and lazy frames are
+#' indexed by row name where Python's `Dataset2D` has no `loc`.
+#' See `vignette("deviations")` for the full list.
 #'
 #' @param store An h5ad file or a zarr directory, given as a path or as an open
 #'   store handle.

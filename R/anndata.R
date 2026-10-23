@@ -50,13 +50,14 @@
 #' `copy()` of a View returns an independent object, `transpose()` raises an
 #' error, and writing a View to h5ad or zarr writes the subset.
 #'
-#' **Deviation from Python:** accessors return plain R values and not View
-#' wrappers.
+#' @section Deviations from Python:
+#' Accessors return plain R values and not View wrappers.
 #' In Python `x = view.X; x[0, 0] = 1` modifies the View, but in R
 #' `x <- view$X; x[1, 1] <- 1` only changes `x` and the View is unaffected.
 #' Assign through the View (`view$X[1, 1] <- 1`) to modify it.
 #' For a View of a backed object this makes the View independent with a
 #' warning, where Python silently changes nothing.
+#' See `vignette("deviations")` for the full list.
 #'
 #' @section Deprecated methods:
 #' `r lifecycle::badge("deprecated")`

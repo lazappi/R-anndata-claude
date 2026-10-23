@@ -18,17 +18,18 @@
 #' Reading int64 or uint64 values of magnitude 2^53 or more raises the error of
 #' `read_h5ad()` when the block holding them is realised.
 #'
-#' Deviation from eager reads: an int32 array holding -2^31 (the bit pattern of
-#' `NA_integer_`) is read as `double` by `read_h5ad()`, but a seed's type is
-#' fixed before any read.
-#' Realising a block that holds -2^31 therefore raises
-#' `anndata_dtype_overflow_error`, suggesting an eager read.
-#'
 #' `chunkdim()` is the chunk grid of Python's `read_elem_lazy()`: the
 #' `chunks` argument if given (`NA` or `-1` for the whole axis), otherwise the
 #' on-disk chunk shape (the inner chunk shape of sharded zarr), and for a
 #' contiguous HDF5 dataset 1000 or the axis length when that is smaller.
 #' The handle must stay open while the seed is used.
+#'
+#' @section Deviations from Python:
+#' An int32 array holding -2^31 (the bit pattern of `NA_integer_`) is read as
+#' `double` by `read_h5ad()`, but a seed's type is fixed before any read.
+#' Realising a block that holds -2^31 therefore raises
+#' `anndata_dtype_overflow_error`, suggesting an eager read.
+#' See `vignette("deviations")` for the full list.
 #'
 #' @param store An open store handle, see [io-store].
 #' @param path Absolute path of the dense array.

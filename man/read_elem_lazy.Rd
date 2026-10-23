@@ -46,6 +46,13 @@ Realising a lazy value gives what \code{\link[=read_h5ad]{read_h5ad()}} and \cod
 the same Element, including \code{NA} and the On-disk dtype records.
 The store stays open while any lazy object that uses it exists.
 }
+\section{Deviations from Python}{
+
+\code{store} is a path or an open store handle, because R has no element object
+like h5py's.
+See \code{vignette("deviations")} for the full list.
+}
+
 \examples{
 \dontshow{if (requireNamespace("Rarr", quietly = TRUE)) withAutoprint(\{ # examplesIf}
 adata <- AnnData(matrix(as.numeric(1:6), nrow = 3))

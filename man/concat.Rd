@@ -134,10 +134,17 @@ arrays stay lazy (\code{DelayedArray}) and their realised values equal the
 in-memory result.
 When some objects are lazy and others are not, the lazy ones are read into
 memory, as Python does.
-Two deviations from Python: \code{obs} and \code{var} of lazy objects are always read
-into memory (Python keeps them lazy, loses their categorical columns and
-fails on an outer join with string columns), and a lazy result has
-DelayedArray's R types, not the promoted On-disk dtype.
+}
+
+\section{Deviations from Python}{
+
+\code{obs} and \code{var} of lazy objects are always read into memory (Python keeps
+them lazy, loses their categorical columns and fails on an outer join with
+string columns), and a lazy result has DelayedArray's R types, not the
+promoted On-disk dtype.
+Annotation columns Python would turn into a mixed \code{object} column raise
+\code{anndata_unsupported_value_error}.
+See \code{vignette("deviations")} for the full list.
 }
 
 \examples{

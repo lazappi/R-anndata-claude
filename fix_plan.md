@@ -143,7 +143,7 @@ The human owns the order of the Queue.
 - [x] other-formats/07: read_excel() (`.scratch/other-formats/issues/07-read-excel.md`)
 - [x] other-formats/08: other formats documentation (`.scratch/other-formats/issues/08-other-formats-docs.md`)
 - [x] hardening/01: coverage pass (`.scratch/hardening/issues/01-coverage.md`)
-- [ ] hardening/02: deviations vignette (`.scratch/hardening/issues/02-deviations-vignette.md`)
+- [x] hardening/02: deviations vignette (`.scratch/hardening/issues/02-deviations-vignette.md`)
 - [ ] hardening/03: real-file benchmarks (`.scratch/hardening/issues/03-real-file-benchmarks.md`)
 - [ ] hardening/04: examples for exported functions (`.scratch/hardening/issues/04-examples.md`)
 - [ ] hardening/05: pkgdown site (`.scratch/hardening/issues/05-pkgdown.md`)

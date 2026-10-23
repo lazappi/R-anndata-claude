@@ -34,6 +34,14 @@ Use \code{\link[=read_h5ad]{read_h5ad()}} or \code{\link[=read_zarr]{read_zarr()
 
 \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
 }
+\section{Deviations from Python}{
+
+Arrays inside \code{uns} are read into memory (Python keeps them as dask arrays),
+\code{t()} of a lazy \code{AnnData} stays lazy (it fails in Python) and lazy frames are
+indexed by row name where Python's \code{Dataset2D} has no \code{loc}.
+See \code{vignette("deviations")} for the full list.
+}
+
 \examples{
 \dontshow{if (requireNamespace("Rarr", quietly = TRUE)) withAutoprint(\{ # examplesIf}
 adata <- AnnData(matrix(as.numeric(1:6), nrow = 3))

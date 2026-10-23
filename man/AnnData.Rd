@@ -109,14 +109,17 @@ R cannot tell \code{view$obs$col <- x} from \code{view$obs <- x}, so both warn w
 the message for assigning the whole Slot.
 \code{copy()} of a View returns an independent object, \code{transpose()} raises an
 error, and writing a View to h5ad or zarr writes the subset.
+}
 
-\strong{Deviation from Python:} accessors return plain R values and not View
-wrappers.
+\section{Deviations from Python}{
+
+Accessors return plain R values and not View wrappers.
 In Python \verb{x = view.X; x[0, 0] = 1} modifies the View, but in R
 \verb{x <- view$X; x[1, 1] <- 1} only changes \code{x} and the View is unaffected.
 Assign through the View (\code{view$X[1, 1] <- 1}) to modify it.
 For a View of a backed object this makes the View independent with a
 warning, where Python silently changes nothing.
+See \code{vignette("deviations")} for the full list.
 }
 
 \section{Deprecated methods}{

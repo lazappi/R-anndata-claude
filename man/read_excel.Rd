@@ -33,6 +33,13 @@ Python gives an \code{object} array when the first column is text and ignores
 Names are always strings, even with the setting \code{restrict_index_types} off
 (Python then keeps the type of the labels).
 }
+\section{Deviations from Python}{
+
+Python's \code{object} X (text in the first column) has no R form, so X is
+numeric, and names are always strings.
+See \code{vignette("deviations")} for the full list.
+}
+
 \examples{
 \dontrun{
 read_excel("counts.xlsx", sheet = "counts")

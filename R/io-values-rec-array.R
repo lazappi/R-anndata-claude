@@ -28,9 +28,12 @@
 #' `anndata_io_registry_error`.
 #' A rec-array with no rows is written, and `compression = "gzip"` in
 #' `dataset_kwargs` compresses an HDF5 rec-array (zarr uses `compressors`).
-#' **Deviation from Python:** `"lzf"` is not available to the helper, so an
-#' HDF5 rec-array is written uncompressed under it.
 #' Integers of 2^53 or more raise `anndata_dtype_overflow_error` on read.
+#'
+#' @section Deviations from Python:
+#' `"lzf"` is not available to the compound helper, so an HDF5 rec-array is
+#' written uncompressed under it.
+#' See `vignette("deviations")` for the full list.
 #'
 #' @param x A `data.frame`.
 #' @param store An open rhdf5 file or group handle.

@@ -32,4 +32,10 @@ the axis and character vectors match names, taking the first match.
 Zero, \code{NA}, unknown names, out-of-range positions and mixed signs raise an
 \code{anndata_index_error}.
 }
+\section{Deviations from Python}{
+
+The indices above.
+See \code{vignette("deviations")} for the full list.
+}
+
 \keyword{internal}

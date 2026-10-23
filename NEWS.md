@@ -1,5 +1,7 @@
 # anndata.claude (development version)
 
+* `vignette("deviations")` lists every documented difference from Python anndata 0.13.4 with its reason, and help pages with a deviation link to it.
+
 # anndata.claude 0.0.5
 
 Fifth milestone: other formats.
