@@ -1,14 +1,23 @@
-# anndata.claude (development version)
+# anndata.claude 0.0.4
 
-- Numeric fields of legacy compound datasets (`obs`, `var`, `uns`, `obsm`) keep their on-disk dtype, such as float32.
+Fourth milestone: files from old anndata releases and full rec-array fidelity.
 
-- Files from old anndata releases read their `obs` and `var` as Python does: compound datasets (anndata before 0.7), `dataframe` version 0.1.0 groups and categories kept in `uns` (`<col>_categories`), each with Python's `anndata_old_format_warning`.
-- Old files with `raw.X`, `raw.var` and `raw.varm` as root members read into `raw`, and `connectivities` and `distances` kept in `uns$neighbors` move to `obsp` with an `anndata_future_warning`.
-- Old files with `obsm` and `varm` stored as compound datasets (such as the PBMC 3k example of cellxgene) read as a matrix per field.
-  rhdf5 cannot see compound member types, so float32 fields of a compound `obs` or `var` read as float64.
-- rec-arrays in h5ad keep their field dtypes (integer widths and signedness, float32, bool, fixed-length and variable-length strings) on read and write, text is written as variable-length UTF-8 like h5py, and rec-arrays with no rows or `compression = "gzip"` can be written (`"lzf"` writes them uncompressed).
-- Old files read in backed mode (`read_h5ad(backed = "r")`) with their unencoded dense or h5sparse `X` left on disk.
+* Files from old anndata releases read their `obs` and `var` as Python does: compound datasets (anndata before 0.7), `dataframe` version 0.1.0 groups and categories kept in `uns` (`<col>_categories`), each with Python's `anndata_old_format_warning`.
+* Old files with `raw.X`, `raw.var` and `raw.varm` as root members read into `raw`, and `connectivities` and `distances` kept in `uns$neighbors` move to `obsp` with an `anndata_future_warning`.
+* Old files with `obsm` and `varm` stored as compound datasets (such as the PBMC 3k example of cellxgene) read as a matrix per field.
+* Numeric fields of legacy compound datasets (`obs`, `var`, `uns`, `obsm`) keep their on-disk dtype, such as float32.
+* Old files read in backed mode (`read_h5ad(backed = "r")`) with their unencoded dense or h5sparse `X` left on disk.
   `read_lazy()` reads only current encodings like Python and no longer moves `uns$neighbors` matrices to `obsp`.
+* rec-arrays in h5ad keep their field dtypes (integer widths and signedness, float32, bool, fixed-length and variable-length strings) on read and write, text is written as variable-length UTF-8 like h5py, and rec-arrays with no rows or `compression = "gzip"` can be written (`"lzf"` writes them uncompressed).
+* The package now has compiled code, a small C helper linked to Rhdf5lib for compound types (ADR 0008), so installing from source needs a C compiler.
+
+## Known limitations
+
+* Other formats (csv, mtx, text, excel, umi_tools and hdf) are not yet supported, and loom will not be (deprecated in Python).
+* Files from anndata before 0.6 and 0.6.x zarr stores are not supported.
+* Writing zarr v2 and zip stores (`.zarr.zip`) are not supported.
+* Unsorted sparse indices are sorted on read (ADR 0006).
+* A lazily read int32 array holding -2^31 cannot be realised lazily, read it with `read_h5ad()` or `read_zarr()` instead.
 
 # anndata.claude 0.0.3
 
