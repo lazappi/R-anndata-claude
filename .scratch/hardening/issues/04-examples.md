@@ -1,6 +1,6 @@
 # Examples for exported functions
 
-Status: ready-for-agent
+Status: done
 Type: task
 Blocked by: none
 
@@ -13,3 +13,10 @@ Examples that need Python, downloads or suggested packages are wrapped so `R CMD
 
 - Every exported help page has examples, and they run in `R CMD check`
 - The full check (`scripts/check.sh --package` and `--tests`) passes
+
+## Comments
+
+2026-10-23: Earlier tickets had already given every exported help page runnable examples (Rarr ones use `@examplesIf`).
+The only gap was `read_excel()`, whose `\dontrun` example now reads `readxl::readxl_example("datasets.xlsx")` under `@examplesIf requireNamespace("readxl")`.
+No `\dontrun` or `\donttest` is left in `man/`.
+Both checks and review passed.

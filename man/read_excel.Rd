@@ -41,7 +41,10 @@ See \code{vignette("deviations")} for the full list.
 }
 
 \examples{
-\dontrun{
-read_excel("counts.xlsx", sheet = "counts")
-}
+\dontshow{if (requireNamespace("readxl", quietly = TRUE)) withAutoprint(\{ # examplesIf}
+path <- readxl::readxl_example("datasets.xlsx")
+# The first column (mpg) becomes the observation names, which repeat here
+adata <- suppressWarnings(read_excel(path, sheet = "mtcars"))
+adata
+\dontshow{\}) # examplesIf}
 }

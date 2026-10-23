@@ -24,10 +24,11 @@
 #'   number (as Python).
 #' @param dtype Ignored, kept for compatibility with Python.
 #' @return An [AnnData()] object.
-#' @examples
-#' \dontrun{
-#' read_excel("counts.xlsx", sheet = "counts")
-#' }
+#' @examplesIf requireNamespace("readxl", quietly = TRUE)
+#' path <- readxl::readxl_example("datasets.xlsx")
+#' # The first column (mpg) becomes the observation names, which repeat here
+#' adata <- suppressWarnings(read_excel(path, sheet = "mtcars"))
+#' adata
 #' @export
 read_excel <- function(filename, sheet, dtype = "float32") {
   call <- rlang::current_env()
