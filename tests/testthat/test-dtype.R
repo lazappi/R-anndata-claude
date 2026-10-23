@@ -101,6 +101,25 @@ test_that("check_dtype_fits rejects missing, fractional and huge floats", {
   expect_no_error(check_dtype_fits(1e300, "float64", "/x"))
 })
 
+# The integer and float32 fast paths (min/max, no copy) must agree with the
+# slow checks at the edges: empty input, missing values and the limits
+test_that("check_dtype_fits fast paths agree with the full checks", {
+  expect_no_error(check_dtype_fits(integer(), "uint8", "/x"))
+  expect_no_error(check_dtype_fits(c(0L, 255L), "uint8", "/x"))
+  for (bad in list(256L, -1L, NA_integer_)) {
+    expect_anndata_condition(
+      check_dtype_fits(c(1L, bad), "uint8", "/x"),
+      "anndata_dtype_overflow_error"
+    )
+  }
+  expect_no_error(check_dtype_fits(double(), "float32", "/x"))
+  expect_no_error(check_dtype_fits(c(-3e38, 3e38), "float32", "/x"))
+  expect_anndata_condition(
+    check_dtype_fits(c(1, -1e39), "float32", "/x"),
+    "anndata_dtype_overflow_error"
+  )
+})
+
 # The error must name the path, as the spec requires
 test_that("overflow errors name the path and dtype", {
   err <- expect_anndata_condition(

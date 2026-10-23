@@ -166,6 +166,25 @@ check_dtype_fits <- function(
   if (identical(dtype, "float64")) {
     return(invisible(x))
   }
+  # Fast path for R integers (such as sparse indices), without a double copy.
+  # Anything it cannot clear falls through to the checks that build the error.
+  limits <- dtype_limits[[dtype]]
+  if (is.integer(x) && !is.null(limits) && !anyNA(x)) {
+    if (length(x) == 0L) {
+      return(invisible(x))
+    }
+    if (min(x) >= limits[[1L]] && max(x) < limits[[2L]]) {
+      return(invisible(x))
+    }
+  }
+  if (identical(dtype, "float32") && is.double(x) && !anyNA(x)) {
+    if (length(x) == 0L) {
+      return(invisible(x))
+    }
+    if (min(x) >= -float32_max && max(x) <= float32_max) {
+      return(invisible(x))
+    }
+  }
   values <- as.double(as.vector(x))
   if (identical(dtype, "float32")) {
     bad <- is.finite(values) & abs(values) > float32_max
@@ -180,7 +199,6 @@ check_dtype_fits <- function(
     }
     return(invisible(x))
   }
-  limits <- dtype_limits[[dtype]]
   missing <- !is.finite(values)
   if (any(missing)) {
     abort_dtype_overflow(

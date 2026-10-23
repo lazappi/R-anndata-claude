@@ -101,6 +101,7 @@ Kept brief and current by the loop.
 - `as(<dense>, "CsparseMatrix")` gives a symmetric class for symmetric input, so go through `"generalMatrix"` first
 - `gen_adata` needs `awkward`, which the uv environment lacks, so `_realistic_adata()` stubs `helpers.gen_awkward` and seeds the global `np.random` too
 - Real-world downloads are legacy format, so `python_rewrite_h5ad()` them first, and `expect_all_equivalent(sorted_paths =)` skips the digest of sparse datasets stored unsorted (ADR 0006)
+- `range()` on large vectors is slow (about 10x `min()` plus `max()`), so use those for bounds checks in hot paths
 - `.lintr` excludes `.scratch`, so throwaway scripts there are not linted (air still formats them)
 - zarr uses `Rarr` devel (`Remotes: Huber-group-EMBL/Rarr@devel`), verdicts in `.scratch/zarr-io/zarr-spike.md`: always pass `data_type` to `write_zarr_array()` (it narrows integers), use `write_zarr_group(path, group = "")` for the root, and use `"|b1"` for bool
 - Encodings never call rhdf5: they use the store layer (`R/io-store.R`, wrappers over `store_backend(store)$op()`, HDF5 in `R/io-store-h5.R`), a list of functions and not S3 methods because `.lintr` rejects dotted names, and a zarr backend adds its own list
