@@ -1,19 +1,24 @@
-# anndata.claude (development version)
+# anndata.claude 0.0.5
 
-* `read_excel()` reads an `.xlsx` sheet into an `AnnData` like Python (first column `obs` names, first row `var` names) using readxl (a suggested package).
-  `dtype` is ignored as in Python and names are always strings.
-
-* `read_hdf()` reads a dataset of an HDF5 file into the X of an `AnnData` like Python, using the `row_names` and `col_names` datasets as `obs` and `var` names when present.
+Fifth milestone: other formats.
 
 * `read_text()` and `read_csv()` read delimited text into an `AnnData` like Python, from a path (plain, `.gz` or `.bz2`), a connection or a character vector of lines, with numpy `dtype` strings (default `"float32"`).
-
 * `read_mtx()` reads Matrix Market files (coordinate or array, integer, real or pattern, `.gz` or `.bz2`) into an `AnnData` with a CSR X like Python, with numpy `dtype` strings (default `"float32"`).
   Complex fields are not supported.
-
 * `read_umi_tools()` reads a umi_tools count table (plain or `.gz`) into an `AnnData` with a CSR X and sorted `obs` and `var` names like Python.
-
+* `read_hdf()` reads a dataset of an HDF5 file into the X of an `AnnData` like Python, using the `row_names` and `col_names` datasets as `obs` and `var` names when present.
+* `read_excel()` reads an `.xlsx` sheet into an `AnnData` like Python (first column `obs` names, first row `var` names) using readxl (a suggested package).
+  `dtype` is ignored as in Python and names are always strings.
 * `write_csvs()` and `adata$write_csvs()` write `obs`, `var`, `obsm`, `varm`, `uns` (and X with `skip_data = FALSE`) as csv files that pandas reads the same as Python's, with Python's `anndata_write_warning` for sparse and unwritable `uns` values.
   A dict in `uns` is written as Python's `repr`, which supports strings, scalars, nested dicts and 1-d arrays that fit on one line.
+
+## Known limitations
+
+* Loom is not supported (deprecated in Python), and complex Matrix Market files raise an error (Python silently drops the imaginary part).
+* Files from anndata before 0.6 and 0.6.x zarr stores are not supported.
+* Writing zarr v2 and zip stores (`.zarr.zip`) are not supported.
+* Unsorted sparse indices are sorted on read (ADR 0006).
+* A lazily read int32 array holding -2^31 cannot be realised lazily, read it with `read_h5ad()` or `read_zarr()` instead.
 
 # anndata.claude 0.0.4
 
