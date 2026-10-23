@@ -28,6 +28,7 @@ NULL
 write_mapping <- function(store, key, value, dataset_kwargs, path) {
   call <- rlang::caller_env()
   r_class <- class(value)
+  # nocov start: defensive, only an S4 or setOldClass list subclass reaches here
   if (is.object(value)) {
     abort_io_registry(
       "No method registered for writing {.cls {r_class}} to {.path {path}}.",
@@ -36,6 +37,7 @@ write_mapping <- function(store, key, value, dataset_kwargs, path) {
       call = call
     )
   }
+  # nocov end
   keys <- names(value)
   if (length(value) > 0L) {
     invalid <- is.null(keys) || anyNA(keys) || any(keys == "")

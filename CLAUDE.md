@@ -43,7 +43,8 @@ Kept brief and current by the loop.
 - The full check that must pass before every commit is `scripts/check.sh --package` (format, lint, document, `R CMD check` without tests) and `scripts/check.sh --tests` (every test), run as two commands because together they exceed an agent's 10-minute command limit.
   `scripts/check.sh --quick <test files>` is for use during development (it lints only changed R files), and `scripts/check.sh --release` runs the single full `R CMD check` with tests (no time limit) before a release.
 - The registry binds named functions late (`late_bound()`), otherwise covr reports registered encodings as uncovered
-- Coverage is not part of the full check, run `scripts/check.sh --coverage` for the report (target at least 90%)
+- Coverage is not part of the full check, run `scripts/check.sh --coverage` for the report (target at least 90%, it takes about 8 minutes so a second covr run to list lines must go in the background)
+- covr cannot see `.onLoad()` code, and defensive aborts are marked with `# nocov start: <reason>` and `# nocov end`
 - `scripts/check.sh` (every mode except `--release` and `--coverage`) runs tests on 4 workers (`TESTTHAT_CPUS`) and fails with "timed out" after 570s (`ANNDATA_CHECK_TIMEOUT`), killing every child process, so a hanging test or a too-slow suite fails fast instead of outliving the agent's 10-minute command limit
 - The full check fails on any NOTE (`error_on = "note"`) and sets `_R_CHECK_SYSTEM_CLOCK_=false` itself
 - `LICENSE` needs `ORGANIZATION` as well as `COPYRIGHT HOLDER`, otherwise check gives a note

@@ -81,6 +81,7 @@ read_sparse_part <- function(store, path, call) {
 }
 
 read_shape_attr <- function(elem, path, call) {
+  # nocov start: defensive, a malformed file is not worth building a fixture
   if (!attr_exists(elem, "shape")) {
     abort_io_registry(
       "Cannot read {.path {path}}, it has no {.field shape} attribute.",
@@ -88,6 +89,7 @@ read_shape_attr <- function(elem, path, call) {
       call = call
     )
   }
+  # nocov end
   as.vector(attr_read(elem, "shape"))
 }
 
@@ -95,6 +97,7 @@ read_shape_attr <- function(elem, path, call) {
 as_sparse_index <- function(x, path, call) {
   dtype <- get_dtype(x) %||% native_dtype(x)
   values <- as.vector(drop_dtype(x))
+  # nocov start: defensive, needs a matrix with more than 2^31 stored values
   if (length(values) > 0L && max(values) > .Machine$integer.max) {
     abort_dtype_overflow(
       path,
@@ -104,6 +107,7 @@ as_sparse_index <- function(x, path, call) {
       call
     )
   }
+  # nocov end
   list(values = as.integer(values), dtype = dtype)
 }
 
@@ -116,6 +120,7 @@ read_sparse_elem <- function(elem, path, store) {
 
 # Reads `data`, `indices` and `indptr` below `path` as a matrix of `shape`
 read_sparse_parts <- function(csr, shape, path, store, call) {
+  # nocov start: defensive, a malformed file is not worth building a fixture
   if (length(shape) != 2L) {
     abort_io_registry(
       "Cannot read {.path {path}}, its {.field shape} must have length 2.",
@@ -123,6 +128,7 @@ read_sparse_parts <- function(csr, shape, path, store, call) {
       call = call
     )
   }
+  # nocov end
   data <- read_sparse_part(store, paste0(path, "/data"), call)
   indices <- as_sparse_index(
     read_sparse_part(store, paste0(path, "/indices"), call),

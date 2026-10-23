@@ -180,6 +180,8 @@ set_setting <- function(name, value, call = rlang::caller_env()) {
 
 # Active bindings do not survive installation (they are saved as plain values),
 # so the fields are added when the package loads
+# nocov start: runs in .onLoad, before covr instruments the package (the tests
+# exercise every binding)
 populate_settings <- function(env) {
   for (name in names(setting_specs)) {
     local({
@@ -208,6 +210,7 @@ populate_settings <- function(env) {
   lockEnvironment(env, bindings = TRUE)
   invisible(env)
 }
+# nocov end
 
 #' @rdname anndata_settings
 #' @format `anndata_settings` is an environment of class `anndata_settings`.
@@ -217,9 +220,11 @@ anndata_settings <- structure(
   class = "anndata_settings"
 )
 
+# nocov start: runs when the package loads, before covr instruments it
 .onLoad <- function(libname, pkgname) {
   populate_settings(anndata_settings)
 }
+# nocov end
 
 # Environments cannot gain fields, so unknown names must be caught here for a
 # classed error rather than the base "locked environment" one

@@ -53,6 +53,7 @@ lazy_dataframe <- function(
   columns <- vector("list", length(col_names))
   for (i in seq_along(col_names)) {
     columns[[i]] <- lazy_column(store, paste0(path, "/", col_names[[i]]), call)
+    # nocov start: defensive, a malformed file is not worth building a fixture
     if (length(columns[[i]]) != n) {
       abort_io_registry(
         "Cannot read {.path {path}}, column {.val {col_names[[i]]}} has
@@ -61,6 +62,7 @@ lazy_dataframe <- function(
         call = call
       )
     }
+    # nocov end
   }
   names(columns) <- col_names
 
