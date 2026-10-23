@@ -5,6 +5,8 @@
 ^\.claude$
 ^ralph$
 ^docs$
+^_pkgdown\.yml$
+^pkgdown-site$
 ^scripts$
 ^CONTEXT\.md$
 ^CLAUDE\.md$

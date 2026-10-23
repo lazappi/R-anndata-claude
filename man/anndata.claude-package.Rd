@@ -8,6 +8,13 @@
 \description{
 An R port of Python 'anndata' (reference release 0.13.4) for annotated data matrices. The first priority is compatibility with the anndata on-disk formats, so that objects read from a file are equal whichever language wrote it.
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://lazappi.github.io/R-anndata-claude/}
+}
+
+}
 \author{
 \strong{Maintainer}: Luke Zappia \email{luke.zappia@gmail.com}
 

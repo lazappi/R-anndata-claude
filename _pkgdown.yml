@@ -1,0 +1,44 @@
+url: https://lazappi.github.io/R-anndata-claude/
+destination: pkgdown-site
+
+template:
+  bootstrap: 5
+
+reference:
+  - title: Core object
+    contents:
+      - AnnData
+      - anndata-generics
+      - format.AnnData
+      - as_array
+  - title: h5ad files
+    contents:
+      - h5ad
+  - title: zarr stores
+    contents:
+      - zarr
+  - title: Backed and lazy reading
+    contents:
+      - sparse_dataset
+      - read_lazy
+      - read_elem_lazy
+  - title: Concatenation
+    contents:
+      - concat
+  - title: Other formats
+    contents:
+      - read_text
+      - read_mtx
+      - read_umi_tools
+      - read_hdf
+      - read_excel
+      - write_csvs
+  - title: Settings and conditions
+    contents:
+      - anndata_settings
+
+articles:
+  - title: Articles
+    contents:
+      - anndata-claude
+      - deviations

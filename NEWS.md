@@ -1,5 +1,7 @@
 # anndata.claude (development version)
 
+* A pkgdown site config (`_pkgdown.yml`) groups the reference by area and lists both vignettes as articles, the site URL is a placeholder.
+
 * Every exported help page has runnable examples, including `read_excel()`.
 
 * `vignette("deviations")` lists every documented difference from Python anndata 0.13.4 with its reason, and help pages with a deviation link to it.

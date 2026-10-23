@@ -146,7 +146,7 @@ The human owns the order of the Queue.
 - [x] hardening/02: deviations vignette (`.scratch/hardening/issues/02-deviations-vignette.md`)
 - [x] hardening/03: real-file benchmarks (`.scratch/hardening/issues/03-real-file-benchmarks.md`)
 - [x] hardening/04: examples for exported functions (`.scratch/hardening/issues/04-examples.md`)
-- [ ] hardening/05: pkgdown site (`.scratch/hardening/issues/05-pkgdown.md`)
+- [x] hardening/05: pkgdown site (`.scratch/hardening/issues/05-pkgdown.md`)
 
 ## Discovered
 
