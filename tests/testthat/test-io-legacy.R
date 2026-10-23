@@ -523,3 +523,66 @@ test_that("an unencoded root without obs is a legacy error", {
   rhdf5::h5createFile(path)
   expect_error(read_h5ad(path), class = "anndata_legacy_format_error")
 })
+
+# Old scanpy wrote `obsm` and `varm` as compound datasets with array-valued
+# fields, which Python's constructor turns into a mapping of the fields
+test_that("compound obsm and varm read as a mapping of matrices", {
+  skip_if_no_python()
+  path <- withr::local_tempfile(fileext = ".h5ad")
+  run_python("write_compound_obsm.py", path)
+  adata <- quietly_read(function() read_h5ad(path))
+  expect_named(adata$obsm, c("X_pca", "X_umap"))
+  expect_equal(
+    as.vector(t(drop_dtype(adata$obsm[["X_pca"]]))),
+    as.numeric(0:5)
+  )
+  expect_equal(dim(adata$obsm[["X_umap"]]), c(3L, 3L))
+  expect_equal(adata$obsm[["X_umap"]][2, 3], 2.5, ignore_attr = TRUE)
+  # float32 is recorded when the compound size determines the field widths
+  expect_identical(get_dtype(adata$obsm[["X_pca"]]), "float32")
+  expect_named(adata$varm, "PCs")
+  expect_equal(dim(adata$varm[["PCs"]]), c(2L, 2L))
+})
+
+# The other layouts of unencoded datasets that Python's `read_dataset` handles,
+# read from the `uns` of the file above (the 2^60 field is read on its own)
+test_that("unencoded strings and compound datasets read as Python does", {
+  skip_if_no_python()
+  path <- withr::local_tempfile(fileext = ".h5ad")
+  run_python("write_compound_obsm.py", path)
+  uns <- quietly_read(function() read_h5ad(path))$uns
+  # Old datasets have a fixed-length string as a one element array, which
+  # Python reads as a scalar (variable-length strings and longer arrays stay)
+  expect_null(dim(uns$one_fixed))
+  expect_identical(as.vector(uns$one_fixed), "abc")
+  expect_identical(dim(uns$one_vlen), 1L)
+  expect_identical(as.vector(uns$three_fixed), c("a", "b", "c"))
+  # A compound without array fields is a rec-array
+  expect_s3_class(uns$plain, "data.frame")
+  expect_named(uns$plain, c("a", "b"))
+  # Array fields give matrices and the other fields stay vectors
+  expect_equal(dim(uns$mixed$m), c(2L, 2L))
+  expect_length(uns$mixed$s, 2L)
+  # Widths that the compound size does not determine leave no dtype record
+  expect_null(get_dtype(uns$ambiguous$p))
+  expect_equal(dim(uns$ambiguous$p), c(2L, 2L))
+  # Too many fields to try every width
+  expect_null(compound_float_widths(NULL, "/x", rep(1L, 13L)))
+  # Complex numbers are the compound of `r` and `i`
+  expect_identical(as.vector(uns$complex), c(1 + 2i, 3 + 4i))
+})
+
+# A 64-bit field of a compound with array fields is checked for precision as
+# in the other readers
+test_that("a compound int64 field beyond 2^53 is an error", {
+  skip_if_no_python()
+  path <- withr::local_tempfile(fileext = ".h5ad")
+  big <- withr::local_tempfile(fileext = ".h5")
+  run_python("write_compound_obsm.py", path, big)
+  store <- rhdf5::H5Fopen(big, flags = "H5F_ACC_RDONLY")
+  withr::defer(rhdf5::H5Fclose(store))
+  expect_anndata_condition(
+    read_unencoded_compound(store, "/big", rlang::current_env()),
+    "anndata_dtype_overflow_error"
+  )
+})

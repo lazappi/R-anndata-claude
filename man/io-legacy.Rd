@@ -23,6 +23,11 @@ Each one raises \code{anndata_old_format_warning}, as Python's \code{OldFormatWa
 A group is read as a dict and a dataset as an array or scalar, and a group
 with the h5sparse attributes \code{h5sparse_format} and \code{h5sparse_shape} is read
 as a CSR or CSC matrix.
+A compound dataset with array-valued fields (old \code{obsm} and \code{varm}) is read
+as a list of matrices, one per field.
+rhdf5 cannot see the type of a compound member, so float32 fields of a
+compound \code{obs}, \code{var} or \code{uns} dataset read as float64, and a matrix field is
+only recorded as float32 when the size of the compound fixes the widths.
 Writing always uses the current encodings.
 }
 \details{

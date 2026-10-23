@@ -2,6 +2,8 @@
 
 - Files from old anndata releases read their `obs` and `var` as Python does: compound datasets (anndata before 0.7), `dataframe` version 0.1.0 groups and categories kept in `uns` (`<col>_categories`), each with Python's `anndata_old_format_warning`.
 - Old files with `raw.X`, `raw.var` and `raw.varm` as root members read into `raw`, and `connectivities` and `distances` kept in `uns$neighbors` move to `obsp` with an `anndata_future_warning`.
+- Old files with `obsm` and `varm` stored as compound datasets (such as the PBMC 3k example of cellxgene) read as a matrix per field.
+  rhdf5 cannot see compound member types, so float32 fields of a compound `obs` or `var` read as float64.
 - Old files read in backed mode (`read_h5ad(backed = "r")`) with their unencoded dense or h5sparse `X` left on disk.
   `read_lazy()` reads only current encodings like Python and no longer moves `uns$neighbors` matrices to `obsp`.
 

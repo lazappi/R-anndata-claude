@@ -6,6 +6,11 @@
 #' A group is read as a dict and a dataset as an array or scalar, and a group
 #' with the h5sparse attributes `h5sparse_format` and `h5sparse_shape` is read
 #' as a CSR or CSC matrix.
+#' A compound dataset with array-valued fields (old `obsm` and `varm`) is read
+#' as a list of matrices, one per field.
+#' rhdf5 cannot see the type of a compound member, so float32 fields of a
+#' compound `obs`, `var` or `uns` dataset read as float64, and a matrix field is
+#' only recorded as float32 when the size of the compound fixes the widths.
 #' Writing always uses the current encodings.
 #'
 #' Legacy files also read with `read_h5ad(backed = )` (an unencoded dense `X`
@@ -181,11 +186,94 @@ anndata_warn_unencoded <- function(path, call) {
   )
 }
 
+# The float widths (4 or 8 bytes) of the fields of a compound dataset that add
+# up to its size, since rhdf5 cannot tell the type of a member. Gives `NULL`
+# (all float64) when the widths are not determined by the size.
+compound_float_widths <- function(store, path, counts) {
+  if (length(counts) > 12L) {
+    return(NULL)
+  }
+  dset <- rhdf5::H5Dopen(store, path)
+  on.exit(rhdf5::H5Dclose(dset), add = TRUE)
+  size <- rhdf5::H5Tget_size(rhdf5::H5Dget_type(dset))
+  grid <- as.matrix(expand.grid(rep(list(c(4L, 8L)), length(counts))))
+  fits <- as.vector(grid %*% counts) == size
+  if (sum(fits) == 1L) grid[fits, ] else NULL
+}
+
+# Python's `read_dataset` for a compound dataset without encoding metadata:
+# a structured array. Fields with array values (the layout of old `obsm` and
+# `varm`) come out as matrices and the others as a rec-array
+read_unencoded_compound <- function(store, path, call) {
+  dset <- rhdf5::H5Dopen(store, path)
+  on.exit(rhdf5::H5Dclose(dset), add = TRUE)
+  fields <- withCallingHandlers(
+    suppressMessages(rhdf5::H5Dread(
+      dset,
+      bit64conversion = "double",
+      compoundAsDataFrame = FALSE
+    )),
+    warning = function(w) abort_dtype_precision(path, "int64", call)
+  )
+  # h5py's complex numbers are the compound of `r` and `i`, which rhdf5 reads
+  # as complex values
+  if (!is.list(fields)) {
+    return(NULL)
+  }
+  if (!any(vapply(fields, function(x) length(dim(x)) == 2L, logical(1)))) {
+    return(read_rec_array_elem(NULL, path, store))
+  }
+  counts <- vapply(
+    fields,
+    function(x) if (length(dim(x)) == 2L) dim(x)[[1L]] else 1L,
+    integer(1)
+  )
+  widths <- compound_float_widths(store, path, counts)
+  for (i in seq_along(fields)) {
+    if (length(dim(fields[[i]])) == 2L) {
+      fields[[i]] <- t(fields[[i]])
+      if (!is.null(widths) && widths[[i]] == 4L) {
+        fields[[i]] <- set_dtype(fields[[i]], "float32")
+      }
+    }
+  }
+  fields
+}
+
+# Whether `path` is a 1-d dataset of a single fixed-length string (the
+# variable-length ones stay arrays in Python)
+is_fixed_string_singleton <- function(store, path) {
+  info <- array_info(store, path)
+  if (!identical(info$dclass, "STRING") || as.integer(info$rank) != 1L) {
+    return(FALSE)
+  }
+  if (!identical(as.numeric(info$shape[[1L]]), 1)) {
+    return(FALSE)
+  }
+  dset <- rhdf5::H5Dopen(store, path)
+  on.exit(rhdf5::H5Dclose(dset), add = TRUE)
+  !rhdf5::H5Tis_variable_str(rhdf5::H5Dget_type(dset))
+}
+
 #' @rdname io-legacy
 read_unencoded_elem <- function(elem, path, store, call) {
   anndata_warn_unencoded(path, call)
   if (!is_group(elem)) {
-    return(read_values_with_shape(store, path, scalar = FALSE))
+    if (
+      !inherits(store, "zarr_node") &&
+        identical(array_info(store, path)$dclass, "COMPOUND")
+    ) {
+      fields <- read_unencoded_compound(store, path, call)
+      if (!is.null(fields)) {
+        return(fields)
+      }
+    }
+    # Backwards compat: old datasets have fixed-length strings as one element
+    # 1-d arrays, which Python reads as a scalar (higher ranks are not strings
+    # written by old versions, and Python would give their first row)
+    scalar <- !inherits(store, "zarr_node") &&
+      is_fixed_string_singleton(store, path)
+    return(read_values_with_shape(store, path, scalar = scalar))
   }
   if (has_h5sparse_attrs(elem)) {
     csr <- identical(h5sparse_encoding(elem), "csr_matrix")

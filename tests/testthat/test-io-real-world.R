@@ -12,6 +12,13 @@ download_pbmc3k <- function(.local_envir = parent.frame()) {
     identical(Sys.getenv("ANNDATA_SKIP_NETWORK"), "true"),
     "ANNDATA_SKIP_NETWORK is true"
   )
+  # A local copy of the file stands in for the download (used where downloads
+  # are not allowed)
+  # (git-ignored, found when tests run from the source tree)
+  local_copy <- testthat::test_path("../../.ralph/oracle/dl/pbmc3k.h5ad")
+  if (file.exists(local_copy)) {
+    return(normalizePath(local_copy))
+  }
   path <- withr::local_tempfile(fileext = ".h5ad", .local_envir = .local_envir)
   withr::local_options(timeout = 300)
   status <- tryCatch(
@@ -34,23 +41,48 @@ download_pbmc3k <- function(.local_envir = parent.frame()) {
 # comparison would fail on them) and sparse indices stored unsorted (ADR 0006)
 test_that("the PBMC 3k example file reads and round trips with equivalence", {
   skip_if_no_python()
-  # The download uses a legacy format (its compound `/obsm` is not yet
-  # supported, see legacy-formats/06), so Python rewrites it with the current
-  # encodings and that file is the original
-  original <- python_rewrite_h5ad(download_pbmc3k())
+  # The download is a legacy format (compound `/obsm` and `/varm`) that is read
+  # directly, and Python's rewrite of it with the current encodings is the
+  # original the written file is compared with
+  download <- download_pbmc3k()
+  original <- python_rewrite_h5ad(download)
 
-  adata <- read_h5ad(original)
+  adata <- quietly_read(function() read_h5ad(download))
   expect_s3_class(adata, "AnnData")
   expect_equal(dim(adata), c(2638L, 1838L))
+  expect_named(
+    adata$obsm,
+    c("X_pca", "X_tsne", "X_umap", "X_draw_graph_fr")
+  )
+  expect_equal(dim(adata$obsm[["X_pca"]]), c(2638L, 50L))
+  expect_named(adata$varm, "PCs")
+  expect_equal(dim(adata$varm[["PCs"]]), c(1838L, 50L))
+  # Reading the download or Python's rewrite gives the same object, except for
+  # the dtype records of the float32 compound fields of the legacy `obs`
+  # (rhdf5 cannot see the member types of a compound dataset)
+  rewritten <- read_h5ad(original)
+  expect_equal(adata$X, rewritten$X)
+  expect_equal(adata$raw$X, rewritten$raw$X)
+  expect_equal(adata$obsm, rewritten$obsm)
+  expect_equal(adata$varm, rewritten$varm)
+  expect_equal(adata$obsp, rewritten$obsp)
+  expect_equal(adata$uns, rewritten$uns)
+  expect_equal(
+    as.data.frame(adata$obs),
+    as.data.frame(rewritten$obs),
+    ignore_attr = TRUE
+  )
 
   written <- withr::local_tempfile(fileext = ".h5ad")
   write_h5ad(adata, written)
 
   rank_genes <- paste0("/uns/rank_genes_groups/", c("names", "scores"))
+  # The float32 `obs` columns of the legacy compound read as float64
+  float32_obs <- paste0("/obs/", c("percent_mito", "n_counts"))
   expect_all_equivalent(
     written,
     original,
-    rec_array_paths = rank_genes,
+    rec_array_paths = c(rank_genes, float32_obs),
     sorted_paths = c("/raw/X/data", "/raw/X/indices")
   )
   for (name in rank_genes) {

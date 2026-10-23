@@ -130,6 +130,7 @@ The human owns the order of the Queue.
 - [x] legacy-formats/03: unencoded Elements and h5sparse groups (`.scratch/legacy-formats/issues/03-unencoded-elements.md`), whole-fixture comparison moved to Discovered
 - [x] legacy-formats/04: legacy dataframes and categories in uns (`.scratch/legacy-formats/issues/04-legacy-dataframes.md`)
 - [x] legacy-formats/05: raw.X, raw.var and the neighbors move (`.scratch/legacy-formats/issues/05-legacy-raw-neighbors.md`)
+- [x] legacy-formats/06: backed, lazy and real-world files (`.scratch/legacy-formats/issues/06-legacy-backed-lazy-real-world.md`)
 
 ## Discovered
 
@@ -143,7 +144,9 @@ The human owns the order of the Queue.
 
 - [x] `format.AnnData` does not escape control characters in keys as Python's `repr` does (`\n`, `\t`), see `quote_key()` in `R/printing.R`
 
-- [ ] The cellxgene PBMC 3k file (the real-world test download) is in a legacy format that `read_h5ad()` rejects (`anndata_legacy_format_error`, unencoded root Element), so the test reads a Python rewrite of it, reading the original needs the `legacy-formats` sub-project
+- [ ] Legacy compound `obs`/`var`/`uns` datasets read float32 fields as float64 because rhdf5 cannot see member types (legacy-formats/06). Needs a way to read compound member types (C-level access or another package), then drop the `float32_obs` exemption in `test-io-real-world.R`.
+
+- [x] The cellxgene PBMC 3k file (the real-world test download) is in a legacy format that `read_h5ad()` rejects (`anndata_legacy_format_error`, unencoded root Element), so the test reads a Python rewrite of it, reading the original needs the `legacy-formats` sub-project
 
 - [x] Coverage was understated because the registry held uninstrumented function copies under covr, fixed with `late_bound()`, now 96.42%
 
@@ -175,8 +178,6 @@ The human owns the order of the Queue.
 
 - [x] legacy-formats/03 leftover: after tickets 04 and 05, read the whole 0.6.22 and 0.7.8 fixtures (h5ad and zarr) to the `legacy_cases.json` values and warnings, then set ticket 03 to `done` and bump the version
 ## Blocked
-
-- legacy-formats/06: backed, lazy and real-world files (`.scratch/legacy-formats/issues/06-legacy-backed-lazy-real-world.md`). Only the PBMC 3k original (compound `/obsm`) remains, and downloading it to inspect was denied (see ticket comments).
 
 ## Follow-up
 
