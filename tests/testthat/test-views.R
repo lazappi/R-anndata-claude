@@ -839,20 +839,29 @@ test_that("a View chunks its own rows as the table says", {
   expect_true(view$is_view)
 })
 
-# Why: rows of the operations table for methods R does not have yet are
-# deferred (human decision, views/04). Each names the sub-project that owns
-# it, which must pass the row when it adds the method. The test keeps the rows
-# in the table and fails once a method appears, as a reminder to test its row
-# and update this list
-test_that("table rows for methods owned by later sub-projects are deferred", {
-  deferred <- list(
-    write_csvs = "other-formats",
-    write_loom = "other-formats"
-  )
-  ops <- view_cases()$operations
+# Why: the `write_csvs` row, writing a View writes the files Python lists, with
+# no warning, and leaves the View a View
+test_that("write_csvs() on a View writes the subset and keeps the View", {
+  expected <- view_cases()$operations$write_csvs
   view <- view_of(view_parent())
-  for (name in names(deferred)) {
-    expect_true(name %in% names(ops), info = name)
-    expect_false(is.function(.subset2(view, name)), info = name)
-  }
+  dir <- withr::local_tempdir()
+  expect_no_warning(view$write_csvs(file.path(dir, "out")))
+  expect_setequal(
+    list.files(file.path(dir, "out")),
+    unlist(expected$result$files)
+  )
+  expect_identical(
+    readLines(file.path(dir, "out", "obs.csv")),
+    c(",num,cat", "o0,1.0,a", "o2,3.0,c")
+  )
+  expect_true(view$is_view)
+})
+
+# Why: `write_loom` is out of scope (deprecated in Python 0.13, spec decision
+# of 2026-10-23, `wontfix`), but its rows stay in the table, so this fails
+# if a method appears without its row being tested
+test_that("the write_loom rows are out of scope", {
+  expect_true("write_loom" %in% names(view_cases()$operations))
+  view <- view_of(view_parent())
+  expect_false(is.function(.subset2(view, "write_loom")))
 })

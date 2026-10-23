@@ -805,6 +805,14 @@ AnnDataClass <- R6Class(
     write_zarr = function(store, ...) {
       write_zarr(self, store, ...)
     },
+    #' @description Writes annotations and `uns` to csv files, see
+    #'   [write_csvs()].
+    #' @param dirname Directory to write to.
+    #' @param skip_data Whether to leave out X.
+    #' @param sep The field separator.
+    write_csvs = function(dirname, skip_data = TRUE, sep = ",") {
+      write_csvs(self, dirname, skip_data = skip_data, sep = sep)
+    },
     #' @description Whether the object holds a value that cannot be written to
     #'   disk, see [write_h5ad()].
     #' @param store_type `NULL`, `"h5"` or `"zarr"`.

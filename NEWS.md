@@ -1,5 +1,8 @@
 # anndata.claude (development version)
 
+* `write_csvs()` and `adata$write_csvs()` write `obs`, `var`, `obsm`, `varm`, `uns` (and X with `skip_data = FALSE`) as csv files that pandas reads the same as Python's, with Python's `anndata_write_warning` for sparse and unwritable `uns` values.
+  A dict in `uns` is written as Python's `repr`, which supports strings, scalars, nested dicts and 1-d arrays that fit on one line.
+
 # anndata.claude 0.0.4
 
 Fourth milestone: files from old anndata releases and full rec-array fidelity.

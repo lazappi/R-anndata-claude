@@ -1,10 +1,3 @@
-other_formats_table <- function() {
-  jsonlite::fromJSON(
-    fixture_path("other_formats_cases.json"),
-    simplifyVector = FALSE
-  )
-}
-
 # Guards the committed table and input files against drifting from what Python
 # gives
 test_that("the committed other-formats table matches the generator", {
