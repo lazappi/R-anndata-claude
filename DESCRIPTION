@@ -1,6 +1,6 @@
 Package: anndata.claude
 Title: Annotated Data Matrices and Their On-Disk Formats
-Version: 0.0.3.9005
+Version: 0.0.3.9006
 Authors@R:
     person("Luke", "Zappia", , "luke.zappia@gmail.com", role = c("aut", "cre"))
 Description: An R port of Python 'anndata' (reference release 0.13.4) for
@@ -27,6 +27,9 @@ Imports:
     S4Arrays,
     S4Vectors,
     SparseArray
+SystemRequirements: GNU make
+LinkingTo:
+    Rhdf5lib
 Suggests:
     bit64,
     covr,

@@ -9,5 +9,6 @@
 #' @importFrom cli cli_abort
 #' @importFrom rlang abort %||%
 #' @importFrom lifecycle deprecated
+#' @useDynLib anndata.claude, .registration = TRUE
 ## usethis namespace: end
 NULL

@@ -76,3 +76,4 @@ importFrom(rlang,
   "%||%",
   abort
 )
+useDynLib(anndata.claude, .registration = TRUE)

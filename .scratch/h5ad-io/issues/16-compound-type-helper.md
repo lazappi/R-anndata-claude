@@ -1,6 +1,6 @@
 # Compound type helper
 
-Status: ready-for-agent
+Status: done
 Type: task
 Blocked by: none
 
@@ -19,3 +19,11 @@ Build the compiled helper of ADR 0008 and prove the design before anything uses 
 - The full check (`scripts/check.sh --package` and `--tests`) passes
 
 ## Comments
+
+2026-10-23: Built `src/compound.c` (`c_compound_members`, `c_compound_write`), `src/Makevars`, `R/io-compound.R` (`compound_members()`, `compound_field()`, `compound_write()`, `compound_copy()`) and `tests/python/compound_types.py`.
+Both verifications passed: the read works while rhdf5 holds the file open (the helper opens with file locking disabled via `H5Pset_file_locking`) and `H5Ocopy()` keeps exact types (checked with h5py, plain and gzip, zero rows).
+Read reports a variable-length string's size as 8 (a pointer) and a bool as an `enum` with names `FALSE`/`TRUE` (h5py shows numpy `bool`).
+Write covers little-endian integer, float, bool enum and fixed/variable ASCII/UTF-8 string fields (what h5py writes for rec-arrays), and rejects out-of-range integers.
+Array-valued, big-endian, complex and vlen members are read-only for now.
+Tickets 15 and 17 use these helpers.
+Status: done.
