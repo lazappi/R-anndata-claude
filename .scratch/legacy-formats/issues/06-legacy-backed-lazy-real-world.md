@@ -1,6 +1,6 @@
 # legacy-formats: backed, lazy and real-world files
 
-Status: in-progress
+Status: needs-info
 Type: task
 Blocked by: 05
 
@@ -25,3 +25,4 @@ Blocked by: 05
 - `test-io-legacy-modes.R`: backed vs in-memory reads, `read_lazy` follows Python (works for 0.10.9, errors otherwise), R-written files equal Python's rewrite (`expect_python_equal()`, h5ad and zarr)
 - NOT met: the PBMC 3k test still reads the Python rewrite. Reading the original download fails with `Cannot read '/obsm', it is complex64 and only complex128 can be read.` (`read_unencoded_elem()` -> `array_read()` -> `h5_read_complex()`): `/obsm` looks like a compound dataset (a structured array of obsm fields), which Python's AnnData constructor turns into a mapping of its fields. I could not inspect the file, because the python-oracle's download (`curl`) was denied. Next run: download pbmc3k.h5ad to `.ralph/oracle/` (if allowed), inspect `/obsm`, `/varm` and `/uns` with h5py, ask the oracle for Python's path, implement it, then switch the test to read the download directly (try `quietly_read()` around `read_h5ad(download)`) and compare with the rewrite
 - Docs: `io-legacy` help page and `NEWS.md` (done)
+- 2026-10-23 (blocked): `curl -sL -o .ralph/oracle/dl/pbmc3k.h5ad <pbmc3k_url>` was denied by the permission mode (the same denial the oracle hit), so `/obsm` of the original download cannot be inspected. Question for the human: allow that one download (to `.ralph/oracle/dl/`), or place `pbmc3k.h5ad` there yourself (the test already downloads it to a temp path, so a copy from `tests/testthat` runs would also do). Recommended: allow `curl` to `.ralph/oracle/dl/`. Then the next run inspects `/obsm` with h5py, asks the oracle for Python's path (compound dataset to a mapping of fields), implements it in `read_unencoded_elem()`, and switches `test-io-real-world.R` to read the download directly.

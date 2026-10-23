@@ -130,7 +130,6 @@ The human owns the order of the Queue.
 - [x] legacy-formats/03: unencoded Elements and h5sparse groups (`.scratch/legacy-formats/issues/03-unencoded-elements.md`), whole-fixture comparison moved to Discovered
 - [x] legacy-formats/04: legacy dataframes and categories in uns (`.scratch/legacy-formats/issues/04-legacy-dataframes.md`)
 - [x] legacy-formats/05: raw.X, raw.var and the neighbors move (`.scratch/legacy-formats/issues/05-legacy-raw-neighbors.md`)
-- [ ] legacy-formats/06 (remaining: PBMC 3k original download fails on a compound `/obsm`, see the ticket comments): backed, lazy and real-world files (`.scratch/legacy-formats/issues/06-legacy-backed-lazy-real-world.md`)
 
 ## Discovered
 
@@ -176,6 +175,8 @@ The human owns the order of the Queue.
 
 - [x] legacy-formats/03 leftover: after tickets 04 and 05, read the whole 0.6.22 and 0.7.8 fixtures (h5ad and zarr) to the `legacy_cases.json` values and warnings, then set ticket 03 to `done` and bump the version
 ## Blocked
+
+- legacy-formats/06: backed, lazy and real-world files (`.scratch/legacy-formats/issues/06-legacy-backed-lazy-real-world.md`). Only the PBMC 3k original (compound `/obsm`) remains, and downloading it to inspect was denied (see ticket comments).
 
 ## Follow-up
 
