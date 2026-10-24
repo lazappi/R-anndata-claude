@@ -169,19 +169,21 @@ check_dtype_fits <- function(
   # Fast path for R integers (such as sparse indices), without a double copy.
   # Anything it cannot clear falls through to the checks that build the error.
   limits <- dtype_limits[[dtype]]
-  if (is.integer(x) && !is.null(limits) && !anyNA(x)) {
+  # `min()` and `max()` give `NA` when `x` holds one, so no separate `anyNA()`
+  # pass (memory-bound on hundreds of millions of values) is needed
+  if (is.integer(x) && !is.null(limits)) {
     if (length(x) == 0L) {
       return(invisible(x))
     }
-    if (min(x) >= limits[[1L]] && max(x) < limits[[2L]]) {
+    if (isTRUE(min(x) >= limits[[1L]] && max(x) < limits[[2L]])) {
       return(invisible(x))
     }
   }
-  if (identical(dtype, "float32") && is.double(x) && !anyNA(x)) {
+  if (identical(dtype, "float32") && is.double(x)) {
     if (length(x) == 0L) {
       return(invisible(x))
     }
-    if (min(x) >= -float32_max && max(x) <= float32_max) {
+    if (isTRUE(min(x) >= -float32_max && max(x) <= float32_max)) {
       return(invisible(x))
     }
   }
@@ -424,7 +426,7 @@ h5_write_dataset <- function(loc, name, x, scalar, dataset_kwargs, call) {
   path <- elem_path(loc, name)
   dtype <- write_dtype(x, path, call)
   values <- as.vector(drop_dtype(x))
-  if (is.double(values)) {
+  if (is.double(values) && anyNA(values)) {
     # `NA_real_` and `NaN` are both written as a plain NaN
     values[is.na(values)] <- NaN
   }
