@@ -148,7 +148,7 @@ The human owns the order of the Queue.
 - [x] hardening/04: examples for exported functions (`.scratch/hardening/issues/04-examples.md`)
 - [x] hardening/05: pkgdown site (`.scratch/hardening/issues/05-pkgdown.md`)
 - [x] hardening/06: read_zarr() memory on large stores (`.scratch/hardening/issues/06-read-zarr-memory.md`)
-- [ ] hardening/07: pbmc3k raw/X digests (`.scratch/hardening/issues/07-pbmc-raw-digests.md`)
+- [x] hardening/07: pbmc3k raw/X digests (`.scratch/hardening/issues/07-pbmc-raw-digests.md`)
 - [ ] hardening/08: large-file performance (`.scratch/hardening/issues/08-large-file-performance.md`)
 
 ## Discovered

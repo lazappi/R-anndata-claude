@@ -2,13 +2,15 @@
 
 Usage:
   benchmark_real_files.py time <current.h5ad> <out_dir> <repeats>
-  benchmark_real_files.py compare <a> <b> [<a> <b> ...]
+  benchmark_real_files.py [--sorted <path> ...] compare <a> <b> [<a> <b> ...]
 
 `time` prints JSON with the best of `repeats` wall-clock seconds for each
 operation (or an `error` string), and leaves the files it wrote in <out_dir>
 (`py.h5ad` and `py.zarr`). `compare` checks pairs of h5ad files or zarr stores
 for Structural equivalence (the h5_tree.py and zarr_tree.py descriptions,
 ignoring chunks) and prints the differences as JSON, one list per pair.
+`--sorted` paths (sparse `data` and `indices` stored unsorted in the source,
+ADR 0006) skip the digest check.
 
 Driven by scripts/benchmark-real-files.R, which is run by hand (not a test).
 """
@@ -90,7 +92,7 @@ def timings(src, out_dir, repeats):
     return result
 
 
-def compare(pairs):
+def compare(pairs, sorted_paths=()):
     def describe(path):
         return (zarr_tree if os.path.isdir(path) else h5_tree).tree(path)
 
@@ -107,6 +109,10 @@ def compare(pairs):
         for path in sorted(set(a) & set(b)):
             x, y = a[path], b[path]
             for prop in ("kind", "dtype", "shape", "digest"):
+                # ADR 0006: R stores unsorted sparse indices sorted, so the
+                # digest of those datasets is expected to differ
+                if prop == "digest" and path in sorted_paths:
+                    continue
                 if x.get(prop) != y.get(prop):
                     diffs.append(f"{path}: {prop} differs ({x.get(prop)!r} vs {y.get(prop)!r})")
             for attr in sorted(set(x["attrs"]) ^ set(y["attrs"])):
@@ -124,8 +130,12 @@ def main(args):
     if args[:1] == ["time"] and len(args) == 4:
         print(json.dumps(timings(args[1], args[2], int(args[3]))))
         return 0
+    sorted_paths = []
+    while args[:1] == ["--sorted"] and len(args) >= 2:
+        sorted_paths.append(args[1])
+        args = args[2:]
     if args[:1] == ["compare"] and len(args) >= 3 and len(args) % 2 == 1:
-        print(json.dumps(compare(list(zip(args[1::2], args[2::2])))))
+        print(json.dumps(compare(list(zip(args[1::2], args[2::2])), sorted_paths)))
         return 0
     print(__doc__, file=sys.stderr)
     return 2

@@ -132,11 +132,16 @@ run_file <- function(name, repeats) {
   message("Comparing written files")
   r_files <- file.path(out_dir, "r", c("r.h5ad", "r.zarr"))
   py_files <- file.path(out_dir, "py", c("py.h5ad", "py.zarr"))
+  # pbmc3k's raw/X has unsorted indices that R stores sorted (ADR 0006)
+  sorted_args <- if (name == "pbmc3k") {
+    c("--sorted", "/raw/X/data", "--sorted", "/raw/X/indices")
+  }
   diffs <- if (all(file.exists(c(r_files, py_files)))) {
     jsonlite::fromJSON(
       paste(
         uv(
           "benchmark_real_files.py",
+          sorted_args,
           "compare",
           r_files[1],
           py_files[1],

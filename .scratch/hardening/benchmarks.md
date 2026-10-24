@@ -42,12 +42,8 @@ Structural equivalence of R's file with Python's:
 
 Structural equivalence of R's file with Python's:
 
-- h5ad: 2 differences
-  - /raw/X/data: digest differs ('7e1af05a18ba41694eecfda2801f1044a088600b09af13b814beab8405f0eb10' vs 'c73425b2e88d5d54845b08aba5ea6a382bdae30f7c3c153875018b4268d84bff')
-  - /raw/X/indices: digest differs ('660f3ae44518041db5cb5169e412a567745f00e3428e5b99cac18aff1515d027' vs 'fb0af952e7852b16df7e64e87b95cafa3dd435981aed0705858b9c2bdd6a7ab1')
-- zarr: 2 differences
-  - /raw/X/data: digest differs ('7e1af05a18ba41694eecfda2801f1044a088600b09af13b814beab8405f0eb10' vs 'c73425b2e88d5d54845b08aba5ea6a382bdae30f7c3c153875018b4268d84bff')
-  - /raw/X/indices: digest differs ('660f3ae44518041db5cb5169e412a567745f00e3428e5b99cac18aff1515d027' vs 'fb0af952e7852b16df7e64e87b95cafa3dd435981aed0705858b9c2bdd6a7ab1')
+- h5ad: equivalent (digests of `/raw/X/data` and `/raw/X/indices` skipped, see Notes)
+- zarr: equivalent (same two digests skipped)
 
 ## Notes
 
@@ -56,7 +52,8 @@ Added by hand, so rerunning `report` overwrites them.
 - Both downloads are legacy format, so each was rewritten by Python first.
   The sizes above are the rewritten files (no compression), the cellxgene download is 764 MB.
 - The two `/raw/X` digest differences are the sparse `data` and `indices` of the pbmc3k raw matrix only, in both formats.
-  This looks like the unsorted-indices case of ADR 0006 (the tests skip these digests with `sorted_paths`), but the cause was not confirmed.
+  Confirmed as the unsorted-indices case of ADR 0006: in Python's rewrite of pbmc3k all 2638 rows of `/raw/X` have unsorted indices, in R's written file none do.
+  `benchmark_real_files.py compare` takes `--sorted <path>` to skip those digests, and the script passes it for pbmc3k only.
 - `read_zarr` of the cellxgene store failed in R with "vector memory limit of 16.0 Gb reached" while the R session also held the AnnData read from h5ad, so it may not fail on its own.
   Rerun alone in a fresh R process (hardening/06) it succeeds in 167.97 s (user 90 s, system 63 s, one run, peak memory not measured), so the failure came from the held object.
   The ratio is queued in hardening/08.
