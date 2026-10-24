@@ -18,7 +18,7 @@ Ratio is R time over Python time, and more than 3 is queued under Discovered in 
 | `read_h5ad` | 30.52 | 5.84 | 5.2 |
 | `write_h5ad` | 83.06 | 15.63 | 5.3 |
 | `write_zarr` | 128.88 | 17.26 | 7.5 |
-| `read_zarr` | failed | 11.18 | - |
+| `read_zarr` | 167.97 | 11.18 | 15.0 |
 | `backed_slice` | 1.76 | 0.44 | 4.0 |
 | `lazy_subset` | 2.20 | 0.98 | 2.2 |
 
@@ -26,10 +26,6 @@ Structural equivalence of R's file with Python's:
 
 - h5ad: equivalent
 - zarr: equivalent
-
-Errors:
-
-- read_zarr: vector memory limit of 16.0 Gb reached, see mem.maxVSize()
 
 ## pbmc3k
 
@@ -62,5 +58,7 @@ Added by hand, so rerunning `report` overwrites them.
 - The two `/raw/X` digest differences are the sparse `data` and `indices` of the pbmc3k raw matrix only, in both formats.
   This looks like the unsorted-indices case of ADR 0006 (the tests skip these digests with `sorted_paths`), but the cause was not confirmed.
 - `read_zarr` of the cellxgene store failed in R with "vector memory limit of 16.0 Gb reached" while the R session also held the AnnData read from h5ad, so it may not fail on its own.
+  Rerun alone in a fresh R process (hardening/06) it succeeds in 167.97 s (user 90 s, system 63 s, one run, peak memory not measured), so the failure came from the held object.
+  The ratio is queued in hardening/08.
 - Only one repeat of the large file was run, and timings are noisy at that count.
 

@@ -78,6 +78,10 @@ r_timings <- function(src, out_dir, repeats) {
     function() write_zarr(adata, out_zarr),
     function() unlink(out_zarr, recursive = TRUE)
   )
+  # Free the object first, holding it made read_zarr() of the 4 GB store hit
+  # the vector memory limit
+  rm(adata)
+  invisible(gc())
   run("read_zarr", function() read_zarr(out_zarr))
   run("backed_slice", function() {
     backed <- read_h5ad(src, backed = "r")

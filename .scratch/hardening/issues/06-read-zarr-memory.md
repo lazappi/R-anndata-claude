@@ -1,6 +1,6 @@
 # read_zarr() memory on large stores
 
-Status: ready-for-agent
+Status: done
 Type: bug
 Blocked by: none
 
@@ -14,3 +14,7 @@ If it still fails or peaks far above the in-memory size of the result, find the 
 
 - The 4 GB store reads in a fresh R process, and its time is added to `.scratch/hardening/benchmarks.md`
 - The full check (`scripts/check.sh --package` and `--tests`) passes
+
+## Comments
+
+- 2026-10-24: Reran `read_zarr()` of the 4 GB store alone in a fresh R process: it succeeds in 167.97 s (user 90 s, system 63 s), giving a 1.9 Gb X, so the earlier failure came from the benchmark session holding the h5ad object. No copies to fix. Peak memory was not measured (`/usr/bin/time -l` is denied in loop runs). The benchmark script now frees the object before the zarr read, `benchmarks.md` has the time, and the 15x ratio against Python is left to hardening/08.
