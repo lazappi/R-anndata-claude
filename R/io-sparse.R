@@ -98,7 +98,11 @@ as_sparse_index <- function(x, path, call) {
   dtype <- get_dtype(x) %||% native_dtype(x)
   values <- as.vector(drop_dtype(x))
   # nocov start: defensive, needs a matrix with more than 2^31 stored values
-  if (length(values) > 0L && max(values) > .Machine$integer.max) {
+  if (
+    !is.integer(values) &&
+      length(values) > 0L &&
+      max(values) > .Machine$integer.max
+  ) {
     abort_dtype_overflow(
       path,
       dtype,
@@ -109,6 +113,11 @@ as_sparse_index <- function(x, path, call) {
   }
   # nocov end
   list(values = as.integer(values), dtype = dtype)
+}
+
+# min() and max() are much faster than comparing every value
+indices_in_range <- function(values, bound) {
+  length(values) == 0L || (min(values) >= 0L && max(values) < bound)
 }
 
 read_sparse_elem <- function(elem, path, store) {
@@ -147,7 +156,7 @@ read_sparse_parts <- function(csr, shape, path, store, call) {
     length(indices$values) == length(data) &&
     identical(indptr$values[[length(indptr$values)]], length(data)) &&
     !is.unsorted(indptr$values) &&
-    all(indices$values >= 0L & indices$values < minor)
+    indices_in_range(indices$values, minor)
   if (!valid) {
     abort_io_registry(
       "Cannot read {.path {path}}, its {.field data}, {.field indices} and
@@ -180,11 +189,14 @@ new_sparse_matrix <- function(csr, data, indices, indptr, shape, data_dtype) {
     p = indptr$values,
     Dim = as.integer(shape)
   )
-  # scipy allows unsorted indices within a major slice but Matrix does not
-  counts <- diff(indptr$values)
-  slice <- rep.int(seq_along(counts), counts)
-  ord <- order(slice, indices$values)
-  if (is.unsorted(ord)) {
+  # scipy allows unsorted indices within a major slice but Matrix does not.
+  # A non-increasing step is fine when it crosses a slice boundary, which is
+  # the case when the position is an `indptr` value (the slice ends there)
+  n_values <- length(indices$values)
+  steps <- which(indices$values[-1L] <= indices$values[-n_values])
+  if (length(steps) > 0L && !all(steps %in% indptr$values)) {
+    slice <- rep.int(seq_along(indptr$values[-1L]), diff(indptr$values))
+    ord <- order(slice, indices$values)
     indices$values <- indices$values[ord]
     args$x <- args$x[ord]
   }

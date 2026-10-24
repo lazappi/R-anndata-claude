@@ -1,6 +1,6 @@
 # Large-file performance
 
-Status: ready-for-agent
+Status: in-progress
 Type: task
 Blocked by: 06
 
@@ -23,4 +23,10 @@ Notes carried over from fix_plan.md (pbmc3k profiling, 2026-10-23):
 
 - Progress (2026-10-23): `check_dtype_fits()` was 40-50% of pbmc3k `write_h5ad`, now has min/max fast paths (pbmc3k write about 0.74s to 0.57s in-process).
 - Still to do: `aperm` and `.Call` (H5Dwrite) in `write_dataset`, `attr_write` per-attribute overhead (about 10%), and on read `aperm.default`, `h5_info`/`h5ls` calls (13%), S4 `new_sparse_matrix` validity.
+- Run 1 (2026-10-24): profiled `read_h5ad` of the large file (`.ralph/oracle/prof-big-read.R`, about 29 s).
+  93% is `read_sparse_parts`: HDF5 reads about 8 s, and the rest was an always-run `order()`/`rep.int()` for unsorted indices, `max`/`as.integer` index checks and `&`/`>=` range checks.
+  Now the unsorted check only sorts when a non-increasing step is not at a slice boundary, and range/overflow checks use `min`/`max` (and skip integers), giving about 25 s (ratio about 4.3, was 5.2).
+  Remaining: HDF5 reads (about 8 s), memory-bound passes over about 400M-entry index vectors (`which` on the step comparison, `as.integer`), S4 `new` validity.
+  Not yet profiled on the large file: `write_h5ad` (83 s), `write_zarr` (129 s), `read_zarr` (168 s), `backed_slice`.
+  `benchmarks.md` is not yet updated, wait for the final run so one benchmark rerun covers all gains.
 - Profile script: `.ralph/oracle/prof-write.R` (needs `.ralph/oracle/bench/pbmc3k/current.h5ad` from `scripts/benchmark-real-files.R run pbmc3k 1`).

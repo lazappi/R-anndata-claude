@@ -150,6 +150,9 @@ The human owns the order of the Queue.
 - [x] hardening/06: read_zarr() memory on large stores (`.scratch/hardening/issues/06-read-zarr-memory.md`)
 - [x] hardening/07: pbmc3k raw/X digests (`.scratch/hardening/issues/07-pbmc-raw-digests.md`)
 - [ ] hardening/08: large-file performance (`.scratch/hardening/issues/08-large-file-performance.md`)
+  - [x] Run 1: `read_h5ad` sparse reading (about 29 s to 25 s on the large file)
+  - [ ] Run 2: profile `write_h5ad`, `read_zarr` and `write_zarr` on the large file, one per process
+  - [ ] Run 3: remaining costs, then rerun `scripts/benchmark-real-files.R` and update `benchmarks.md`
 
 ## Discovered
 
