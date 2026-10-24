@@ -1,8 +1,8 @@
 # Real-file benchmarks
 
-Date: 2026-10-23
+Date: 2026-10-24
 Machine: Darwin 25.6.0 (x86_64)
-Versions: R 4.6.1, anndata.claude 0.0.5.9002, rhdf5 2.57.20, Python anndata 0.13.4
+Versions: R 4.6.1, anndata.claude 0.0.5.9007, rhdf5 2.57.20, Python anndata 0.13.4
 
 Made by `scripts/benchmark-real-files.R`.
 Times are the best wall-clock seconds of the repeats, on the file after a Python rewrite (the downloads are legacy format).
@@ -15,12 +15,12 @@ Ratio is R time over Python time, and more than 3 is queued under Discovered in 
 
 | Operation | R (s) | Python (s) | Ratio |
 |---|---|---|---|
-| `read_h5ad` | 30.52 | 5.84 | 5.2 |
-| `write_h5ad` | 83.06 | 15.63 | 5.3 |
-| `write_zarr` | 128.88 | 17.26 | 7.5 |
-| `read_zarr` | 167.97 | 11.18 | 15.0 |
-| `backed_slice` | 1.76 | 0.44 | 4.0 |
-| `lazy_subset` | 2.20 | 0.98 | 2.2 |
+| `read_h5ad` | 32.71 | 5.80 | 5.6 |
+| `write_h5ad` | 24.32 | 15.30 | 1.6 |
+| `write_zarr` | 68.59 | 16.18 | 4.2 |
+| `read_zarr` | 86.18 | 10.02 | 8.6 |
+| `backed_slice` | 1.72 | 0.52 | 3.3 |
+| `lazy_subset` | 1.92 | 0.90 | 2.1 |
 
 Structural equivalence of R's file with Python's:
 
@@ -48,14 +48,17 @@ Structural equivalence of R's file with Python's:
 ## Notes
 
 Added by hand, so rerunning `report` overwrites them.
+The pbmc3k table is from 2026-10-23 (before hardening/08), only the cellxgene-vascular table was rerun on 2026-10-24.
 
 - Both downloads are legacy format, so each was rewritten by Python first.
   The sizes above are the rewritten files (no compression), the cellxgene download is 764 MB.
 - The two `/raw/X` digest differences are the sparse `data` and `indices` of the pbmc3k raw matrix only, in both formats.
   Confirmed as the unsorted-indices case of ADR 0006: in Python's rewrite of pbmc3k all 2638 rows of `/raw/X` have unsorted indices, in R's written file none do.
   `benchmark_real_files.py compare` takes `--sorted <path>` to skip those digests, and the script passes it for pbmc3k only.
-- `read_zarr` of the cellxgene store failed in R with "vector memory limit of 16.0 Gb reached" while the R session also held the AnnData read from h5ad, so it may not fail on its own.
-  Rerun alone in a fresh R process (hardening/06) it succeeds in 167.97 s (user 90 s, system 63 s, one run, peak memory not measured), so the failure came from the held object.
-  The ratio is queued in hardening/08.
 - Only one repeat of the large file was run, and timings are noisy at that count.
+- After hardening/08 (three runs) the large-file ratios are `read_h5ad` 5.6 (was 5.2), `write_h5ad` 1.6 (was 5.3), `write_zarr` 4.2 (was 7.5), `read_zarr` 8.6 (was 15.0), `backed_slice` 3.3 (was 4.0).
+  Remaining costs:
+  - `read_h5ad`: about 8 s of HDF5 reads, the rest memory-bound passes over about 400M-entry index vectors and S4 validity
+  - `write_zarr`: mostly inside Rarr (gzip `memCompress` 26%, `writeBin` 12%, `.truncate_overflow` 11%)
+  - `read_zarr`: Rarr's chunk reading and transposes, and our assembly of int64 indices from two int32 parts (was four uint16 parts)
 

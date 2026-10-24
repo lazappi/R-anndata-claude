@@ -24,7 +24,7 @@ Metadata is always read from the node's own files, so consolidated metadata
 is neither needed nor trusted.
 Rarr cannot read complex values, and turns 64-bit integers (and uint32)
 beyond the R integer range into \code{NA}.
-Those arrays are read again as 16-bit integers or float64 from a temporary
+Those arrays are read again as 32-bit integers or float64 from a temporary
 copy of the array with a trailing dimension, which holds the same bytes, and
 the values are put together in R.
 }

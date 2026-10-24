@@ -1,5 +1,7 @@
 # anndata.claude (development version)
 
+* Reading and writing large files is faster: `read_h5ad()` of sparse matrices, `write_h5ad()` (about 3x on a 4 GB file) and `read_zarr()` (about 2x).
+
 * A pkgdown site config (`_pkgdown.yml`) groups the reference by area and lists both vignettes as articles, the site URL is a placeholder.
 
 * Every exported help page has runnable examples, including `read_excel()`.

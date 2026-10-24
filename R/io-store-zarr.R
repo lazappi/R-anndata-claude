@@ -10,7 +10,7 @@
 #' is neither needed nor trusted.
 #' Rarr cannot read complex values, and turns 64-bit integers (and uint32)
 #' beyond the R integer range into `NA`.
-#' Those arrays are read again as 16-bit integers or float64 from a temporary
+#' Those arrays are read again as 32-bit integers or float64 from a temporary
 #' copy of the array with a trailing dimension, which holds the same bytes, and
 #' the values are put together in R.
 #'
@@ -398,7 +398,7 @@ zarr_numeric_read <- function(array, selection, call) {
     )
   }
   if (dtype %in% c("int64", "uint64", "uint32")) {
-    # Always from 16-bit parts (read as double like HDF5), because Rarr warns
+    # Always from 32-bit parts (read as double like HDF5), because Rarr warns
     # once per value beyond the integer range, which takes minutes when big
     return(record_dtype(zarr_wide_read(array, selection, path, call), dtype))
   }
@@ -413,24 +413,31 @@ zarr_numeric_read <- function(array, selection, call) {
   record_dtype(values, dtype)
 }
 
-# int64, uint64 and uint32 values Rarr could not hold, put together from 16-bit
+# int64, uint64 and uint32 values Rarr could not hold, put together from 32-bit
 # parts, least significant first
 zarr_wide_read <- function(array, selection, path, call) {
   dtype <- array$dtype
-  count <- if (identical(dtype, "uint32")) 2L else 4L
-  parts <- zarr_split_read(array, "uint16", count, selection)
-  columns <- matrix(as.double(parts), ncol = count)
-  weights <- 2^(16 * (seq_len(count) - 1L))
-  negative <- identical(dtype, "int64") & columns[, count] >= 2^15
-  # Two's complement: a negative value is minus the complement plus one
-  columns[negative, ] <- 65535 - columns[negative, , drop = FALSE]
-  values <- as.vector(columns %*% weights)
-  values[negative] <- values[negative] + 1
-  # A sum that is not exact is at least 2^53, so it is caught here too
-  if (any(values >= 2^53)) {
-    abort_dtype_precision(path, dtype, call)
+  count <- if (identical(dtype, "uint32")) 1L else 2L
+  parts <- zarr_split_read(array, "int32", count, selection)
+  # R reads -2^31 as NA
+  if (anyNA(parts)) {
+    parts[is.na(parts)] <- -2^31
   }
-  values[negative] <- -values[negative]
+  n <- length(parts) %/% count
+  # Low words are unsigned, the high word is signed only for int64
+  values <- as.double(parts[seq_len(n)])
+  values[values < 0] <- values[values < 0] + 2^32
+  if (count == 2L) {
+    high <- as.double(parts[n + seq_len(n)])
+    if (!identical(dtype, "int64")) {
+      high[high < 0] <- high[high < 0] + 2^32
+    }
+    values <- high * 2^32 + values
+    # A sum that is not exact is at least 2^53, so it is caught here too
+    if (n > 0L && (max(values) >= 2^53 || min(values) <= -2^53)) {
+      abort_dtype_precision(path, dtype, call)
+    }
+  }
   zarr_unsplit_dims(values, parts)
 }
 
@@ -536,7 +543,7 @@ zarr_split_read <- function(array, part_type, count, selection) {
     rank <- length(meta$shape)
     meta$shape <- c(meta$shape, list(count))
     meta$chunks <- c(meta$chunks, list(count))
-    meta$dtype <- if (part_type == "uint16") "<u2" else "<f8"
+    meta$dtype <- if (part_type == "int32") "<i4" else "<f8"
     meta$fill_value <- 0L
     meta_file <- ".zarray"
     # A 0-d array keeps its single chunk key

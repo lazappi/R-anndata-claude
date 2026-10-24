@@ -149,10 +149,10 @@ The human owns the order of the Queue.
 - [x] hardening/05: pkgdown site (`.scratch/hardening/issues/05-pkgdown.md`)
 - [x] hardening/06: read_zarr() memory on large stores (`.scratch/hardening/issues/06-read-zarr-memory.md`)
 - [x] hardening/07: pbmc3k raw/X digests (`.scratch/hardening/issues/07-pbmc-raw-digests.md`)
-- [ ] hardening/08: large-file performance (`.scratch/hardening/issues/08-large-file-performance.md`)
+- [x] hardening/08: large-file performance (`.scratch/hardening/issues/08-large-file-performance.md`)
   - [x] Run 1: `read_h5ad` sparse reading (about 29 s to 25 s on the large file)
   - [x] Run 2: profile `write_h5ad` and `write_zarr` on the large file (write_h5ad 26.6 s to 17.3 s in-process, write_zarr 69 s, mostly Rarr), `read_zarr` moved to run 3
-  - [ ] Run 3: profile `read_zarr` (`.ralph/oracle/prof-big-zarr.R read`), remaining costs, then rerun `scripts/benchmark-real-files.R` and update `benchmarks.md`
+  - [x] Run 3: `read_zarr` 169 s to 86 s (int32 parts), benchmarks rerun, `benchmarks.md` updated, remaining costs recorded in the ticket
 
 ## Discovered
 
@@ -201,7 +201,7 @@ The human owns the order of the Queue.
 - [x] legacy-formats/03 leftover: after tickets 04 and 05, read the whole 0.6.22 and 0.7.8 fixtures (h5ad and zarr) to the `legacy_cases.json` values and warnings, then set ticket 03 to `done` and bump the version
 - [x] wontfix (human, 2026-10-23: keep the error, Python silently drops the imaginary part): `read_mtx()` rejects the `complex` field (scipy reads complex128 then `.astype(dtype)` discards the imaginary part with a `ComplexWarning`). Ask python-oracle and add support if wanted.
 
-- [ ] `read_zarr()` of the 4 GB cellxgene store takes 168 s against Python's 11 s (ratio 15, user 90 s and system 63 s), so hardening/08 must cover it (the human may want to name it in that ticket)
+- [x] (done in hardening/08, now 86 s, ratio 8.6) `read_zarr()` of the 4 GB cellxgene store takes 168 s against Python's 11 s (ratio 15, user 90 s and system 63 s), so hardening/08 must cover it (the human may want to name it in that ticket)
 
 ## Blocked
 

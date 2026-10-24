@@ -1,6 +1,6 @@
 # Large-file performance
 
-Status: in-progress
+Status: done
 Type: task
 Blocked by: 06
 
@@ -34,4 +34,9 @@ Notes carried over from fix_plan.md (pbmc3k profiling, 2026-10-23):
   `check_dtype_fits()` now relies on `min`/`max` giving `NA` (no `anyNA`) and the double write only runs `is.na()` when `anyNA()`, giving 17.3 s (ratio about 1.1).
   `write_zarr` is 69 s in-process (Python 17.2 s, ratio about 4): 26% `memCompress` (Rarr gzip chunks, ours to avoid only by a different default codec), 12% `writeBin`, 11% Rarr `.truncate_overflow`, the rest dtype checks and `array`, all inside Rarr.
   `read_zarr` was not profiled (`prof-big-zarr.R read` reads `.ralph/oracle/bench/cellxgene-vascular/prof.zarr`, left by the write profile) and is for run 3, along with `benchmarks.md`.
+- Run 3 (2026-10-24): `read_zarr` was 169 s, 73% in `zarr_wide_read` (int64 `indices` read as four uint16 parts through Rarr, whose chunk transposes dominate).
+  Now int64/uint64 are read as two int32 parts and uint32 as one (restoring `NA` as -2^31), giving about 86 s.
+  Reran `scripts/benchmark-real-files.R` for the large file and updated `benchmarks.md` (ratios: read_h5ad 5.6, write_h5ad 1.6, write_zarr 4.2, read_zarr 8.6, backed_slice 3.3).
+  Not all operations are within 3x after three runs, remaining costs are in the benchmarks Notes (HDF5 reads and memory-bound passes for `read_h5ad`, Rarr internals for zarr).
+  Note `report` overwrites hand-written Notes and the pbmc3k table (not rerun), they were restored by hand.
 - Profile script: `.ralph/oracle/prof-write.R` (needs `.ralph/oracle/bench/pbmc3k/current.h5ad` from `scripts/benchmark-real-files.R run pbmc3k 1`).

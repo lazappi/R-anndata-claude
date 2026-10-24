@@ -296,7 +296,7 @@ test_that("invalid selections are rejected", {
 })
 
 test_that("64-bit values beyond the integer range read as doubles", {
-  # Rarr turns them into NA, so they are put together from 16-bit parts.
+  # Rarr turns them into NA, so they are put together from 32-bit parts.
   # Fixtures hold no such values, so the arrays are written by hand
   big <- 2^40
   for (version in c(3L, 2L)) {
@@ -368,6 +368,56 @@ test_that("64-bit values at 2^53 or more raise a precision error", {
       array_read(store, "x"),
       class = "anndata_dtype_overflow_error"
     )
+    # A 32-bit word of 0x80000000 reads as NA in R, in the high word of these
+    # it must still be seen as out of range, not as a missing value
+    for (case in list(
+      list("int64", "<i8", c(0, 0, 0, 0, 0, 0, 0, 0x80)),
+      list("uint64", "<u8", c(0, 0, 0, 0, 0, 0, 0, 0x80))
+    )) {
+      store <- local_zarr_array(
+        version,
+        case[[1L]],
+        case[[2L]],
+        as.raw(case[[3L]]),
+        1L,
+        environment()
+      )
+      expect_error(
+        array_read(store, "x"),
+        class = "anndata_dtype_overflow_error"
+      )
+    }
+  }
+})
+
+test_that("64-bit and uint32 words equal to -2^31 are not read as missing", {
+  # Rarr gives NA for the int32 value -2^31, which these parts can hold as the
+  # low word (0x80000000) of 2^31 and -2^31
+  low <- 2^31
+  values <- c(low, -low, -low - 2^32)
+  bytes <- unlist(lapply(values, function(v) {
+    halves <- c(v %% 2^32, floor(v / 2^32) %% 2^32)
+    as.raw(floor(rep(halves, each = 4) / 256^(0:3)) %% 256)
+  }))
+  for (version in c(3L, 2L)) {
+    store <- local_zarr_array(
+      version,
+      "int64",
+      "<i8",
+      as.raw(bytes),
+      3L,
+      environment()
+    )
+    expect_identical(array_read(store, "x"), set_dtype(values, "int64"))
+    store <- local_zarr_array(
+      version,
+      "uint32",
+      "<u4",
+      as.raw(c(0, 0, 0, 0x80)),
+      1L,
+      environment()
+    )
+    expect_identical(array_read(store, "x"), set_dtype(low, "uint32"))
   }
 })
 
