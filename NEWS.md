@@ -1,5 +1,7 @@
 # anndata.claude (development version)
 
+* A sparse matrix with out-of-range `indices` (such as the 1-based indices Illumina DRAGEN 4.5.4 writes) raises an error saying so, with a hint when they look 1-based, and is listed in `vignette("deviations")` (Python reads it into an invalid matrix).
+
 # anndata.claude 0.0.6
 
 Sixth milestone: hardening (performance, documentation and deviations).

@@ -24,6 +24,11 @@
 #' `anndata_old_format_warning` (Python's `OldFormatWarning`) and writing
 #' always uses the current encodings (see [read_lazy()] for lazy reading).
 #'
+#' @section Deviations from Python:
+#' A sparse matrix whose `indices` are out of range (such as 1-based indices)
+#' raises an error, where Python reads it into an invalid scipy matrix.
+#' See `vignette("deviations")` for the full list.
+#'
 #' @param filename Path of the `.h5ad` file.
 #' @param backed `NULL` or `FALSE` to read everything into memory, `"r"` or
 #'   `"r+"` to keep `X` and `raw$X` on disk (read-only or read-write, see

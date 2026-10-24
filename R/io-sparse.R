@@ -120,6 +120,26 @@ indices_in_range <- function(values, bound) {
   length(values) == 0L || (min(values) >= 0L && max(values) < bound)
 }
 
+# Out-of-range `indices`, with a hint when they look 1-based (as some writers,
+# such as Illumina DRAGEN 4.5.4, write them)
+abort_sparse_index_range <- function(path, values, bound, csr, call) {
+  low <- min(values)
+  high <- max(values)
+  one_based <- low >= 1L && high == bound
+  abort_io_registry(
+    c(
+      "Cannot read {.path {path}}, its {.field indices} must be from 0 to
+       {bound - 1L} (the number of {if (csr) 'columns' else 'rows'} minus 1),
+       but they range from {low} to {high}.",
+      i = if (one_based) {
+        "The indices look 1-based, but h5ad sparse indices are 0-based."
+      }
+    ),
+    path = path,
+    call = call
+  )
+}
+
 read_sparse_elem <- function(elem, path, store) {
   call <- rlang::caller_env()
   csr <- identical(read_elem_attr(elem, "encoding-type"), "csr_matrix")
@@ -152,11 +172,15 @@ read_sparse_parts <- function(csr, shape, path, store, call) {
 
   major <- if (csr) shape[[1L]] else shape[[2L]]
   minor <- if (csr) shape[[2L]] else shape[[1L]]
+  # Python reads out-of-range indices into an invalid scipy matrix, but Matrix
+  # cannot hold one, so this is an error (vignette("deviations"))
+  if (!indices_in_range(indices$values, minor)) {
+    abort_sparse_index_range(path, indices$values, minor, csr, call)
+  }
   valid <- length(indptr$values) == major + 1L &&
     length(indices$values) == length(data) &&
     identical(indptr$values[[length(indptr$values)]], length(data)) &&
-    !is.unsorted(indptr$values) &&
-    indices_in_range(indices$values, minor)
+    !is.unsorted(indptr$values)
   if (!valid) {
     abort_io_registry(
       "Cannot read {.path {path}}, its {.field data}, {.field indices} and

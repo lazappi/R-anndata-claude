@@ -123,6 +123,10 @@ Help page: `?read_excel`
 
 - **`NA` and `NaN`.**
   Double `NA_real_` and `NaN` are both written as `NaN`, and read back as `NaN` (h5ad-io spec, "Encodings").
+- **Out-of-range sparse indices.**
+  Help page: `?h5ad`.
+  A CSR or CSC matrix whose `indices` are out of range for its shape (such as the 1-based indices Illumina DRAGEN 4.5.4 writes) raises `anndata_io_registry_error`, with a hint when they look 1-based.
+  Python reads such a file without complaint into an invalid scipy matrix (`check_format()` fails and `toarray()` misplaces values), and `Matrix` cannot hold an invalid matrix.
 - **Unsorted sparse indices.**
   Unsorted `indices` of a CSR or CSC matrix are sorted on read, with their `data`, because `Matrix` needs them sorted.
   The matrix is the same but the on-disk order of `indices` and `data` can differ (ADR 0006).

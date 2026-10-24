@@ -86,6 +86,13 @@ Element written without encoding metadata raising
 \code{anndata_old_format_warning} (Python's \code{OldFormatWarning}) and writing
 always uses the current encodings (see \code{\link[=read_lazy]{read_lazy()}} for lazy reading).
 }
+\section{Deviations from Python}{
+
+A sparse matrix whose \code{indices} are out of range (such as 1-based indices)
+raises an error, where Python reads it into an invalid scipy matrix.
+See \code{vignette("deviations")} for the full list.
+}
+
 \examples{
 adata <- AnnData(matrix(as.numeric(1:6), nrow = 3))
 path <- tempfile(fileext = ".h5ad")

@@ -234,6 +234,33 @@ test_that("inconsistent sparse components raise on read", {
   expect_identical(err$path, "/x")
 })
 
+# Python reads out-of-range indices into an invalid matrix, R refuses them
+# (vignette("deviations")), hinting when they look 1-based
+test_that("out-of-range sparse indices raise on read", {
+  for (format in c("csr", "csc")) {
+    store <- local_h5_store()
+    expected <- sparse_expected(format)
+    write_elem(store, "x", expected)
+    group <- rhdf5::H5Gopen(store, "x")
+    indices <- if (format == "csr") expected@j else expected@i
+    rhdf5::H5Ldelete(group, "indices")
+    write_dataset(group, "indices", as.integer(indices + 1L))
+    err <- expect_anndata_condition(
+      read_elem(store, "x"),
+      "anndata_io_registry_error"
+    )
+    expect_identical(err$path, "/x", info = format)
+    message <- conditionMessage(err)
+    expect_match(message, "must be from 0", info = format)
+    if (
+      max(indices) + 1L ==
+        if (format == "csr") ncol(expected) else nrow(expected)
+    ) {
+      expect_match(message, "1-based", info = format)
+    }
+  }
+})
+
 # Sparse subsets and transposes keep their dtype record, so they must write the
 # recorded dtype too
 test_that("a subset keeps its sparse dtype record on write", {
