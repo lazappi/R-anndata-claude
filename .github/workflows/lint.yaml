@@ -1,0 +1,56 @@
+# Formatting, lints and up-to-date documentation, as in `scripts/check.sh --package`
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+name: lint
+
+permissions: read-all
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: posit-dev/setup-air@v1
+
+      - name: air format --check
+        run: air format --check .
+
+  lint:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: any::lintr, any::devtools, local::.
+          needs: lint
+
+      - name: lintr::lint_package()
+        run: |
+          pkgload::load_all(quiet = TRUE)
+          lints <- lintr::lint_package()
+          if (length(lints)) {
+            print(lints)
+            quit(status = 1)
+          }
+        shell: Rscript {0}
+
+      - name: devtools::document() leaves man/ and NAMESPACE unchanged
+        run: |
+          Rscript -e 'devtools::document()'
+          git diff --exit-code -- man NAMESPACE DESCRIPTION

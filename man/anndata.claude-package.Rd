@@ -11,7 +11,9 @@ An R port of Python 'anndata' (reference release 0.13.4) for annotated data matr
 \seealso{
 Useful links:
 \itemize{
+  \item \url{https://github.com/lazappi/R-anndata-claude}
   \item \url{https://lazappi.github.io/R-anndata-claude/}
+  \item Report bugs at \url{https://github.com/lazappi/R-anndata-claude/issues}
 }
 
 }

@@ -1,0 +1,50 @@
+# Coverage report in the job log (target 90%), no upload
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+name: test-coverage
+
+permissions: read-all
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test-coverage:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      TESTTHAT_CPUS: 4
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: any::covr
+          needs: coverage
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+          cache-dependency-glob: tests/python/uv.lock
+
+      - name: Install the Python reference environment
+        run: uv sync --project tests/python --locked
+
+      - name: Test coverage
+        run: |
+          cov <- covr::package_coverage(quiet = FALSE, clean = FALSE)
+          print(cov)
+          pct <- covr::percent_coverage(cov)
+          cat(sprintf("\nTotal coverage: %.1f%%\n", pct))
+          cat(sprintf("## Coverage\n\nTotal: %.1f%%\n", pct), file = Sys.getenv("GITHUB_STEP_SUMMARY"), append = TRUE)
+        shell: Rscript {0}

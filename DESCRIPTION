@@ -8,7 +8,9 @@ Description: An R port of Python 'anndata' (reference release 0.13.4) for
     anndata on-disk formats, so that objects read from a file are equal
     whichever language wrote it.
 License: BSD_3_clause + file LICENSE
-URL: https://lazappi.github.io/R-anndata-claude/
+URL: https://github.com/lazappi/R-anndata-claude,
+    https://lazappi.github.io/R-anndata-claude/
+BugReports: https://github.com/lazappi/R-anndata-claude/issues
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 Depends:
