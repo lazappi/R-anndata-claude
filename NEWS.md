@@ -1,3 +1,5 @@
+# anndata.claude (development version)
+
 # anndata.claude 0.0.6
 
 Sixth milestone: hardening (performance, documentation and deviations).
