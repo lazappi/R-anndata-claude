@@ -147,6 +147,9 @@ The human owns the order of the Queue.
 - [x] hardening/03: real-file benchmarks (`.scratch/hardening/issues/03-real-file-benchmarks.md`)
 - [x] hardening/04: examples for exported functions (`.scratch/hardening/issues/04-examples.md`)
 - [x] hardening/05: pkgdown site (`.scratch/hardening/issues/05-pkgdown.md`)
+- [ ] hardening/06: read_zarr() memory on large stores (`.scratch/hardening/issues/06-read-zarr-memory.md`)
+- [ ] hardening/07: pbmc3k raw/X digests (`.scratch/hardening/issues/07-pbmc-raw-digests.md`)
+- [ ] hardening/08: large-file performance (`.scratch/hardening/issues/08-large-file-performance.md`)
 
 ## Discovered
 
@@ -194,20 +197,6 @@ The human owns the order of the Queue.
 
 - [x] legacy-formats/03 leftover: after tickets 04 and 05, read the whole 0.6.22 and 0.7.8 fixtures (h5ad and zarr) to the `legacy_cases.json` values and warnings, then set ticket 03 to `done` and bump the version
 - [x] wontfix (human, 2026-10-23: keep the error, Python silently drops the imaginary part): `read_mtx()` rejects the `complex` field (scipy reads complex128 then `.astype(dtype)` discards the imaginary part with a `ComplexWarning`). Ask python-oracle and add support if wanted.
-
-- [ ] Slow operations from `.scratch/hardening/benchmarks.md` (R seconds vs Python, ratio over 3), found by hardening/03.
-  Large file (cellxgene-vascular, 83k cells): `read_h5ad` 30.5 vs 5.8 (5.2x), `write_h5ad` 83.1 vs 15.6 (5.3x), `write_zarr` 128.9 vs 17.3 (7.5x), `backed_slice` 1.76 vs 0.44 (4.0x).
-  Small file (pbmc3k, 2.6k cells): `read_h5ad` 0.51 vs 0.09 (5.8x), `write_h5ad` 0.84 vs 0.09 (9.1x), `read_zarr` 1.11 vs 0.13 (8.4x), `backed_slice` 0.30 vs 0.05 (6.2x), `lazy_subset` 0.51 vs 0.13 (3.9x).
-  Profile (for example with `profvis`) and fix the biggest costs, `write_*` first. Small-file ratios may be fixed overhead.
-  Progress (2026-10-23): `check_dtype_fits()` was 40-50% of pbmc3k `write_h5ad`, now has min/max fast paths (pbmc3k write about 0.74s to 0.57s in-process).
-  Still to do: `aperm` and `.Call` (H5Dwrite) in `write_dataset`, `attr_write` per-attribute overhead (about 10%), and on read `aperm.default`, `h5_info`/`h5ls` calls (13%), S4 `new_sparse_matrix` validity.
-  Profile script: `.ralph/oracle/prof-write.R` (needs `.ralph/oracle/bench/pbmc3k/current.h5ad` from `scripts/benchmark-real-files.R run pbmc3k 1`).
-
-- [ ] `read_zarr()` of the 4 GB rewritten cellxgene-vascular store fails with "vector memory limit of 16.0 Gb reached" (Python reads it in 11.2s).
-  The session also held the AnnData read from h5ad, so rerun alone first (`Rscript scripts/benchmark-real-files.R run cellxgene-vascular 1` after dropping the earlier objects) to see whether the memory use is real.
-
-- [ ] pbmc3k written by R differs from Python's in the digests of `/raw/X/data` and `/raw/X/indices` (h5ad and zarr).
-  Probably ADR 0006 (legacy file with unsorted indices), but check whether R sorts differently from Python, and if so add `sorted_paths` handling to `benchmark_real_files.py`.
 
 ## Blocked
 
