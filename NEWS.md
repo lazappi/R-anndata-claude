@@ -1,12 +1,20 @@
-# anndata.claude (development version)
+# anndata.claude 0.0.6
 
-* Reading and writing large files is faster: `read_h5ad()` of sparse matrices, `write_h5ad()` (about 3x on a 4 GB file) and `read_zarr()` (about 2x).
-
-* A pkgdown site config (`_pkgdown.yml`) groups the reference by area and lists both vignettes as articles, the site URL is a placeholder.
-
-* Every exported help page has runnable examples, including `read_excel()`.
+Sixth milestone: hardening (performance, documentation and deviations).
 
 * `vignette("deviations")` lists every documented difference from Python anndata 0.13.4 with its reason, and help pages with a deviation link to it.
+* Every exported help page has runnable examples, including `read_excel()`.
+* Large files are faster to write and to read from zarr: on an 800 MB h5ad (84k cells, 4 GB after rewriting), `write_h5ad()` is about 3x faster and `read_zarr()` about 2x faster.
+* A pkgdown site config (`_pkgdown.yml`) groups the reference by area and lists both vignettes as articles, the site URL is a placeholder.
+
+## Known limitations
+
+* Reading is slower than Python on large files (about 5x for `read_h5ad()` and 8x for `read_zarr()`), see `.scratch/hardening/benchmarks.md`.
+* Loom is not supported (deprecated in Python), and complex Matrix Market files raise an error (Python silently drops the imaginary part).
+* Files from anndata before 0.6 and 0.6.x zarr stores are not supported.
+* Writing zarr v2 and zip stores (`.zarr.zip`) are not supported.
+* Unsorted sparse indices are sorted on read (ADR 0006).
+* A lazily read int32 array holding -2^31 cannot be realised lazily, read it with `read_h5ad()` or `read_zarr()` instead.
 
 # anndata.claude 0.0.5
 
