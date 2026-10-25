@@ -4,7 +4,7 @@ pkgdown_sha: ~
 articles:
   anndata-claude: anndata-claude.html
   deviations: deviations.html
-last_built: 2026-10-25T08:42Z
+last_built: 2026-10-25T09:18Z
 urls:
   reference: https://lazappi.github.io/R-anndata-claude/reference
   article: https://lazappi.github.io/R-anndata-claude/articles
