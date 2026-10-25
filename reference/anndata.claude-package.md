@@ -17,11 +17,13 @@ Useful links:
 
 ## Author
 
-**Maintainer**: Luke Zappia <luke.zappia@gmail.com>
+**Maintainer**: Luke Zappia <luke@lazappi.id.au>
+([ORCID](https://orcid.org/0000-0001-7744-8565)) (github: lazappi)
 
 Authors:
 
-- Luke Zappia <luke.zappia@gmail.com>
+- Luke Zappia <luke@lazappi.id.au>
+  ([ORCID](https://orcid.org/0000-0001-7744-8565)) (github: lazappi)
 
 Other contributors:
 

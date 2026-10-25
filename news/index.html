@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">anndata.claude</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.6.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -36,8 +36,24 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="anndataclaude-development-version">anndata.claude (development version)<a class="anchor" aria-label="anchor" href="#anndataclaude-development-version"></a></h2>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.1.0" id="anndataclaude-010">anndata.claude 0.1.0<a class="anchor" aria-label="anchor" href="#anndataclaude-010"></a></h2>
+<p>First public release, on GitHub, covering every sub-project of the roadmap except the experimental Python features.</p>
 <ul><li>A sparse matrix with out-of-range <code>indices</code> (such as the 1-based indices Illumina DRAGEN 4.5.4 writes) raises an error saying so, with a hint when they look 1-based, and is listed in <code><a href="../articles/deviations.html">vignette("deviations")</a></code> (Python reads it into an invalid matrix).</li>
+<li>The package is on GitHub (<a href="https://github.com/lazappi/R-anndata-claude" class="external-link uri">https://github.com/lazappi/R-anndata-claude</a>) with GitHub Actions for <code>R CMD check</code> on Ubuntu and macOS (with the Python comparison tests), lint, coverage and the pkgdown site at <a href="https://lazappi.github.io/R-anndata-claude/" class="uri">https://lazappi.github.io/R-anndata-claude/</a>.</li>
+<li>The README describes the features, installation (including OpenSSL on macOS for Rhdf5lib) and the directory structure.</li>
+</ul><div class="section level3">
+<h3 id="known-limitations-0-1-0">Known limitations<a class="anchor" aria-label="anchor" href="#known-limitations-0-1-0"></a></h3>
+<ul><li>Reading is slower than Python on large files (about 5x for <code><a href="../reference/h5ad.html">read_h5ad()</a></code> and 8x for <code><a href="../reference/zarr.html">read_zarr()</a></code>).</li>
+<li>Loom is not supported (deprecated in Python), and complex Matrix Market files raise an error (Python silently drops the imaginary part).</li>
+<li>Files from anndata before 0.6 and 0.6.x zarr stores are not supported.</li>
+<li>Writing zarr v2 and zip stores (<code>.zarr.zip</code>) are not supported.</li>
+<li>The experimental Python features (<code>AnnCollection</code>, <code>concat_on_disk</code>, awkward arrays and accessors) are not supported.</li>
+<li>Unsorted sparse indices are sorted on read (ADR 0006).</li>
+<li>A lazily read int32 array holding -2^31 cannot be realised lazily, read it with <code><a href="../reference/h5ad.html">read_h5ad()</a></code> or <code><a href="../reference/zarr.html">read_zarr()</a></code> instead.</li>
 </ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.0.6" id="anndataclaude-006">anndata.claude 0.0.6<a class="anchor" aria-label="anchor" href="#anndataclaude-006"></a></h2>
 <p>Sixth milestone: hardening (performance, documentation and deviations).</p>
