@@ -3,7 +3,8 @@ Title: Annotated Data Matrices and Their On-Disk Formats
 Version: 0.0.6.9000
 Authors@R:
     c(
-      person("Luke", "Zappia", , "luke.zappia@gmail.com", role = c("aut", "cre")),
+      person("Luke", "Zappia", , "luke@lazappi.id.au", role = c("aut", "cre"),
+             comment = c(ORCID = "0000-0001-7744-8565", github = "lazappi")),
       person("Claude", , , "noreply@anthropic.com", role = "ctb",
              comment = "Anthropic AI models (Opus and Sonnet)")
     )
