@@ -1,0 +1,104 @@
+# anndata.claude
+
+`anndata.claude` is an R port of Python
+[anndata](https://anndata.readthedocs.io) for annotated data matrices.
+
+Its first priority is full compatibility with the anndata on-disk
+formats (h5ad, and zarr later). An object read from a file is equal
+whichever language wrote it, and files written by R are structurally
+equivalent to files written by Python. The in-memory `AnnData` object
+supports that goal, with full feature parity as the long-term aim.
+
+## Relationship to Python anndata
+
+Python anndata release 0.13.4 is the only reference for behaviour. This
+package matches its observable behaviour (values, errors, warnings and
+files written) but is idiomatic R rather than a line-by-line
+translation.
+
+The package is developed with an autonomous loop and is at an early
+stage. Nothing is exported yet.
+
+## Acknowledgements
+
+Thanks to the authors of Python anndata, whose design and file formats
+this package follows.
+
+## License
+
+BSD 3-Clause, see `LICENSE.md`.
+
+# Package index
+
+## Core object
+
+- [`AnnData()`](https://lazappi.github.io/R-anndata-claude/reference/AnnData.md)
+  : Annotated data matrix
+- [`dim(`*`<AnnData>`*`)`](https://lazappi.github.io/R-anndata-claude/reference/anndata-generics.md)
+  [`dimnames(`*`<AnnData>`*`)`](https://lazappi.github.io/R-anndata-claude/reference/anndata-generics.md)
+  [`length(`*`<AnnData>`*`)`](https://lazappi.github.io/R-anndata-claude/reference/anndata-generics.md)
+  [`Ops(`*`<AnnData>`*`)`](https://lazappi.github.io/R-anndata-claude/reference/anndata-generics.md)
+  : Base R generics for AnnData
+- [`format(`*`<AnnData>`*`)`](https://lazappi.github.io/R-anndata-claude/reference/format.AnnData.md)
+  [`print(`*`<AnnData>`*`)`](https://lazappi.github.io/R-anndata-claude/reference/format.AnnData.md)
+  : Format and print an AnnData object
+- [`as_array()`](https://lazappi.github.io/R-anndata-claude/reference/as_array.md)
+  : Mark a vector as an array
+
+## h5ad files
+
+- [`read_h5ad()`](https://lazappi.github.io/R-anndata-claude/reference/h5ad.md)
+  [`write_h5ad()`](https://lazappi.github.io/R-anndata-claude/reference/h5ad.md)
+  : Read and write h5ad files
+
+## zarr stores
+
+- [`read_zarr()`](https://lazappi.github.io/R-anndata-claude/reference/zarr.md)
+  [`write_zarr()`](https://lazappi.github.io/R-anndata-claude/reference/zarr.md)
+  : Read and write zarr stores
+
+## Backed and lazy reading
+
+- [`sparse_dataset()`](https://lazappi.github.io/R-anndata-claude/reference/sparse_dataset.md)
+  : Handle on a sparse matrix on disk
+- [`read_lazy()`](https://lazappi.github.io/R-anndata-claude/reference/read_lazy.md)
+  : Read an AnnData lazily
+- [`read_elem_lazy()`](https://lazappi.github.io/R-anndata-claude/reference/read_elem_lazy.md)
+  : Read an Element lazily
+
+## Concatenation
+
+- [`concat()`](https://lazappi.github.io/R-anndata-claude/reference/concat.md)
+  : Concatenate AnnData objects
+
+## Other formats
+
+- [`read_text()`](https://lazappi.github.io/R-anndata-claude/reference/read_text.md)
+  [`read_csv()`](https://lazappi.github.io/R-anndata-claude/reference/read_text.md)
+  : Read text and csv files
+- [`read_mtx()`](https://lazappi.github.io/R-anndata-claude/reference/read_mtx.md)
+  : Read a Matrix Market file
+- [`read_umi_tools()`](https://lazappi.github.io/R-anndata-claude/reference/read_umi_tools.md)
+  : Read a umi_tools count table
+- [`read_hdf()`](https://lazappi.github.io/R-anndata-claude/reference/read_hdf.md)
+  : Read an HDF5 file with a data matrix
+- [`read_excel()`](https://lazappi.github.io/R-anndata-claude/reference/read_excel.md)
+  : Read an Excel sheet with a data matrix
+- [`write_csvs()`](https://lazappi.github.io/R-anndata-claude/reference/write_csvs.md)
+  : Write annotations and uns to csv files
+
+## Settings and conditions
+
+- [`anndata_settings`](https://lazappi.github.io/R-anndata-claude/reference/anndata_settings.md)
+  [`local_anndata_settings()`](https://lazappi.github.io/R-anndata-claude/reference/anndata_settings.md)
+  [`with_anndata_settings()`](https://lazappi.github.io/R-anndata-claude/reference/anndata_settings.md)
+  : Package settings
+
+# Articles
+
+### Articles
+
+- [Getting started with
+  anndata.claude](https://lazappi.github.io/R-anndata-claude/articles/anndata-claude.md):
+- [Differences from Python
+  anndata](https://lazappi.github.io/R-anndata-claude/articles/deviations.md):

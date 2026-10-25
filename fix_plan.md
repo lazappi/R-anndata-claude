@@ -1,0 +1,576 @@
+# Fix plan
+
+The prioritised queue for the Ralph loop (see `PROMPT.md`). Each run
+takes the first unblocked item. The loop may tick items, split them into
+sub-items and add Discovered and Blocked entries. The human owns the
+order of the Queue.
+
+## Queue
+
+foundations/10: faster test suite, again
+(`.scratch/foundations/issues/10-test-speed-again.md`), target relaxed
+to 7 minutes (see Decisions)
+
+foundations/01: package skeleton
+(`.scratch/foundations/issues/01-package-skeleton.md`)
+
+foundations/02: formatting and linting
+(`.scratch/foundations/issues/02-formatting-and-linting.md`)
+
+foundations/03: check script
+(`.scratch/foundations/issues/03-check-script.md`)
+
+foundations/04: condition helpers
+(`.scratch/foundations/issues/04-condition-helpers.md`)
+
+foundations/05: settings (`.scratch/foundations/issues/05-settings.md`)
+
+foundations/06: Python reference environment
+(`.scratch/foundations/issues/06-python-environment.md`)
+
+foundations/07: structural comparison helpers
+(`.scratch/foundations/issues/07-structural-comparison.md`)
+
+foundations/08: fixture pipeline and offline mode
+(`.scratch/foundations/issues/08-fixture-pipeline.md`)
+
+Break `.scratch/core-object/spec.md` into tickets
+(`.scratch/core-object/issues/`, all `needs-triage`), once foundations
+is done (16 tickets, awaiting human triage)
+
+Break `.scratch/h5ad-io/spec.md` into tickets
+(`.scratch/h5ad-io/issues/`, all `needs-triage`), once foundations is
+done (14 tickets, awaiting human triage)
+
+h5ad-io/01: rhdf5 capability spike
+(`.scratch/h5ad-io/issues/01-rhdf5-spike.md`)
+
+h5ad-io/02: encoding table
+(`.scratch/h5ad-io/issues/02-encoding-table.md`)
+
+🛑 Human checkpoint: review `.scratch/h5ad-io/rhdf5-spike.md` and
+`.scratch/h5ad-io/encoding-table.md` before core-object starts
+
+core-object/01: matrix value coercion and helpers
+(`.scratch/core-object/issues/01-matrix-values.md`)
+
+core-object/02: obs and var data frame handling
+(`.scratch/core-object/issues/02-dataframe-inputs.md`)
+
+core-object/03: AnnData class and basic construction
+(`.scratch/core-object/issues/03-anndata-class-construction.md`)
+
+core-object/04: X assignment and validation
+(`.scratch/core-object/issues/04-x-assignment.md`)
+
+`X` setter rules (scalar, reshape, 3-D, NULL)
+
+`adata$layers[[NA]]` assignment, once ticket 06 provides layers
+
+core-object/05: aligned mappings: obsm, varm, obsp, varp
+(`.scratch/core-object/issues/05-aligned-mappings.md`)
+
+core-object/06: layers (`.scratch/core-object/issues/06-layers.md`)
+
+core-object/07: obs, var, names and uns assignment
+(`.scratch/core-object/issues/07-obs-var-names-uns-assignment.md`)
+
+core-object/08: raw class and raw slot
+(`.scratch/core-object/issues/08-raw.md`)
+
+core-object/09: remaining construction forms
+(`.scratch/core-object/issues/09-construction-forms.md`)
+
+core-object/10: subsetting
+(`.scratch/core-object/issues/10-subsetting.md`)
+
+core-object/11: copy and transpose
+(`.scratch/core-object/issues/11-copy-and-transpose.md`)
+
+core-object/12: obs_names_make_unique and var_names_make_unique
+(`.scratch/core-object/issues/12-make-unique.md`)
+
+core-object/13: to_df, obs_vector, var_vector and key methods
+(`.scratch/core-object/issues/13-data-access-methods.md`)
+
+core-object/14: strings_to_categoricals and rename_categories
+(`.scratch/core-object/issues/14-categorical-methods.md`)
+
+`strings_to_categoricals` and `rename_categories` on obs and var
+
+`rename_categories` renaming of scanpy `uns` rec-array fields (needs
+rec-array structure from h5ad-io/08)
+
+core-object/15: printing (`.scratch/core-object/issues/15-printing.md`)
+
+core-object/16: R generics and comparison error
+(`.scratch/core-object/issues/16-generics-and-comparison.md`)
+
+h5ad-io/03: element registry and error classes
+(`.scratch/h5ad-io/issues/03-element-registry.md`)
+
+h5ad-io/04: on-disk dtype preservation mechanism
+(`.scratch/h5ad-io/issues/04-on-disk-dtype-records.md`)
+
+h5ad-io/05: dense arrays, string arrays, scalars, null and bytes
+(`.scratch/h5ad-io/issues/05-dense-scalar-null.md`)
+
+h5ad-io/06: nullable and categorical arrays
+(`.scratch/h5ad-io/issues/06-nullable-categorical.md`)
+
+h5ad-io/07: sparse matrices
+(`.scratch/h5ad-io/issues/07-sparse-matrices.md`)
+
+foundations/09: faster test suite
+(`.scratch/foundations/issues/09-test-speed.md`)
+
+core-object/17: deprecation warnings
+(`.scratch/core-object/issues/17-deprecation-warnings.md`)
+
+core-object/18: escape keys in printing like Python’s repr
+(`.scratch/core-object/issues/18-repr-key-escaping.md`)
+
+h5ad-io/08: dict and rec-array
+(`.scratch/h5ad-io/issues/08-dict-rec-array.md`)
+
+h5ad-io/09: dataframe (`.scratch/h5ad-io/issues/09-dataframe.md`)
+
+h5ad-io/10: AnnData and Raw, read_h5ad and write_h5ad basics
+(`.scratch/h5ad-io/issues/10-anndata-raw-roundtrip.md`)
+
+h5ad-io/11: read_h5ad and write_h5ad options
+(`.scratch/h5ad-io/issues/11-read-write-options.md`)
+
+h5ad-io/12: realistic and compressed fixtures
+(`.scratch/h5ad-io/issues/12-realistic-fixtures.md`)
+
+h5ad-io/13: real-world file test
+(`.scratch/h5ad-io/issues/13-real-world-file.md`)
+
+h5ad-io/14: package vignette (`.scratch/h5ad-io/issues/14-vignette.md`)
+
+zarr-io/01: zarr library spike
+(`.scratch/zarr-io/issues/01-zarr-library-spike.md`), re-run against
+Rarr devel and zarr main (see Decisions)
+
+🛑 Human checkpoint: review `.scratch/zarr-io/zarr-spike.md`, then grill
+the rest of the zarr-io spec and write its tickets
+
+zarr-io/02: backend-neutral store layer
+(`.scratch/zarr-io/issues/02-store-abstraction.md`)
+
+zarr-io/03: zarr fixtures and encoding table
+(`.scratch/zarr-io/issues/03-zarr-fixtures-and-encoding-table.md`)
+
+zarr-io/04: reading zarr stores
+(`.scratch/zarr-io/issues/04-zarr-read-backend.md`)
+
+zarr-io/05: writing zarr stores
+(`.scratch/zarr-io/issues/05-zarr-write-backend.md`)
+
+zarr-io/06: zarr v3 dense, string, scalar, null and sparse Elements
+(`.scratch/zarr-io/issues/06-zarr-v3-basic-elements.md`)
+
+zarr-io/07: zarr v3 nullable, categorical, dataframe, dict and rec-array
+Elements (`.scratch/zarr-io/issues/07-zarr-v3-compound-elements.md`)
+
+nullable arrays, categorical, dataframe and dict
+
+rec-array: zarr `table_read`/`table_write` for the v3 `struct` data type
+(own chunk packing, zstd via Rarr), three round-trip directions on the
+`rec_array_*` fixtures
+
+zarr-io/08: read_zarr, write_zarr and settings
+(`.scratch/zarr-io/issues/08-read-write-zarr.md`)
+
+[`read_zarr()`](https://lazappi.github.io/R-anndata-claude/reference/zarr.md),
+[`write_zarr()`](https://lazappi.github.io/R-anndata-claude/reference/zarr.md),
+`adata$write_zarr()`, `chunks`, settings, whole-AnnData round trips and
+cross-format checks
+
+dataset arguments: compression (`compressor`/`compressors` with zstd,
+gzip, blosc) and `shards` (the sharding itself is ticket 09), dropped
+for scalars and nulls
+
+Python’s warning for `zarr_write_format = 2` (moved to ticket 11, as v2
+is refused until then) and the zarr `unwriteable` details (already
+tested in `test-io-h5ad.R`)
+
+vignette-independent NEWS entry for zarr (the settings help text changes
+with ticket 09, sharding)
+
+[`read_elem()`](https://lazappi.github.io/R-anndata-claude/reference/io-registry.md)/[`write_elem()`](https://lazappi.github.io/R-anndata-claude/reference/io-registry.md)
+tests on zarr groups with a path and error parity with h5ad (forward
+slashes, bad keys)
+
+zarr-io/09: writing sharded zarr v3
+(`.scratch/zarr-io/issues/09-zarr-shard-writing.md`)
+
+zarr-io/10: reading zarr v2
+(`.scratch/zarr-io/issues/10-zarr-v2-read.md`)
+
+zarr-io/12: zarr documentation
+(`.scratch/zarr-io/issues/12-zarr-docs.md`)
+
+zarr-io/14: zarr rec-array field dtypes and sharding
+(`.scratch/zarr-io/issues/14-zarr-rec-array-fidelity.md`)
+
+views/01: view operations table
+(`.scratch/views/issues/01-view-operations-table.md`)
+
+views/02: Views: creation, access and Views of Views
+(`.scratch/views/issues/02-view-core.md`)
+
+views/03: Views: copy-on-write
+(`.scratch/views/issues/03-view-copy-on-write.md`)
+
+views/04: Views: methods and writing
+(`.scratch/views/issues/04-view-methods-and-io.md`)
+
+`transpose()`/[`t()`](https://rdrr.io/r/base/t.html) of a View raise
+Python’s error, writing a View to h5ad and zarr reads back as the table
+says
+
+Structural equivalence of a written View with Python writing the same
+View (`expect_python_equal()`)
+
+Table rows with no R method yet: `to_memory`, `write_csvs`,
+`write_loom`, `chunked_X`, `chunk_X` listed as deferred in
+`test-views.R` (human decision, see ticket), `write` is under Discovered
+
+views/05: Views documentation (`.scratch/views/issues/05-view-docs.md`)
+
+zarr-io/15: zarr rec-array compressors
+(`.scratch/zarr-io/issues/15-zarr-rec-array-compressors.md`)
+
+backed/01: backed operations table
+(`.scratch/backed/issues/01-backed-operations-table.md`)
+
+backed/02: backed reading and the file manager
+(`.scratch/backed/issues/02-backed-file-manager.md`)
+
+backed/03: backed dense X (`.scratch/backed/issues/03-backed-dense.md`)
+
+backed/04: backed sparse X and sparse_dataset()
+(`.scratch/backed/issues/04-backed-sparse.md`)
+
+`backed_sparse` class, every index form,
+[`sparse_dataset()`](https://lazappi.github.io/R-anndata-claude/reference/sparse_dataset.md)
+reads, Views, dtype records
+
+`sparse_dataset()$append()` (table rows `append_*` in `sparse_dataset`,
+in `"r+"` mode, resizing `data`, `indices`, `indptr` and the `shape`
+attribute, and invalidating the `indptr` cache in `x$cache`)
+
+(moved to `legacy-formats`) h5sparse legacy attributes in
+[`sparse_dataset()`](https://lazappi.github.io/R-anndata-claude/reference/sparse_dataset.md)
+(row `legacy_attributes`)
+
+backed/05: writing backed objects
+(`.scratch/backed/issues/05-backed-writing.md`)
+
+[`write()`](https://rdrr.io/r/base/write.html)/[`write_h5ad()`](https://lazappi.github.io/R-anndata-claude/reference/h5ad.md)
+of backed objects, `copy(filename)`, `to_memory()` and Views of backed
+objects
+
+Assigning X in `"r+"` mode (rows `X_assign_*`, `X_item`, `X_del`,
+`layers_none_assign`, `write_after_X_assign`, `view_*_assign`)
+
+The `filename` setter (rows `filename_*`)
+
+Chunked copy with `min_rows_for_chunked_h5_copy`
+
+Raw rows (`raw_X_assign`, `raw_assign`, `raw_operations`) and
+`write_obs_edit`
+
+backed/06: chunked_X, chunk_X and read_elem_partial
+(`.scratch/backed/issues/06-backed-chunks-and-partial.md`)
+
+backed/07: backed mode documentation
+(`.scratch/backed/issues/07-backed-docs.md`)
+
+lazy/01: lazy seeds spike
+(`.scratch/lazy/issues/01-lazy-seeds-spike.md`)
+
+HDF5Array seeds, ZarrArray and `DataFrame` with DelayedArray columns
+probed, first draft of `.scratch/lazy/seeds-spike.md`
+
+Cause of the own-seed zarr block-read error, and verdicts for the own
+seed on zarr v3 and v2
+
+Own-seed probes for every dtype, bool, nullable and string columns, the
+2^53 error, sparse and chunk shape
+
+Remaining sparse probes for `H5SparseMatrixSeed` (2^53, result types)
+and ZarrArray (sparse bool)
+
+🛑 Checkpoint (orchestrator): read `.scratch/lazy/seeds-spike.md`,
+choose the seeds, finish the lazy spec and write its tickets (ask the
+human only if there is no clear choice)
+
+lazy/02: lazy operations table
+(`.scratch/lazy/issues/02-lazy-operations-table.md`)
+
+lazy/03: seed foundations
+(`.scratch/lazy/issues/03-lazy-seed-foundations.md`)
+
+lazy/04: dense lazy seeds
+(`.scratch/lazy/issues/04-lazy-dense-seeds.md`)
+
+lazy/05: sparse lazy seeds
+(`.scratch/lazy/issues/05-lazy-sparse-seeds.md`)
+
+lazy/06: lazy obs and var (`.scratch/lazy/issues/06-lazy-dataframes.md`)
+
+lazy/07: read_elem_lazy and read_lazy
+(`.scratch/lazy/issues/07-read-lazy.md`)
+
+[`read_elem_lazy()`](https://lazappi.github.io/R-anndata-claude/reference/read_elem_lazy.md)
+for every encoding, `chunks`, path and handle stores
+
+[`read_lazy()`](https://lazappi.github.io/R-anndata-claude/reference/read_lazy.md)
+(lazy AnnData with lazy X, layers, obsm, raw, obs and var,
+`load_annotation_index`)
+
+`read_lazy` table rows: compare each row (`default`,
+`load_annotation_index_*`, `open_handle`, `missing_store`,
+`unconsolidated_zarr` warning), zarr v2 fixtures, dtypes, and record the
+eager `uns` arrays as a deviation
+
+Operations on lazily read objects: subsetting, Views, `to_memory()`,
+printing, copy, transpose, writing (the `operations` and `dask_chunks`
+rows)
+
+lazy/08: lazy reading documentation
+(`.scratch/lazy/issues/08-lazy-docs.md`)
+
+concat/01: concat table (`.scratch/concat/issues/01-concat-table.md`)
+
+concat/02: concat: axes, joins and arrays
+(`.scratch/concat/issues/02-concat-arrays.md`)
+
+concat/03: concat: obs, var and merge strategies
+(`.scratch/concat/issues/03-concat-annotations.md`)
+
+concat/04: concat: aligned mappings, pairwise and raw
+(`.scratch/concat/issues/04-concat-mappings.md`)
+
+concat/05: concat: Views and backed inputs
+(`.scratch/concat/issues/05-concat-views-backed.md`)
+
+concat/06: concat: lazy inputs
+(`.scratch/concat/issues/06-concat-lazy.md`)
+
+concat/07: concatenation documentation
+(`.scratch/concat/issues/07-concat-docs.md`)
+
+legacy-formats/01: legacy releases spike
+(`.scratch/legacy-formats/issues/01-legacy-releases-spike.md`)
+
+🛑 Checkpoint (orchestrator): read
+`.scratch/legacy-formats/releases-spike.md`, finish the legacy-formats
+spec and write its tickets (ask the human only if there is no clear
+choice) (5 tickets 02-06, all `needs-triage`, awaiting human triage)
+
+legacy-formats/02: fixture generator and expectation table
+(`.scratch/legacy-formats/issues/02-legacy-fixtures.md`)
+
+legacy-formats/03: unencoded Elements and h5sparse groups
+(`.scratch/legacy-formats/issues/03-unencoded-elements.md`),
+whole-fixture comparison moved to Discovered
+
+legacy-formats/04: legacy dataframes and categories in uns
+(`.scratch/legacy-formats/issues/04-legacy-dataframes.md`)
+
+legacy-formats/05: raw.X, raw.var and the neighbors move
+(`.scratch/legacy-formats/issues/05-legacy-raw-neighbors.md`)
+
+legacy-formats/06: backed, lazy and real-world files
+(`.scratch/legacy-formats/issues/06-legacy-backed-lazy-real-world.md`)
+
+h5ad-io/16: compound type helper
+(`.scratch/h5ad-io/issues/16-compound-type-helper.md`)
+
+h5ad-io/15: rec-array field dtype fidelity
+(`.scratch/h5ad-io/issues/15-rec-array-dtype-fidelity.md`)
+
+h5ad-io/17: legacy compound float32 fields
+(`.scratch/h5ad-io/issues/17-legacy-compound-float32.md`)
+
+other-formats/01: other formats table
+(`.scratch/other-formats/issues/01-other-formats-table.md`)
+
+other-formats/02: write_csvs()
+(`.scratch/other-formats/issues/02-write-csvs.md`)
+
+other-formats/03: read_text() and read_csv()
+(`.scratch/other-formats/issues/03-read-text-csv.md`)
+
+other-formats/04: read_mtx()
+(`.scratch/other-formats/issues/04-read-mtx.md`)
+
+other-formats/05: read_umi_tools()
+(`.scratch/other-formats/issues/05-read-umi-tools.md`)
+
+other-formats/06: read_hdf()
+(`.scratch/other-formats/issues/06-read-hdf.md`)
+
+other-formats/07: read_excel()
+(`.scratch/other-formats/issues/07-read-excel.md`)
+
+other-formats/08: other formats documentation
+(`.scratch/other-formats/issues/08-other-formats-docs.md`)
+
+hardening/01: coverage pass (`.scratch/hardening/issues/01-coverage.md`)
+
+hardening/02: deviations vignette
+(`.scratch/hardening/issues/02-deviations-vignette.md`)
+
+hardening/03: real-file benchmarks
+(`.scratch/hardening/issues/03-real-file-benchmarks.md`)
+
+hardening/04: examples for exported functions
+(`.scratch/hardening/issues/04-examples.md`)
+
+hardening/05: pkgdown site (`.scratch/hardening/issues/05-pkgdown.md`)
+
+hardening/06: read_zarr() memory on large stores
+(`.scratch/hardening/issues/06-read-zarr-memory.md`)
+
+hardening/07: pbmc3k raw/X digests
+(`.scratch/hardening/issues/07-pbmc-raw-digests.md`)
+
+hardening/08: large-file performance
+(`.scratch/hardening/issues/08-large-file-performance.md`)
+
+Run 1: `read_h5ad` sparse reading (about 29 s to 25 s on the large file)
+
+Run 2: profile `write_h5ad` and `write_zarr` on the large file
+(write_h5ad 26.6 s to 17.3 s in-process, write_zarr 69 s, mostly Rarr),
+`read_zarr` moved to run 3
+
+Run 3: `read_zarr` 169 s to 86 s (int32 parts), benchmarks rerun,
+`benchmarks.md` updated, remaining costs recorded in the ticket
+
+## Discovered
+
+`.Rbuildignore` excludes `^tests/python$`, but ticket 06 needs
+`tests/python` available inside `R CMD check` (tests are copied into the
+check directory). Fix as part of foundations/06.
+
+Deadlock: core-object/06 has `Blocked by: 04`, but 04’s last sub-item
+(`layers[[NA]]` assignment) needs 06. The human should remove 04 from
+06’s `Blocked by:` (06 can then finish 04’s sub-item).
+
+Python 0.13.4 marks `obs_vector`, `var_vector` and the `*_keys()`
+methods deprecated (they warn). core-object/13 does not warn, because
+the spec is silent. The human should decide whether to add an
+`anndata_deprecated_warning`.
+
+rec-arrays ignore `dataset_kwargs` (compression, ticket h5ad-io/11) and
+a rec-array with no rows cannot be written, because rhdf5’s compound
+writer needs a non-empty chunk (h5ad-io/15 would fix both)
+
+`format.AnnData` does not escape control characters in keys as Python’s
+`repr` does (`\n`, `\t`), see `quote_key()` in `R/printing.R`
+
+(moved to h5ad-io/17) Legacy compound `obs`/`var`/`uns` datasets read
+float32 fields as float64 because rhdf5 cannot see member types
+(legacy-formats/06). Needs a way to read compound member types (C-level
+access or another package), then drop the `float32_obs` exemption in
+`test-io-real-world.R`.
+
+The cellxgene PBMC 3k file (the real-world test download) is in a legacy
+format that
+[`read_h5ad()`](https://lazappi.github.io/R-anndata-claude/reference/h5ad.md)
+rejects (`anndata_legacy_format_error`, unencoded root Element), so the
+test reads a Python rewrite of it, reading the original needs the
+`legacy-formats` sub-project
+
+Coverage was understated because the registry held uninstrumented
+function copies under covr, fixed with `late_bound()`, now 96.42%
+
+Python writes a missing `raw` as a `null` Element in zarr (not in h5ad),
+and zarr keeps rec-array field dtypes (see zarr-io/03 comments).
+zarr-io/05 must write the `null` raw, and the human should decide on
+rec-array dtype fidelity in zarr (ADR 0005, zarr-io/07)
+
+Delete the stale unpacked `tests/testthat/fixtures/zarr/` (ignored by
+git and the build, but unused), the shell denied `rm`
+
+Writing a large int64 (or complex) array to zarr through the split-parts
+writer hangs: a 2^19 x 3 int64 matrix never finished in
+`zarr_write_read()` (zarr-io/05 shrank the test with the
+`anndata.zarr_chunk_limit` option instead of finding the cause). Find
+and fix the slow path, then add a test that writes a 2^19 x 3 int64
+matrix in seconds. Cause was the read, not the write: Rarr warns once
+per out-of-range value and the muffling handler made it take minutes.
+`zarr_numeric_read()` now reads int64, uint64 and uint32 from 16-bit
+parts always.
+
+zarr-io/11 must emit Python’s `DeprecationWarning` when
+`zarr_write_format = 2` is used for writing (`zarr.py:244-256`)
+
+(moved to zarr-io/14) zarr rec-arrays are written unsharded, and
+`shards = "auto"` is rejected (Python accepts it). Python shards
+rec-arrays by default, so a human may want parity
+
+(moved to zarr-io/15) zarr rec-arrays ignore `compressors` (Python
+honours it) because the struct reader only decodes zstd, and the writer
+always uses one chunk (zarr-io/14)
+
+`adata$write()` is missing: Python’s `write` is a shortcut for
+`write_h5ad` (`anndata.py:1744`). Add it as an alias and pass its row of
+the Views operations table.
+
+Deadlock for the human: backed/04’s last sub-item (h5sparse legacy
+attributes) belongs to the stub `legacy-formats` sub-project, so
+backed/04 cannot become `done` and blocks backed/05, 06 and 07 (all
+`Blocked by: 04`). Either move that sub-item out of backed/04 (for
+example into a legacy-formats ticket) and let 04 finish, or remove 04
+from the `Blocked by:` lines of 05 and 06. The run on 2026-10-17 skipped
+to lazy/01 for this reason.
+
+`resolve_lazy_chunks()` (`R/lazy-dense.R`) forces chunks of at least 1,
+so a dense array with a zero-length axis has `chunkdim()` larger than
+[`dim()`](https://rdrr.io/r/base/dim.html), which DelayedArray rejects.
+Use 0 as `StoreSparseSeed` does (Python’s layout is `(0,)`) and add a
+test with an empty dense array.
+
+Fixed: `h5_attr_write()` writes logicals with `bool_type()`, the full
+suite passes. Regression from upgrading rhdf5 to 2.57.20 (with R 4.6.1):
+the categorical `ordered` attribute is now written (or read back) as
+`uint8` instead of h5py’s bool enum, so `test-io-dataframe.R:138` fails
+Structural equivalence
+(`/x/c: attribute ordered type differs ("uint8" vs "bool")`). The writer
+builds the enum in `R/io-values.R:78-82`, so check what rhdf5 2.57.20
+does with enum attributes
+([`attr_write()`](https://lazappi.github.io/R-anndata-claude/reference/io-store.md)
+in the store layer), fix it so Python sees a bool, and look for other
+bool attributes and datasets hit the same way.
+`scripts/check.sh --tests` stopped at the failure limit, so other
+regressions may hide behind it: rerun the whole suite with
+`testthat::set_max_fails(Inf)` once this is fixed.
+
+legacy-formats/03 leftover: after tickets 04 and 05, read the whole
+0.6.22 and 0.7.8 fixtures (h5ad and zarr) to the `legacy_cases.json`
+values and warnings, then set ticket 03 to `done` and bump the version
+
+wontfix (human, 2026-10-23: keep the error, Python silently drops the
+imaginary part):
+[`read_mtx()`](https://lazappi.github.io/R-anndata-claude/reference/read_mtx.md)
+rejects the `complex` field (scipy reads complex128 then
+`.astype(dtype)` discards the imaginary part with a `ComplexWarning`).
+Ask python-oracle and add support if wanted.
+
+(done in hardening/08, now 86 s, ratio 8.6)
+[`read_zarr()`](https://lazappi.github.io/R-anndata-claude/reference/zarr.md)
+of the 4 GB cellxgene store takes 168 s against Python’s 11 s (ratio 15,
+user 90 s and system 63 s), so hardening/08 must cover it (the human may
+want to name it in that ticket)
+
+## Blocked
+
+## Follow-up
+
+Tickets that need triage before they can be queued.
