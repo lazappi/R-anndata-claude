@@ -2,7 +2,11 @@ Package: anndata.claude
 Title: Annotated Data Matrices and Their On-Disk Formats
 Version: 0.0.6.9000
 Authors@R:
-    person("Luke", "Zappia", , "luke.zappia@gmail.com", role = c("aut", "cre"))
+    c(
+      person("Luke", "Zappia", , "luke.zappia@gmail.com", role = c("aut", "cre")),
+      person("Claude", , , "noreply@anthropic.com", role = "ctb",
+             comment = "Anthropic AI models (Opus and Sonnet)")
+    )
 Description: An R port of Python 'anndata' (reference release 0.13.4) for
     annotated data matrices. The first priority is compatibility with the
     anndata on-disk formats, so that objects read from a file are equal

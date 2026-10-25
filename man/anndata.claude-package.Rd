@@ -25,5 +25,10 @@ Authors:
   \item Luke Zappia \email{luke.zappia@gmail.com}
 }
 
+Other contributors:
+\itemize{
+  \item Claude \email{noreply@anthropic.com} (Anthropic AI models (Opus and Sonnet)) [contributor]
+}
+
 }
 \keyword{internal}
