@@ -18,11 +18,11 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Luke Zappia \email{luke.zappia@gmail.com}
+\strong{Maintainer}: Luke Zappia \email{luke@lazappi.id.au} (\href{https://orcid.org/0000-0001-7744-8565}{ORCID}) (github: lazappi)
 
 Authors:
 \itemize{
-  \item Luke Zappia \email{luke.zappia@gmail.com}
+  \item Luke Zappia \email{luke@lazappi.id.au} (\href{https://orcid.org/0000-0001-7744-8565}{ORCID}) (github: lazappi)
 }
 
 Other contributors:

@@ -1,6 +1,20 @@
-# anndata.claude (development version)
+# anndata.claude 0.1.0
+
+First public release, on GitHub, covering every sub-project of the roadmap except the experimental Python features.
 
 * A sparse matrix with out-of-range `indices` (such as the 1-based indices Illumina DRAGEN 4.5.4 writes) raises an error saying so, with a hint when they look 1-based, and is listed in `vignette("deviations")` (Python reads it into an invalid matrix).
+* The package is on GitHub (<https://github.com/lazappi/R-anndata-claude>) with GitHub Actions for `R CMD check` on Ubuntu and macOS (with the Python comparison tests), lint, coverage and the pkgdown site at <https://lazappi.github.io/R-anndata-claude/>.
+* The README describes the features, installation (including OpenSSL on macOS for Rhdf5lib) and the directory structure.
+
+## Known limitations
+
+* Reading is slower than Python on large files (about 5x for `read_h5ad()` and 8x for `read_zarr()`).
+* Loom is not supported (deprecated in Python), and complex Matrix Market files raise an error (Python silently drops the imaginary part).
+* Files from anndata before 0.6 and 0.6.x zarr stores are not supported.
+* Writing zarr v2 and zip stores (`.zarr.zip`) are not supported.
+* The experimental Python features (`AnnCollection`, `concat_on_disk`, awkward arrays and accessors) are not supported.
+* Unsorted sparse indices are sorted on read (ADR 0006).
+* A lazily read int32 array holding -2^31 cannot be realised lazily, read it with `read_h5ad()` or `read_zarr()` instead.
 
 # anndata.claude 0.0.6
 
