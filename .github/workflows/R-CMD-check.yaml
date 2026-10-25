@@ -49,6 +49,12 @@ jobs:
           extra-packages: any::rcmdcheck
           needs: check
 
+      # The Rhdf5lib macOS binary links libssl and libcrypto, which the runner
+      # lacks, so install CRAN's OpenSSL build into /opt/R
+      - name: Install OpenSSL for Rhdf5lib
+        if: runner.os == 'macOS'
+        run: sudo Rscript -e 'source("https://mac.R-project.org/bin/install.R"); install.libs("openssl")'
+
       - uses: astral-sh/setup-uv@v6
         with:
           # h5py has no macOS wheels for newer Pythons, so match the local version
