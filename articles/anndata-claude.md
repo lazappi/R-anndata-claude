@@ -127,7 +127,7 @@ backed <- read_h5ad(path, backed = "r")
 backed$isbacked
 #> [1] TRUE
 backed$filename
-#> [1] "/tmp/Rtmpyik04p/file1d652cb8ab00.h5ad"
+#> [1] "/tmp/Rtmpt1fbxk/file1e8dbeaee61.h5ad"
 backed$X[1:2, c(1, 3)]
 #>      [,1] [,2]
 #> [1,]    1    7
