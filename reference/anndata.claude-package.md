@@ -22,3 +22,8 @@ Useful links:
 Authors:
 
 - Luke Zappia <luke.zappia@gmail.com>
+
+Other contributors:
+
+- Claude <noreply@anthropic.com> (Anthropic AI models (Opus and Sonnet))
+  \[contributor\]

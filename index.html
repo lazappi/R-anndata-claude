@@ -51,13 +51,206 @@
   <main id="main" class="col-md-9"><div class="section level1">
 <div class="page-header"><h1 id="anndataclaude">anndata.claude<a class="anchor" aria-label="anchor" href="#anndataclaude"></a>
 </h1></div>
+<!-- badges: start -->
+
 <p><code>anndata.claude</code> is an R port of Python <a href="https://anndata.readthedocs.io" class="external-link">anndata</a> for annotated data matrices.</p>
-<p>Its first priority is full compatibility with the anndata on-disk formats (h5ad, and zarr later). An object read from a file is equal whichever language wrote it, and files written by R are structurally equivalent to files written by Python. The in-memory <code>AnnData</code> object supports that goal, with full feature parity as the long-term aim.</p>
+<p>Its first priority is full compatibility with the anndata on-disk formats. An object read from an h5ad file or zarr store is equal whichever language wrote it, and files written by R are structurally equivalent to files written by Python. The in-memory <code>AnnData</code> object supports that goal and aims for feature parity with Python.</p>
+<p>The package was written by Claude (Anthropic’s AI models) in an autonomous development loop, supervised by a human maintainer (see <a href="#development">Development</a>).</p>
 <div class="section level2">
 <h2 id="relationship-to-python-anndata">Relationship to Python anndata<a class="anchor" aria-label="anchor" href="#relationship-to-python-anndata"></a>
 </h2>
-<p>Python anndata release 0.13.4 is the only reference for behaviour. This package matches its observable behaviour (values, errors, warnings and files written) but is idiomatic R rather than a line-by-line translation.</p>
-<p>The package is developed with an autonomous loop and is at an early stage. Nothing is exported yet.</p>
+<p>Python anndata release 0.13.4 is the only reference for behaviour. This package matches its observable behaviour (values, errors, warnings and files written) but is idiomatic R rather than a line-by-line translation. Indexing is 1-based with negative exclusion, and <code>AnnData</code> objects have reference semantics (R6) like their Python counterparts.</p>
+<p>Every known difference is listed with its reason in <code><a href="articles/deviations.html">vignette("deviations")</a></code>.</p>
+</div>
+<div class="section level2">
+<h2 id="features">Features<a class="anchor" aria-label="anchor" href="#features"></a>
+</h2>
+<ul>
+<li>The <code>AnnData</code> object with <code>X</code>, <code>obs</code>, <code>var</code>, <code>obsm</code>, <code>varm</code>, <code>obsp</code>, <code>varp</code>, <code>layers</code>, <code>uns</code> and <code>raw</code>, with <code>obs</code> and <code>var</code> as <code><a href="https://rdrr.io/pkg/S4Vectors/man/DataFrame-class.html" class="external-link">S4Vectors::DataFrame</a></code>s</li>
+<li>Views with copy-on-write when subsetting</li>
+<li>
+<code><a href="reference/h5ad.html">read_h5ad()</a></code> and <code><a href="reference/h5ad.html">write_h5ad()</a></code> for every current anndata encoding except awkward arrays, with compression</li>
+<li>
+<code><a href="reference/zarr.html">read_zarr()</a></code> for zarr v2 and v3 and <code><a href="reference/zarr.html">write_zarr()</a></code> for zarr v3 (including sharding)</li>
+<li>Backed mode for h5ad (<code>read_h5ad(backed = "r")</code>) and <code><a href="reference/sparse_dataset.html">sparse_dataset()</a></code>
+</li>
+<li>Lazy reading with <code>DelayedArray</code> (<code><a href="reference/read_lazy.html">read_lazy()</a></code> and <code><a href="reference/read_elem_lazy.html">read_elem_lazy()</a></code>)</li>
+<li>
+<code><a href="reference/concat.html">concat()</a></code> with Python’s join, merge and label options</li>
+<li>Files from older anndata releases (0.6 onwards)</li>
+<li>
+<code><a href="reference/read_text.html">read_csv()</a></code>, <code><a href="reference/read_text.html">read_text()</a></code>, <code><a href="reference/read_mtx.html">read_mtx()</a></code>, <code><a href="reference/read_umi_tools.html">read_umi_tools()</a></code>, <code><a href="reference/read_hdf.html">read_hdf()</a></code>, <code><a href="reference/read_excel.html">read_excel()</a></code> and <code><a href="reference/write_csvs.html">write_csvs()</a></code>
+</li>
+<li>Python’s settings (<code><a href="reference/anndata_settings.html">anndata_settings()</a></code>) and its warnings and errors as classed R conditions</li>
+</ul>
+<p>Not supported: loom (deprecated in Python), writing zarr v2, zip stores and the experimental Python features (<code>AnnCollection</code>, <code>concat_on_disk</code>, awkward arrays). Reading is slower than Python on large files. See the known limitations in <code>NEWS.md</code> for details.</p>
+</div>
+<div class="section level2">
+<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+</h2>
+<p>Install the development version from GitHub with <a href="https://pak.r-lib.org" class="external-link">pak</a>, which also installs the Bioconductor dependencies and the development version of <a href="https://github.com/Huber-group-EMBL/Rarr" class="external-link">Rarr</a>:</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># install.packages("pak")</span></span>
+<span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"lazappi/R-anndata-claude"</span><span class="op">)</span></span></code></pre></div>
+<p>The package has compiled code that links to the HDF5 library from Rhdf5lib. On macOS that library needs OpenSSL, which can be installed with <code>source("https://mac.R-project.org/bin/install.R"); install.libs("openssl")</code> (run as an administrator) or Homebrew.</p>
+</div>
+<div class="section level2">
+<h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
+</h2>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/lazappi/R-anndata-claude" class="external-link">anndata.claude</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">X</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">12</span><span class="op">)</span>, nrow <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span>
+<span><span class="va">obs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>cell_type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"T"</span>, <span class="st">"B"</span>, <span class="st">"T"</span><span class="op">)</span>, row.names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"cell"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">var</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>row.names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"gene"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">adata</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/AnnData.html">AnnData</a></span><span class="op">(</span><span class="va">X</span>, obs <span class="op">=</span> <span class="va">obs</span>, var <span class="op">=</span> <span class="va">var</span><span class="op">)</span></span>
+<span><span class="va">adata</span><span class="op">$</span><span class="va">layers</span><span class="op">[[</span><span class="st">"counts"</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">X</span> <span class="op">*</span> <span class="fl">2</span></span>
+<span></span>
+<span><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".h5ad"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/h5ad.html">write_h5ad</a></span><span class="op">(</span><span class="va">adata</span>, <span class="va">path</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/h5ad.html">read_h5ad</a></span><span class="op">(</span><span class="va">path</span><span class="op">)</span></span></code></pre></div>
+<p>Start with <code><a href="articles/anndata-claude.html">vignette("anndata-claude")</a></code>, or browse the documentation at <a href="https://lazappi.github.io/R-anndata-claude/" class="uri">https://lazappi.github.io/R-anndata-claude/</a>.</p>
+</div>
+<div class="section level2">
+<h2 id="directory-structure">Directory structure<a class="anchor" aria-label="anchor" href="#directory-structure"></a>
+</h2>
+<div class="section level3">
+<h3 id="the-package">The package<a class="anchor" aria-label="anchor" href="#the-package"></a>
+</h3>
+<table class="table">
+<colgroup>
+<col width="50%">
+<col width="50%">
+</colgroup>
+<thead><tr>
+<th>Path</th>
+<th>Contents</th>
+</tr></thead>
+<tbody>
+<tr>
+<td><code>R/</code></td>
+<td>Package code, grouped by file prefix (<code>anndata*</code>, <code>io-*</code>, <code>backed*</code>, <code>lazy-*</code>, <code>concat*</code> and so on)</td>
+</tr>
+<tr>
+<td><code>src/</code></td>
+<td>A small C helper for HDF5 compound types, linked to Rhdf5lib (ADR 0008)</td>
+</tr>
+<tr>
+<td><code>man/</code></td>
+<td>Help pages generated by roxygen2</td>
+</tr>
+<tr>
+<td><code>vignettes/</code></td>
+<td>The getting started guide and the list of deviations from Python</td>
+</tr>
+<tr>
+<td><code>tests/testthat/</code></td>
+<td>testthat tests and their helpers</td>
+</tr>
+<tr>
+<td><code>tests/testthat/fixtures/</code></td>
+<td>Files written by Python anndata and JSON tables of Python’s expected behaviour</td>
+</tr>
+<tr>
+<td><code>tests/python/</code></td>
+<td>The uv project pinning Python anndata 0.13.4, with scripts that generate fixtures and compare files</td>
+</tr>
+<tr>
+<td>
+<code>DESCRIPTION</code>, <code>NAMESPACE</code>, <code>NEWS.md</code>, <code>LICENSE</code>
+</td>
+<td>Standard package files</td>
+</tr>
+<tr>
+<td><code>_pkgdown.yml</code></td>
+<td>pkgdown site configuration (built into the git-ignored <code>pkgdown-site/</code>)</td>
+</tr>
+<tr>
+<td><code>.github/workflows/</code></td>
+<td>GitHub Actions for <code>R CMD check</code>, lint, coverage and the pkgdown site</td>
+</tr>
+<tr>
+<td>
+<code>air.toml</code>, <code>.lintr</code>
+</td>
+<td>Formatter and linter settings</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section level3">
+<h3 id="development">Development<a class="anchor" aria-label="anchor" href="#development"></a>
+</h3>
+<p>These files are excluded from the built package.</p>
+<table class="table">
+<colgroup>
+<col width="50%">
+<col width="50%">
+</colgroup>
+<thead><tr>
+<th>Path</th>
+<th>Contents</th>
+</tr></thead>
+<tbody>
+<tr>
+<td><code>CONTEXT.md</code></td>
+<td>Domain glossary (Slot, Element, Encoding type, On-disk dtype and so on)</td>
+</tr>
+<tr>
+<td><code>docs/adr/</code></td>
+<td>Architecture decision records</td>
+</tr>
+<tr>
+<td><code>docs/agents/</code></td>
+<td>Conventions for the issue tracker, triage labels and domain docs</td>
+</tr>
+<tr>
+<td><code>.scratch/</code></td>
+<td>Specs and tickets, one directory per sub-project, starting from <code>.scratch/roadmap/spec.md</code>
+</td>
+</tr>
+<tr>
+<td><code>fix_plan.md</code></td>
+<td>The queue of tickets for the development loop</td>
+</tr>
+<tr>
+<td><code>PROMPT.md</code></td>
+<td>The prompt given to each run of the development loop</td>
+</tr>
+<tr>
+<td><code>CLAUDE.md</code></td>
+<td>Instructions and accumulated build, test and tooling learnings for agents</td>
+</tr>
+<tr>
+<td>
+<code>ralph/</code>, <code>.claude/</code>
+</td>
+<td>Claude Code settings for loop runs and interactive sessions, and the project subagents</td>
+</tr>
+<tr>
+<td><code>scripts/</code></td>
+<td>The full check (<code>check.sh</code>), the loop (<code>ralph.sh</code>), fixture regeneration, benchmarks and fetching the Python reference</td>
+</tr>
+<tr>
+<td><code>.reference/</code></td>
+<td>Git-ignored clone of Python anndata 0.13.4 (from <code>scripts/fetch-reference.sh</code>)</td>
+</tr>
+<tr>
+<td><code>.ralph/</code></td>
+<td>Git-ignored loop logs, scratch experiments and downloaded test files</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section level2">
+<h2 id="development-1">Development<a class="anchor" aria-label="anchor" href="#development-1"></a>
+</h2>
+<p>Development runs as a “Ralph loop”: <code>scripts/ralph.sh</code> starts a fresh Claude Code run for each ticket in <code>fix_plan.md</code>, which works test-first, checks its result against Python and commits. The human maintainer writes the specs with Claude, approves tickets and decides releases.</p>
+<p>The full check, which must pass before every commit, is:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="ex">scripts/check.sh</span> <span class="at">--package</span>  <span class="co"># format, lint, document and R CMD check without tests</span></span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="ex">scripts/check.sh</span> <span class="at">--tests</span>    <span class="co"># every test</span></span></code></pre></div>
+<p>Tests that compare with Python need <a href="https://docs.astral.sh/uv/" class="external-link">uv</a>, and are skipped without it or when <code>ANNDATA_SKIP_PYTHON</code> is set.</p>
 </div>
 <div class="section level2">
 <h2 id="acknowledgements">Acknowledgements<a class="anchor" aria-label="anchor" href="#acknowledgements"></a>
@@ -98,10 +291,17 @@
 <h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
 <li>Luke Zappia <br><small class="roles"> Author, maintainer </small>   </li>
+<li><a href="authors.html">More about authors...</a></li>
 </ul>
 </div>
 
-
+<div class="dev-status">
+<h2 data-toc-skip>Dev status</h2>
+<ul class="list-unstyled">
+<li><a href="https://github.com/lazappi/R-anndata-claude/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/lazappi/R-anndata-claude/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a></li>
+<li><a href="https://github.com/lazappi/R-anndata-claude/actions/workflows/lint.yaml" class="external-link"><img src="https://github.com/lazappi/R-anndata-claude/actions/workflows/lint.yaml/badge.svg" alt="lint"></a></li>
+</ul>
+</div>
 
   </aside>
 </div>

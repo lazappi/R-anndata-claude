@@ -4,6 +4,9 @@
 
 - **Luke Zappia**. Author, maintainer.
 
+- **Claude**. Contributor.  
+  Anthropic AI models (Opus and Sonnet)
+
 ## Citation
 
 Source:
