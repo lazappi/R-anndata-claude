@@ -10,6 +10,8 @@ STOP
 *.tar.gz
 !tests/testthat/fixtures/zarr-fixtures.tar.gz
 !tests/testthat/fixtures/legacy-zarr-fixtures.tar.gz
+# Compressed text fixtures, which a global *.gz rule would otherwise hide
+!tests/testthat/fixtures/other_formats/*.gz
 .venv/
 # Local pkgdown site
 pkgdown-site/
