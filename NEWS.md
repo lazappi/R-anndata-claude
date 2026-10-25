@@ -1,3 +1,5 @@
+# anndata.claude (development version)
+
 # anndata.claude 0.1.0
 
 First public release, on GitHub, covering every sub-project of the roadmap except the experimental Python features.
