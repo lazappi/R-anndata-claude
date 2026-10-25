@@ -5,9 +5,15 @@
 [![lint](https://github.com/lazappi/R-anndata-claude/actions/workflows/lint.yaml/badge.svg)](https://github.com/lazappi/R-anndata-claude/actions/workflows/lint.yaml)
 <!-- badges: end -->
 
-`anndata.claude` is an R port of Python [anndata](https://anndata.readthedocs.io) for annotated data matrices.
+> [!NOTE]
+> This package was created as an experiment in using Claude Code to autonomously port a package from Python to R.
+> It is **NOT** intended to be used in practice, you should use [**{anndataR}**](https://anndatar.scverse.org/) instead.
+>
+> See https://lazappi.id.au/posts/2026-10-25-anndata-r-claude/ for a blog post describing how this package was created.
 
-Its first priority is full compatibility with the anndata on-disk formats.
+**{anndata.claude}** is an R port of Python [**anndata**](https://anndata.readthedocs.io) for annotated data matrices.
+
+Its first priority is full compatibility with the **anndata** on-disk formats.
 An object read from an h5ad file or zarr store is equal whichever language wrote it, and files written by R are structurally equivalent to files written by Python.
 The in-memory `AnnData` object supports that goal and aims for feature parity with Python.
 
@@ -120,7 +126,7 @@ Tests that compare with Python need [uv](https://docs.astral.sh/uv/), and are sk
 
 ## Acknowledgements
 
-Thanks to the authors of Python anndata, whose design and file formats this package follows.
+Thanks to the authors of Python **anndata**, whose design and file formats this package follows.
 
 ## License
 
