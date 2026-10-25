@@ -53,8 +53,12 @@
 </h1></div>
 <!-- badges: start -->
 
-<p><code>anndata.claude</code> is an R port of Python <a href="https://anndata.readthedocs.io" class="external-link">anndata</a> for annotated data matrices.</p>
-<p>Its first priority is full compatibility with the anndata on-disk formats. An object read from an h5ad file or zarr store is equal whichever language wrote it, and files written by R are structurally equivalent to files written by Python. The in-memory <code>AnnData</code> object supports that goal and aims for feature parity with Python.</p>
+<blockquote>
+<p>[!NOTE] This package was created as an experiment in using Claude Code to autonomously port a package from Python to R. It is <strong>NOT</strong> intended to be used in practice, you should use <a href="https://anndatar.scverse.org/" class="external-link"><strong>{anndataR}</strong></a> instead.</p>
+<p>See <a href="https://lazappi.id.au/posts/2026-10-25-anndata-r-claude/" class="external-link uri">https://lazappi.id.au/posts/2026-10-25-anndata-r-claude/</a> for a blog post describing how this package was created.</p>
+</blockquote>
+<p><strong>{anndata.claude}</strong> is an R port of Python <a href="https://anndata.readthedocs.io" class="external-link"><strong>anndata</strong></a> for annotated data matrices.</p>
+<p>Its first priority is full compatibility with the <strong>anndata</strong> on-disk formats. An object read from an h5ad file or zarr store is equal whichever language wrote it, and files written by R are structurally equivalent to files written by Python. The in-memory <code>AnnData</code> object supports that goal and aims for feature parity with Python.</p>
 <p>The package was written by Claude (Anthropic’s AI models) in an autonomous development loop, supervised by a human maintainer (see <a href="#development">Development</a>).</p>
 <div class="section level2">
 <h2 id="relationship-to-python-anndata">Relationship to Python anndata<a class="anchor" aria-label="anchor" href="#relationship-to-python-anndata"></a>
@@ -255,7 +259,7 @@
 <div class="section level2">
 <h2 id="acknowledgements">Acknowledgements<a class="anchor" aria-label="anchor" href="#acknowledgements"></a>
 </h2>
-<p>Thanks to the authors of Python anndata, whose design and file formats this package follows.</p>
+<p>Thanks to the authors of Python <strong>anndata</strong>, whose design and file formats this package follows.</p>
 </div>
 <div class="section level2">
 <h2 id="license">License<a class="anchor" aria-label="anchor" href="#license"></a>
@@ -290,7 +294,7 @@
 <div class="developers">
 <h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
-<li>Luke Zappia <br><small class="roles"> Author, maintainer </small>   </li>
+<li>Luke Zappia <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0001-7744-8565" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
 <li><a href="authors.html">More about authors...</a></li>
 </ul>
 </div>

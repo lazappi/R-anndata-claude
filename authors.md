@@ -3,6 +3,8 @@
 ## Authors
 
 - **Luke Zappia**. Author, maintainer.
+  [](https://orcid.org/0000-0001-7744-8565)  
+  lazappi
 
 - **Claude**. Contributor.  
   Anthropic AI models (Opus and Sonnet)
